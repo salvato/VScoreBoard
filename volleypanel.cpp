@@ -1,0 +1,259 @@
+#include <QtGlobal>
+#include <QtWidgets>
+#include <QProcess>
+#include <QVBoxLayout>
+#include <QMessageBox>
+#include <QTime>
+
+#include "volleypanel.h"
+#include "timeoutwindow.h"
+#include "utility.h"
+
+VolleyPanel::VolleyPanel(QFile *myLogFile, QWidget *parent)
+    : ScorePanel(myLogFile, parent)
+    , iServizio(0)
+    , maxTeamNameLen(15)
+    , pTimeoutWindow(Q_NULLPTR)
+{
+    sFontName = QString("Liberation Sans Bold");
+    fontWeight = QFont::Black;
+
+    QSize panelSize = QGuiApplication::primaryScreen()->geometry().size();
+    iTeamFontSize    = std::min(panelSize.height()/8,
+                                int(panelSize.width()/(2.2*maxTeamNameLen)));
+    iScoreFontSize   = std::min(panelSize.height()/4,
+                                int(panelSize.width()/9));
+    iLabelsFontSize  = panelSize.height()/8; // 2 Righe
+    iTimeoutFontSize = panelSize.height()/8; // 2 Righe
+    iSetFontSize     = panelSize.height()/8; // 2 Righe
+
+    // QWidget propagates explicit palette roles from parent to child.
+    // If you assign a brush or color to a specific role on a palette and
+    // assign that palette to a widget, that role will propagate to all
+    // the widget's children, overriding any system defaults for that role.
+    panelPalette = QWidget::palette();
+    panelGradient = QLinearGradient(0.0, 0.0, 0.0, height());
+    panelGradient.setColorAt(0, QColor(0, 0, START_GRADIENT));
+    panelGradient.setColorAt(1, QColor(0, 0, END_GRADIENT));
+    panelBrush = QBrush(panelGradient);
+    panelPalette.setBrush(QPalette::Active,   QPalette::Window, panelBrush);
+    panelPalette.setBrush(QPalette::Inactive, QPalette::Window, panelBrush);
+    panelPalette.setColor(QPalette::WindowText,    Qt::yellow);
+    panelPalette.setColor(QPalette::Base,          Qt::black);
+    panelPalette.setColor(QPalette::AlternateBase, Qt::blue);
+    panelPalette.setColor(QPalette::Text,          Qt::yellow);
+    panelPalette.setColor(QPalette::BrightText,    Qt::white);
+    setPalette(panelPalette);
+
+
+    pTimeoutWindow = new TimeoutWindow(Q_NULLPTR);
+    connect(pTimeoutWindow, SIGNAL(doneTimeout()),
+            this, SLOT(onTimeoutDone()));
+
+    createPanelElements();
+    buildLayout();
+}
+
+
+VolleyPanel::~VolleyPanel() {
+    if(pTimeoutWindow) delete pTimeoutWindow;
+    pTimeoutWindow = nullptr;
+}
+
+
+void
+VolleyPanel::setTeam(int iTeam, QString sTeamName) {
+    team[iTeam]->setText(sTeamName.left(maxTeamNameLen));
+}
+
+
+void
+VolleyPanel::setScore(int iTeam, int iScore) {
+    score[iTeam]->setText(QString("%1").arg(iScore));
+}
+
+
+void
+VolleyPanel::setSets(int iTeam, int iSets) {
+    set[iTeam]->setText(QString("%1").arg(iSets));
+}
+
+
+void
+VolleyPanel::setServizio(int iServizio) {
+    servizio[0]->setText(" ");
+    servizio[1]->setText(" ");
+    if(iServizio == 0) {
+        servizio[0]->setPixmap(*pPixmapService);
+    } else if(iServizio == 1) {
+        servizio[1]->setPixmap(*pPixmapService);
+    }
+}
+
+
+void
+VolleyPanel::setTimeout(int iTeam, int iTimeout) {
+    timeout[iTeam]->setText(QString("%1").arg(iTimeout));
+}
+
+
+void
+VolleyPanel::startTimeout(int iTimeoutDuration) {
+    pTimeoutWindow->startTimeout(iTimeoutDuration*1000);
+    pTimeoutWindow->showFullScreen();
+}
+
+
+void
+VolleyPanel::stopTimeout() {
+    pTimeoutWindow->stopTimeout();
+    pTimeoutWindow->hide();
+}
+
+
+void
+VolleyPanel::setMirrored(bool isPanelMirrored) {
+    isMirrored = isPanelMirrored;
+    buildLayout();
+}
+
+
+bool
+VolleyPanel::getMirrored() {
+    return isMirrored;
+}
+
+
+void
+VolleyPanel::closeEvent(QCloseEvent *event) {
+    if(pTimeoutWindow) delete pTimeoutWindow;
+    pTimeoutWindow = nullptr;
+    ScorePanel::closeEvent(event);
+    event->accept();
+}
+
+
+void
+VolleyPanel::onTimeoutDone() {
+    showFullScreen();
+    pTimeoutWindow->hide();
+}
+
+
+void
+VolleyPanel::createPanelElements() {
+    // QWidget propagates explicit palette roles from parent to child.
+    // If you assign a brush or color to a specific role on a palette and
+    // assign that palette to a widget, that role will propagate to all
+    // the widget's children, overriding any system defaults for that role.
+
+    // Timeout
+    timeoutLabel = new QLabel("Timeout");
+    timeoutLabel->setFont(QFont(sFontName, iLabelsFontSize/2, fontWeight));
+    timeoutLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    for(int i=0; i<2; i++) {
+        timeout[i] = new QLabel("8");
+        timeout[i]->setFrameStyle(QFrame::NoFrame);
+        timeout[i]->setFont(QFont(sFontName, iTimeoutFontSize, fontWeight));
+    }
+
+    // Set
+    setLabel = new QLabel(tr("Set"));
+    setLabel->setFont(QFont(sFontName, iLabelsFontSize/2, fontWeight));
+    setLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    for(int i=0; i<2; i++) {
+        set[i] = new QLabel("8");
+        set[i]->setFrameStyle(QFrame::NoFrame);
+        set[i]->setFont(QFont(sFontName, iSetFontSize, fontWeight));
+    }
+
+    // Score
+    scoreLabel = new QLabel(tr(""));
+    scoreLabel->setFont(QFont(sFontName, iLabelsFontSize, fontWeight));
+    scoreLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    for(int i=0; i<2; i++){
+        score[i] = new QLabel("88");
+        score[i]->setAlignment(Qt::AlignHCenter);
+        score[i]->setFont(QFont(sFontName, iScoreFontSize, fontWeight));
+        score[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    }
+
+    // Servizio
+    for(int i=0; i<2; i++){
+        servizio[i] = new QLabel(" ");
+        servizio[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    }
+
+    // Teams
+    QPalette pal = panelPalette;
+    pal.setColor(QPalette::WindowText, Qt::white);
+    for(int i=0; i<2; i++) {
+        team[i] = new QLabel();
+        team[i]->setPalette(pal);
+        team[i]->setFont(QFont(sFontName, iTeamFontSize, fontWeight));
+        team[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    }
+    team[0]->setText(tr("Locali"));
+    team[1]->setText(tr("Ospiti"));
+}
+
+
+QGridLayout*
+VolleyPanel::createPanel() {
+    QGridLayout *layout = new QGridLayout();
+
+    int ileft  = 0;
+    int iright = 1;
+    if(isMirrored) {
+        ileft  = 1;
+        iright = 0;
+    }
+    QPixmap* pixmapLeftTop = new QPixmap(":/Logo_UniMe.png");
+    QLabel* leftTopLabel = new QLabel();
+    leftTopLabel->setPixmap(*pixmapLeftTop);
+
+    QPixmap* pixmapRightTop = new QPixmap(":/Logo_SSD_UniMe.png");
+    QLabel* rightTopLabel = new QLabel();
+    rightTopLabel->setPixmap(*pixmapRightTop);
+
+    pPixmapService = new QPixmap(":/ball2.png");
+    *pPixmapService = pPixmapService->scaled(2*iLabelsFontSize/3, 2*iLabelsFontSize/3);
+
+    layout->addWidget(team[ileft],      0, 0, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(team[iright],     0, 6, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+
+    layout->addWidget(score[ileft],     2, 1, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(servizio[ileft],  2, 4, 4, 1, Qt::AlignLeft   |Qt::AlignTop);
+    layout->addWidget(scoreLabel,       2, 5, 4, 2, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(servizio[iright], 2, 7, 4, 1, Qt::AlignRight  |Qt::AlignTop);
+    layout->addWidget(score[iright],    2, 8, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
+
+    layout->addWidget(set[ileft],       6, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(setLabel,         6, 3, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(set[iright],      6, 9, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+
+    layout->addWidget(leftTopLabel,     8, 0, 2, 2, Qt::AlignLeft   |Qt::AlignBottom);
+    layout->addWidget(timeout[ileft],   8, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(timeoutLabel,     8, 3, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(timeout[iright],  8, 9, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(rightTopLabel,    8,10, 2, 2, Qt::AlignRight  |Qt::AlignBottom);
+
+    return layout;
+}
+
+
+void
+VolleyPanel::changeEvent(QEvent *event) {
+    if (event->type() == QEvent::LanguageChange) {
+#ifdef LOG_VERBOSE
+        logMessage(pLogFile,
+                   Q_FUNC_INFO,
+                   QString("%1  %2")
+                   .arg(setLabel->text(), scoreLabel->text()));
+#endif
+        setLabel->setText(tr("Set"));
+        scoreLabel->setText(tr("Punti"));
+    } else
+        QWidget::changeEvent(event);
+}
+

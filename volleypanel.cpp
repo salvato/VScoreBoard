@@ -11,10 +11,15 @@
 
 VolleyPanel::VolleyPanel(QFile *myLogFile, QWidget *parent)
     : ScorePanel(myLogFile, parent)
+    , sLeftLogo(QString(":/Logo_UniMe.png"))
+    , sRightLogo(QString(":/Logo_SSD_UniMe.png"))
     , iServizio(0)
     , maxTeamNameLen(15)
     , pTimeoutWindow(Q_NULLPTR)
 {
+    pPixmapLeftTop  = new QPixmap(sLeftLogo);
+    pPixmapRightTop = new QPixmap(sRightLogo);
+
     sFontName = QString("Liberation Sans Bold");
     fontWeight = QFont::Black;
 
@@ -198,6 +203,28 @@ VolleyPanel::createPanelElements() {
 }
 
 
+void
+VolleyPanel::setLeftLogo(QString sFileLogo) {
+    if(QFile::exists(sFileLogo)) {
+        sLeftLogo = sFileLogo;
+        if(pPixmapLeftTop) delete pPixmapLeftTop;
+        pPixmapLeftTop = new QPixmap(sLeftLogo);
+        buildLayout();
+    }
+}
+
+
+void
+VolleyPanel::setRightLogo(QString sFileLogo) {
+    if(QFile::exists(sFileLogo)) {
+        sRightLogo = sFileLogo;
+        if(pPixmapRightTop) delete pPixmapRightTop;
+        pPixmapRightTop = new QPixmap(sRightLogo);
+        buildLayout();
+    }
+}
+
+
 QGridLayout*
 VolleyPanel::createPanel() {
     QGridLayout *layout = new QGridLayout();
@@ -208,13 +235,11 @@ VolleyPanel::createPanel() {
         ileft  = 1;
         iright = 0;
     }
-    QPixmap* pixmapLeftTop = new QPixmap(":/Logo_UniMe.png");
     QLabel* leftTopLabel = new QLabel();
-    leftTopLabel->setPixmap(*pixmapLeftTop);
+    leftTopLabel->setPixmap(*pPixmapLeftTop);
 
-    QPixmap* pixmapRightTop = new QPixmap(":/Logo_SSD_UniMe.png");
     QLabel* rightTopLabel = new QLabel();
-    rightTopLabel->setPixmap(*pixmapRightTop);
+    rightTopLabel->setPixmap(*pPixmapRightTop);
 
     pPixmapService = new QPixmap(":/ball2.png");
     *pPixmapService = pPixmapService->scaled(2*iLabelsFontSize/3, 2*iLabelsFontSize/3);

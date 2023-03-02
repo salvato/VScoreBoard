@@ -31,8 +31,12 @@ public:
     void setServizio(int iServizio);
     void setMirrored(bool isPanelMirrored);
     bool getMirrored();
+    void setLeftLogo(QString sFileLogo);
+    void setRightLogo(QString sFileLogo);
 
 private:
+    QString           sLeftLogo;
+    QString           sRightLogo;
     QLabel            *team[2];
     QLabel            *score[2];
     QLabel            *scoreLabel;
@@ -54,7 +58,8 @@ private:
     int                iLabelsFontSize;
     int                maxTeamNameLen;
     QPixmap*           pPixmapService;
-
+    QPixmap*           pPixmapLeftTop;
+    QPixmap*           pPixmapRightTop;
     void               createPanelElements();
     QGridLayout*       createPanel();
     TimeoutWindow     *pTimeoutWindow;

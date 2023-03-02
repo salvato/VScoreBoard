@@ -67,7 +67,6 @@ private:
     QPushButton buttonOk;
     QPushButton buttonCancel;
 
-    QLabel      labelDirection;
     QComboBox   directionCombo;
 
     GeneralSetupArguments* pTempArguments;

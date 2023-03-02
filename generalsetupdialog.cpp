@@ -69,7 +69,7 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
 
     QLabel* pSlidesPathLabel = new QLabel(tr("Slides folder:"));
     QLabel* pSpotsPathLabel  = new QLabel(tr("Movies folder:"));
-    labelDirection.setText(tr("Orientamento"));
+    QLabel* pLabelDirection = new QLabel(("Orientamento"));
     directionCombo.addItem(tr("Normale"));
     directionCombo.addItem(tr("Riflesso"));
     directionCombo.setDisabled(true);
@@ -121,7 +121,7 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
     pMainLayout->addWidget(pTimeoutDurationLabel,   4, 0, 1, 3);
     pMainLayout->addWidget(&timeoutDurationEdit,    4, 3, 1, 1);
 
-    pMainLayout->addWidget(&labelDirection,         5, 0, 1, 2);
+    pMainLayout->addWidget(pLabelDirection,         5, 0, 1, 2);
     pMainLayout->addWidget(&directionCombo,         5, 2, 1, 6);
 
     pMainLayout->addWidget(&buttonCancel,           6, 6, 1, 1);

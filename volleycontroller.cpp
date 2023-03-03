@@ -78,22 +78,22 @@ VolleyController::resizeEvent(QResizeEvent *event) {
 
 void
 VolleyController::GeneralSetup() {
-    GeneralSetupDialog* pGeneralSetupDialog = new GeneralSetupDialog(&generalSetupArguments);
+    GeneralSetupDialog* pGeneralSetupDialog = new GeneralSetupDialog(&gsArgs);
     connect(pGeneralSetupDialog, SIGNAL(changeOrientation(PanelOrientation)),
             this, SLOT(onChangePanelOrientation(PanelOrientation)));
     int iResult = pGeneralSetupDialog->exec();
     if(iResult == QDialog::Accepted) {
-        if(!generalSetupArguments.sSlideDir.endsWith(QString("/")))
-            generalSetupArguments.sSlideDir+= QString("/");
-        QDir slideDir(generalSetupArguments.sSlideDir);
+        if(!gsArgs.sSlideDir.endsWith(QString("/")))
+            gsArgs.sSlideDir+= QString("/");
+        QDir slideDir(gsArgs.sSlideDir);
         if(!slideDir.exists()) {
-            generalSetupArguments.sSlideDir = QStandardPaths::displayName(QStandardPaths::PicturesLocation);
+            gsArgs.sSlideDir = QStandardPaths::displayName(QStandardPaths::PicturesLocation);
         }
-        if(!generalSetupArguments.sSpotDir.endsWith(QString("/")))
-            generalSetupArguments.sSpotDir+= QString("/");
-        QDir spotDir(generalSetupArguments.sSpotDir);
+        if(!gsArgs.sSpotDir.endsWith(QString("/")))
+            gsArgs.sSpotDir+= QString("/");
+        QDir spotDir(gsArgs.sSpotDir);
         if(!spotDir.exists()) {
-            generalSetupArguments.sSpotDir = QStandardPaths::displayName(QStandardPaths::MoviesLocation);
+            gsArgs.sSpotDir = QStandardPaths::displayName(QStandardPaths::MoviesLocation);
         }
         SaveSettings();
         sendAll();
@@ -255,19 +255,19 @@ VolleyController::CreateGameButtons() {
 
 void
 VolleyController::GetSettings() {
-    generalSetupArguments.maxTimeout           = pSettings->value("volley/maxTimeout", 2).toInt();
-    generalSetupArguments.maxSet               = pSettings->value("volley/maxSet", 3).toInt();
-    generalSetupArguments.iTimeoutDuration     = pSettings->value("volley/TimeoutDuration", 30).toInt();
-    generalSetupArguments.sSlideDir            = pSettings->value("directories/slides", generalSetupArguments.sSlideDir).toString();
-    generalSetupArguments.sSpotDir             = pSettings->value("directories/spots",  generalSetupArguments.sSpotDir).toString();
-    generalSetupArguments.isPanelMirrored      = pSettings->value("panel/orientation",  true).toBool();
-    generalSetupArguments.sTeamLogoFilePath[0] = pSettings->value("panel/logo0", ":/Logo_UniMe.png").toString();
-    generalSetupArguments.sTeamLogoFilePath[1] = pSettings->value("panel/logo1", ":/Logo_SSD_UniMe.png").toString();
-    generalSetupArguments.sTeamName[0]         = pSettings->value("team1/name", QString(tr("Locali"))).toString();
-    generalSetupArguments.sTeamName[1]         = pSettings->value("team2/name", QString(tr("Ospiti"))).toString();
+    gsArgs.maxTimeout           = pSettings->value("volley/maxTimeout", 2).toInt();
+    gsArgs.maxSet               = pSettings->value("volley/maxSet", 3).toInt();
+    gsArgs.iTimeoutDuration     = pSettings->value("volley/TimeoutDuration", 30).toInt();
+    gsArgs.sSlideDir            = pSettings->value("directories/slides", gsArgs.sSlideDir).toString();
+    gsArgs.sSpotDir             = pSettings->value("directories/spots",  gsArgs.sSpotDir).toString();
+    gsArgs.isPanelMirrored      = pSettings->value("panel/orientation",  true).toBool();
+    gsArgs.sTeamLogoFilePath[0] = pSettings->value("panel/logo0", ":/Logo_UniMe.png").toString();
+    gsArgs.sTeamLogoFilePath[1] = pSettings->value("panel/logo1", ":/Logo_SSD_UniMe.png").toString();
+    gsArgs.sTeamName[0]         = pSettings->value("team1/name", QString(tr("Locali"))).toString();
+    gsArgs.sTeamName[1]         = pSettings->value("team2/name", QString(tr("Ospiti"))).toString();
 
-    sTeam[0]    = generalSetupArguments.sTeamName[0];
-    sTeam[1]    = generalSetupArguments.sTeamName[1];
+    sTeam[0]    = gsArgs.sTeamName[0];
+    sTeam[1]    = gsArgs.sTeamName[1];
     iTimeout[0] = pSettings->value("team1/timeouts", 0).toInt();
     iTimeout[1] = pSettings->value("team2/timeouts", 0).toInt();
     iSet[0]     = pSettings->value("team1/sets", 0).toInt();
@@ -279,10 +279,10 @@ VolleyController::GetSettings() {
 
     // Check Stored Values vs Maximum Values
     for(int i=0; i<2; i++) {
-        if(iTimeout[i] > generalSetupArguments.maxTimeout)
-            iTimeout[i] = generalSetupArguments.maxTimeout;
-        if(iSet[i] > generalSetupArguments.maxSet)
-            iSet[i] = generalSetupArguments.maxSet;
+        if(iTimeout[i] > gsArgs.maxTimeout)
+            iTimeout[i] = gsArgs.maxTimeout;
+        if(iSet[i] > gsArgs.maxSet)
+            iSet[i] = gsArgs.maxSet;
     }
 
     sendAll();
@@ -297,10 +297,10 @@ VolleyController::sendAll() {
         pVolleyPanel->setSets(i, iSet[i]);
         pVolleyPanel->setScore(i, iScore[i]);
     }
-    pVolleyPanel->setLogo(0, generalSetupArguments.sTeamLogoFilePath[0]);
-    pVolleyPanel->setLogo(1, generalSetupArguments.sTeamLogoFilePath[1]);
+    pVolleyPanel->setLogo(0, gsArgs.sTeamLogoFilePath[0]);
+    pVolleyPanel->setLogo(1, gsArgs.sTeamLogoFilePath[1]);
     pVolleyPanel->setServizio(iServizio);
-    pVolleyPanel->setMirrored(generalSetupArguments.isPanelMirrored);
+    pVolleyPanel->setMirrored(gsArgs.isPanelMirrored);
 }
 
 
@@ -322,14 +322,14 @@ VolleyController::SaveStatus() {
 
 void
 VolleyController::SaveSettings() { // Save General Setup Values
-    pSettings->setValue("directories/slides",     generalSetupArguments.sSlideDir);
-    pSettings->setValue("directories/spots",      generalSetupArguments.sSpotDir);
-    pSettings->setValue("volley/maxTimeout",      generalSetupArguments.maxTimeout);
-    pSettings->setValue("volley/maxSet",          generalSetupArguments.maxSet);
-    pSettings->setValue("volley/TimeoutDuration", generalSetupArguments.iTimeoutDuration);
-    pSettings->setValue("panel/orientation",      generalSetupArguments.isPanelMirrored);
-    pSettings->setValue("panel/logo0",            generalSetupArguments.sTeamLogoFilePath[0]);
-    pSettings->setValue("panel/logo1",            generalSetupArguments.sTeamLogoFilePath[1]);
+    pSettings->setValue("directories/slides",     gsArgs.sSlideDir);
+    pSettings->setValue("directories/spots",      gsArgs.sSpotDir);
+    pSettings->setValue("volley/maxTimeout",      gsArgs.maxTimeout);
+    pSettings->setValue("volley/maxSet",          gsArgs.maxSet);
+    pSettings->setValue("volley/TimeoutDuration", gsArgs.iTimeoutDuration);
+    pSettings->setValue("panel/orientation",      gsArgs.isPanelMirrored);
+    pSettings->setValue("panel/logo0",            gsArgs.sTeamLogoFilePath[0]);
+    pSettings->setValue("panel/logo1",            gsArgs.sTeamLogoFilePath[1]);
 }
 
 
@@ -370,7 +370,7 @@ VolleyController::buildControls() {
         pTimeoutDecrement[iTeam]->setIconSize(minusPixmap.rect().size());
         if(iTimeout[iTeam] == 0)
             pTimeoutDecrement[iTeam]->setEnabled(false);
-        if(iTimeout[iTeam] == generalSetupArguments.maxTimeout) {
+        if(iTimeout[iTeam] == gsArgs.maxTimeout) {
             pTimeoutIncrement[iTeam]->setEnabled(false);
             pTimeoutEdit[iTeam]->setStyleSheet("background:rgba(0, 0, 0, 0);color:red; border: none");
         }
@@ -390,7 +390,7 @@ VolleyController::buildControls() {
         pSetsDecrement[iTeam]->setIconSize(minusPixmap.rect().size());
         if(iSet[iTeam] == 0)
             pSetsDecrement[iTeam]->setEnabled(false);
-        if(iSet[iTeam] == generalSetupArguments.maxSet)
+        if(iSet[iTeam] == gsArgs.maxSet)
             pSetsIncrement[iTeam]->setEnabled(false);
         // Service
         QPixmap pixmap(":/buttonIcons/ball.png");
@@ -494,7 +494,7 @@ VolleyController::setEventHandlers() {
 
 void
 VolleyController::startSpotLoop() {
-    pVolleyPanel->setSpotDir(generalSetupArguments.sSpotDir);
+    pVolleyPanel->setSpotDir(gsArgs.sSpotDir);
     pVolleyPanel->startSpotLoop();
 }
 
@@ -507,7 +507,7 @@ VolleyController::stopSpotLoop() {
 
 void
 VolleyController::startSlideShow() {
-    pVolleyPanel->setSlideDir(generalSetupArguments.sSlideDir);
+    pVolleyPanel->setSlideDir(gsArgs.sSlideDir);
     pVolleyPanel->startSlideShow();
 }
 
@@ -525,14 +525,14 @@ VolleyController::stopSlideShow() {
 void
 VolleyController::onTimeOutIncrement(int iTeam) {
     iTimeout[iTeam]++;
-    if(iTimeout[iTeam] >= generalSetupArguments.maxTimeout) {
+    if(iTimeout[iTeam] >= gsArgs.maxTimeout) {
         pTimeoutIncrement[iTeam]->setEnabled(false);
         pTimeoutEdit[iTeam]->setStyleSheet("background-color: rgba(0, 0, 0, 0);color:red; border: none");
     }
     pTimeoutDecrement[iTeam]->setEnabled(true);
     pVolleyPanel->setTimeout(iTeam, iTimeout[iTeam]);
-    if(generalSetupArguments.iTimeoutDuration > 0) {
-        pVolleyPanel->startTimeout(generalSetupArguments.iTimeoutDuration);
+    if(gsArgs.iTimeoutDuration > 0) {
+        pVolleyPanel->startTimeout(gsArgs.iTimeoutDuration);
     }
     QString sText = QString("%1").arg(iTimeout[iTeam]);
     pTimeoutEdit[iTeam]->setText(sText);
@@ -564,7 +564,7 @@ void
 VolleyController::onSetIncrement(int iTeam) {
     iSet[iTeam]++;
     pSetsDecrement[iTeam]->setEnabled(true);
-    if(iSet[iTeam] == generalSetupArguments.maxSet) {
+    if(iSet[iTeam] == gsArgs.maxSet) {
         pSetsIncrement[iTeam]->setEnabled(false);
     }
     pVolleyPanel->setSets(iTeam, iSet[iTeam]);
@@ -650,9 +650,9 @@ VolleyController::onTeamTextChanged(QString sText, int iTeam) {
     sTeam[iTeam] = sText;
     pVolleyPanel->setTeam(iTeam, sTeam[iTeam]);
     if(iTeam == 0)
-         generalSetupArguments.sTeamName[0] = sTeam[iTeam];
+         gsArgs.sTeamName[0] = sTeam[iTeam];
     else
-        generalSetupArguments.sTeamName[1] = sTeam[iTeam];
+        gsArgs.sTeamName[1] = sTeam[iTeam];
     sText = QString("team%1/name").arg(iTeam+1, 1);
     pSettings->setValue(sText, sTeam[iTeam]);
 }
@@ -672,11 +672,11 @@ VolleyController::onButtonChangeFieldClicked() {
     pTeamName[0]->setText(sTeam[0]);
     pTeamName[1]->setText(sTeam[1]);
 
-    generalSetupArguments.sTeamName[0] = sTeam[1];
-    generalSetupArguments.sTeamName[1] = sTeam[0];
-    sText = generalSetupArguments.sTeamLogoFilePath[0];
-    generalSetupArguments.sTeamLogoFilePath[0] = generalSetupArguments.sTeamLogoFilePath[1];
-    generalSetupArguments.sTeamLogoFilePath[1] = sText;
+    gsArgs.sTeamName[0] = sTeam[1];
+    gsArgs.sTeamName[1] = sTeam[0];
+    sText = gsArgs.sTeamLogoFilePath[0];
+    gsArgs.sTeamLogoFilePath[0] = gsArgs.sTeamLogoFilePath[1];
+    gsArgs.sTeamLogoFilePath[1] = sText;
 
     int iVal = iSet[0];
     iSet[0] = iSet[1];
@@ -723,14 +723,14 @@ VolleyController::onButtonChangeFieldClicked() {
         if(iSet[iTeam] == 0) {
             pSetsDecrement[iTeam]->setEnabled(false);
         }
-        if(iSet[iTeam] == generalSetupArguments.maxSet) {
+        if(iSet[iTeam] == gsArgs.maxSet) {
             pSetsIncrement[iTeam]->setEnabled(false);
         }
 
         pTimeoutIncrement[iTeam]->setEnabled(true);
         pTimeoutDecrement[iTeam]->setEnabled(true);
         pTimeoutEdit[iTeam]->setStyleSheet("background-color: rgba(0, 0, 0, 0);color:yellow; border: none");
-        if(iTimeout[iTeam] == generalSetupArguments.maxTimeout) {
+        if(iTimeout[iTeam] == gsArgs.maxTimeout) {
             pTimeoutIncrement[iTeam]->setEnabled(false);
             pTimeoutEdit[iTeam]->setStyleSheet("background:rgba(0, 0, 0, 0);color:white; border: none");
         }
@@ -758,11 +758,11 @@ VolleyController::onButtonNewSetClicked() {
     pTeamName[0]->setText(sTeam[0]);
     pTeamName[1]->setText(sTeam[1]);
 
-    generalSetupArguments.sTeamName[0] = sTeam[1];
-    generalSetupArguments.sTeamName[1] = sTeam[0];
-    sText = generalSetupArguments.sTeamLogoFilePath[0];
-    generalSetupArguments.sTeamLogoFilePath[0] = generalSetupArguments.sTeamLogoFilePath[1];
-    generalSetupArguments.sTeamLogoFilePath[1] = sText;
+    gsArgs.sTeamName[0] = sTeam[1];
+    gsArgs.sTeamName[1] = sTeam[0];
+    sText = gsArgs.sTeamLogoFilePath[0];
+    gsArgs.sTeamLogoFilePath[0] = gsArgs.sTeamLogoFilePath[1];
+    gsArgs.sTeamLogoFilePath[1] = sText;
 
     int iVal = iSet[0];
     iSet[0] = iSet[1];
@@ -841,6 +841,6 @@ VolleyController::onChangePanelOrientation(PanelOrientation orientation) {
                QString("Direction %1")
                .arg(static_cast<int>(orientation)));
 #endif
-    pVolleyPanel->setMirrored(generalSetupArguments.isPanelMirrored);
+    pVolleyPanel->setMirrored(gsArgs.isPanelMirrored);
 }
 

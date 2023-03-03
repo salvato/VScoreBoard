@@ -57,7 +57,7 @@ private:
     void          sendAll();
 
 private:
-    GeneralSetupArguments generalSetupArguments;
+    GeneralSetupArguments gsArgs;
     VolleyPanel*  pVolleyPanel;
     QString       sTeam[2];
     int           iTimeout[2]{};

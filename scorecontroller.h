@@ -2,11 +2,8 @@
 
 #include <QMainWindow>
 #include <QFile>
-//#include <QSoundEffect>
 #include <QFileInfoList>
 #include <QSettings>
-
-#include "panelorientation.h"
 
 
 QT_FORWARD_DECLARE_CLASS(QHBoxLayout)
@@ -29,9 +26,6 @@ protected slots:
     void onButtonSetupClicked();
     void onButtonShutdownClicked();
 
-    void onGetPanelDirection();
-    void onSetPanelDirection(PanelOrientation direction);
-
 protected:
     bool            prepareLogFile();
     void            prepareServices();
@@ -46,9 +40,7 @@ protected:
     virtual void    stopSlideShow();
 
 protected:
-    int                   iCurrentSpot;
     QFile*                pLogFile;
-//    QSoundEffect*         pButtonClick;
     QSettings*            pSettings;
     QPushButton*          pSpotButton{};
     QPushButton*          pSlideShowButton{};

@@ -1,7 +1,7 @@
 QT += core
 QT += gui
 QT += widgets
-#QT += multimedia
+
 
 CONFIG += c++17
 
@@ -11,7 +11,6 @@ CONFIG += c++17
 
 SOURCES += \
     button.cpp \
-    cameratab.cpp \
     edit.cpp \
     generalsetuparguments.cpp \
     generalsetupdialog.cpp \
@@ -28,7 +27,6 @@ SOURCES += \
 
 HEADERS += \
     button.h \
-    cameratab.h \
     edit.h \
     generalsetuparguments.h \
     generalsetupdialog.h \

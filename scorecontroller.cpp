@@ -10,13 +10,11 @@
 
 
 #include "scorecontroller.h"
-#include "utility.h"
 
 
 ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
     : QMainWindow(parent)
     , pLogFile(myLogFile)
-//    , pButtonClick(nullptr)
     , pSettings(new QSettings("Gabriele Salvato", "Volley Controller"))
 {
     QList<QScreen*> screens = QApplication::screens();
@@ -27,17 +25,10 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
                               QMessageBox::Abort);
         exit(EXIT_FAILURE);
     }
-    // Move the Panel on the Secondary Display
-    QPoint point = QPoint(screens.at(0)->geometry().x(),
-                          screens.at(0)->geometry().y());
-    move(point);
+    // Move the Panel on the Primary Display
+    move(QPoint(screens.at(0)->geometry().x(),
+                screens.at(0)->geometry().y()));
     setWindowTitle("Score Controller");
-
-    // The click sound for button press.
-//    pButtonClick = new QSoundEffect(this);
-//    pButtonClick->setSource(QUrl::fromLocalFile(":/key.wav"));
-
-    iCurrentSpot  = 0;
 
     pSpotButtonsLayout = CreateSpotButtons();
     connectButtonSignals();
@@ -106,16 +97,6 @@ ScoreController::connectButtonSignals() {
 
     connect(pShutdownButton, SIGNAL(clicked(bool)),
             this, SLOT(onButtonShutdownClicked()));
-
-// Keypress Sound
-//    connect(pSpotButton, SIGNAL(clicked()),
-//            pButtonClick, SLOT(play()));
-//    connect(pSlideShowButton, SIGNAL(clicked()),
-//            pButtonClick, SLOT(play()));
-//    connect(pGeneralSetupButton, SIGNAL(clicked()),
-//            pButtonClick, SLOT(play()));
-//    connect(pShutdownButton, SIGNAL(clicked()),
-//            pButtonClick, SLOT(play()));
 }
 
 
@@ -137,31 +118,35 @@ ScoreController::SaveStatus() {
 }
 
 
-void
-ScoreController::UpdateUI() {
-    pSpotButton->setEnabled(true);
-    pSlideShowButton->setEnabled(true);
-    pShutdownButton->setEnabled(true);
-}
-
-
+// Dummy... see Volley Panel
 void
 ScoreController::startSpotLoop() {
 }
 
 
+// Dummy... see Volley Panel
 void
 ScoreController::stopSpotLoop() {
 }
 
 
+// Dummy... see Volley Panel
 void
 ScoreController::startSlideShow() {
 }
 
 
+// Dummy... see Volley Panel
 void
 ScoreController::stopSlideShow() {
+}
+
+
+void
+ScoreController::UpdateUI() {
+    pSpotButton->setEnabled(true);
+    pSlideShowButton->setEnabled(true);
+    pShutdownButton->setEnabled(true);
 }
 
 
@@ -189,23 +174,6 @@ ScoreController::onButtonSpotLoopClicked() {
         stopSpotLoop();
         myStatus = showPanel;
     }
-}
-
-
-void
-ScoreController::onGetPanelDirection() {
-}
-
-
-void
-ScoreController::onSetPanelDirection(PanelOrientation direction) {
-    Q_UNUSED(direction)
-#ifdef LOG_VERBOSE
-    logMessage(pLogFile,
-               Q_FUNC_INFO,
-               QString("Direction %1")
-               .arg(static_cast<int>(direction)));
-#endif
 }
 
 

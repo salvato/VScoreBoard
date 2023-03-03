@@ -64,8 +64,16 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
     spotsDirEdit.setReadOnly(true);
     slidesDirEdit.setStyleSheet("background:red;color:white;");
     spotsDirEdit.setStyleSheet("background:red;color:white;");
-    setSlideDir(pArguments->sSlideDir);
-    setSpotDir(pArguments->sSpotDir);
+    setSlideDir();
+    setSpotDir();
+
+    team0LogoPathEdit.setReadOnly(true);
+    team1LogoPathEdit.setReadOnly(true);
+    team0LogoPathEdit.setStyleSheet("background:red;color:white;");
+    team1LogoPathEdit.setStyleSheet("background:red;color:white;");
+    setTeam0Path();
+    setTeam1Path();
+
 
     QLabel* pSlidesPathLabel = new QLabel(tr("Slides folder:"));
     QLabel* pSpotsPathLabel  = new QLabel(tr("Movies folder:"));
@@ -79,6 +87,8 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
 
     buttonSelectSlidesDir.setText("Change");
     buttonSelectSpotsDir.setText("Change");
+    buttonSelectTeam0Logo.setText("Change");
+    buttonSelectTeam1Logo.setText("Change");
 
     // Signals from Dialog Elements
     connect(&directionCombo, SIGNAL(currentIndexChanged(int)),
@@ -87,10 +97,16 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
             this, SLOT(onSelectSlideDir()));
     connect(&buttonSelectSpotsDir, SIGNAL(clicked()),
             this, SLOT(onSelectSpotDir()));
+    connect(&buttonSelectTeam0Logo, SIGNAL(clicked()),
+            this, SLOT(onSelectLogo0()));
+    connect(&buttonSelectTeam1Logo, SIGNAL(clicked()),
+            this, SLOT(onSelectLogo1()));
 
     QLabel* pNumTimeoutLabel      = new QLabel(tr("Max Timeouts:"));
     QLabel* pMaxSetLabel          = new QLabel(tr("Max Sets:"));
     QLabel* pTimeoutDurationLabel = new QLabel(tr("Timeout sec:"));
+    QLabel* pTeam0Label           = new QLabel("Logo "+pTempArguments->sTeam0Name);
+    QLabel* pTeam1Label           = new QLabel("Logo "+pTempArguments->sTeam1Name);
 
     numTimeoutEdit.setMaxLength(1);
     maxSetEdit.setMaxLength(1);
@@ -127,8 +143,16 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
     pMainLayout->addWidget(pLabelDirection,         5, 0, 1, 2);
     pMainLayout->addWidget(&directionCombo,         5, 2, 1, 6);
 
-    pMainLayout->addWidget(&buttonCancel,           6, 6, 1, 1);
-    pMainLayout->addWidget(&buttonOk,               6, 7, 1, 1);
+    pMainLayout->addWidget(pTeam0Label,             6, 0, 1, 1);
+    pMainLayout->addWidget(&team0LogoPathEdit,      6, 1, 1, 6);
+    pMainLayout->addWidget(&buttonSelectTeam0Logo,  6, 7, 1, 1);
+
+    pMainLayout->addWidget(pTeam1Label,             7, 0, 1, 1);
+    pMainLayout->addWidget(&team1LogoPathEdit,      7, 1, 1, 6);
+    pMainLayout->addWidget(&buttonSelectTeam1Logo,  7, 7, 1, 1);
+
+    pMainLayout->addWidget(&buttonCancel,           8, 6, 1, 1);
+    pMainLayout->addWidget(&buttonOk,               8, 7, 1, 1);
 
     setLayout(pMainLayout);
 
@@ -140,27 +164,31 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
 
 
 void
-GeneralSetupDialog::setSlideDir(const QString& sDir) {
-    slidesDirEdit.setText(sDir);
-    QDir slideDir(sDir);
+GeneralSetupDialog::setSlideDir() {
+    slidesDirEdit.setText(pTempArguments->sSlideDir);
+    QDir slideDir(pTempArguments->sSlideDir);
     if(slideDir.exists()) {
         slidesDirEdit.setStyleSheet("background:white;color:black;");
+        buttonOk.setEnabled(true);
     }
     else {
         slidesDirEdit.setStyleSheet("background:red;color:white;");
+        buttonOk.setDisabled(true);
     }
 }
 
 
 void
-GeneralSetupDialog::setSpotDir(const QString& sDir){
-    spotsDirEdit.setText(sDir);
-    QDir spotDir(sDir);
+GeneralSetupDialog::setSpotDir() {
+    spotsDirEdit.setText(pTempArguments->sSpotDir);
+    QDir spotDir(pTempArguments->sSpotDir);
     if(spotDir.exists()) {
         spotsDirEdit.setStyleSheet("background:white;color:black;");
+        buttonOk.setEnabled(true);
     }
     else {
         spotsDirEdit.setStyleSheet("background:red;color:white;");
+        buttonOk.setDisabled(true);
     }
 }
 
@@ -181,9 +209,8 @@ GeneralSetupDialog::onSelectSlideDir() {
     }
     if(sSlideDir == QString()) return; // "Cancel" has been pressed...
     if(!sSlideDir.endsWith(QString("/"))) sSlideDir+= QString("/");
-    slidesDirEdit.setText(sSlideDir);
-    slideDir.setPath(sSlideDir);
-    setSlideDir(sSlideDir);
+    pTempArguments->sSlideDir = sSlideDir;
+    setSlideDir();
 }
 
 
@@ -203,9 +230,34 @@ GeneralSetupDialog::onSelectSpotDir() {
     }
     if(sSpotDir == QString()) return; // "Cancel" has been pressed...
     if(!sSpotDir.endsWith(QString("/"))) sSpotDir+= QString("/");
-    spotsDirEdit.setText(sSpotDir);
-    spotDir.setPath(sSpotDir);
-    setSpotDir(sSpotDir);
+    pTempArguments->sSpotDir = sSpotDir;
+    setSpotDir();
+}
+
+
+void
+GeneralSetupDialog::onSelectLogo0() {
+    QString sFileName =
+            QFileDialog::getOpenFileName(this,
+                                         tr("Logo File"),
+                                         team0LogoPathEdit.text(),
+                                         tr("Image Files (*.png *.jpg *.bmp)"));
+    if(sFileName == QString()) return; // "Cancel" has been pressed...
+    pTempArguments->sTeam0LogoFilePath = sFileName;
+    setTeam0Path();
+}
+
+
+void
+GeneralSetupDialog::onSelectLogo1() {
+    QString sFileName =
+            QFileDialog::getOpenFileName(this,
+                                         tr("Logo File"),
+                                         team1LogoPathEdit.text(),
+                                         tr("Image Files (*.png *.jpg *.bmp)"));
+    if(sFileName == QString()) return; // "Cancel" has been pressed...
+    pTempArguments->sTeam1LogoFilePath = sFileName;
+    setTeam1Path();
 }
 
 
@@ -223,11 +275,13 @@ GeneralSetupDialog::onChangePanelOrientation(int iOrientation) {
 
 void
 GeneralSetupDialog::onOk() {
-    pTempArguments->iTimeoutDuration = timeoutDurationEdit.text().toInt();
-    pTempArguments->maxTimeout       = numTimeoutEdit.text().toInt();
-    pTempArguments->maxSet           = maxSetEdit.text().toInt();
-    pTempArguments->sSlideDir        = slidesDirEdit.text();
-    pTempArguments->sSpotDir         = spotsDirEdit.text();
+    pTempArguments->iTimeoutDuration   = timeoutDurationEdit.text().toInt();
+    pTempArguments->maxTimeout         = numTimeoutEdit.text().toInt();
+    pTempArguments->maxSet             = maxSetEdit.text().toInt();
+    pTempArguments->sSlideDir          = slidesDirEdit.text();
+    pTempArguments->sSpotDir           = spotsDirEdit.text();
+    pTempArguments->sTeam0LogoFilePath = team0LogoPathEdit.text();
+    pTempArguments->sTeam1LogoFilePath = team1LogoPathEdit.text();
     accept();
 }
 
@@ -235,4 +289,30 @@ GeneralSetupDialog::onOk() {
 void
 GeneralSetupDialog::onCancel() {
     reject();
+}
+
+
+void
+GeneralSetupDialog::setTeam0Path() {
+    team0LogoPathEdit.setText(pTempArguments->sTeam0LogoFilePath);
+    QFile logoFile(pTempArguments->sTeam0LogoFilePath);
+    if(logoFile.exists()) {
+        team0LogoPathEdit.setStyleSheet("background:white;color:black;");
+    }
+    else {
+        team0LogoPathEdit.setStyleSheet("background:red;color:white;");
+    }
+}
+
+
+void
+GeneralSetupDialog::setTeam1Path() {
+    team1LogoPathEdit.setText(pTempArguments->sTeam1LogoFilePath);
+    QFile logoFile(pTempArguments->sTeam0LogoFilePath);
+    if(logoFile.exists()) {
+        team1LogoPathEdit.setStyleSheet("background:white;color:black;");
+    }
+    else {
+        team1LogoPathEdit.setStyleSheet("background:red;color:white;");
+    }
 }

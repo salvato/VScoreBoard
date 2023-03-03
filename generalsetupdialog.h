@@ -43,13 +43,18 @@ signals:
 public slots:
     void onSelectSlideDir();
     void onSelectSpotDir();
+    void onSelectLogo0();
+    void onSelectLogo1();
     void onOk();
     void onCancel();
     void onChangePanelOrientation(int iOrientation);
 
 protected:
-    void setSlideDir(const QString& sDir);
-    void setSpotDir(const QString& sDir);
+    void setSlideDir();
+    void setSpotDir();
+    void setTeam0Path();
+    void setTeam1Path();
+
 
 private:
     QPalette    panelPalette;
@@ -63,6 +68,12 @@ private:
     QLineEdit   spotsDirEdit;
     QPushButton buttonSelectSlidesDir;
     QPushButton buttonSelectSpotsDir;
+
+    QLineEdit   team0LogoPathEdit;
+    QLineEdit   team1LogoPathEdit;
+    QPushButton buttonSelectTeam0Logo;
+    QPushButton buttonSelectTeam1Logo;
+
     QPushButton buttonOk;
     QPushButton buttonCancel;
 

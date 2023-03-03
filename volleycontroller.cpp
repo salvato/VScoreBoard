@@ -254,15 +254,19 @@ VolleyController::CreateGameButtons() {
 
 void
 VolleyController::GetSettings() {
-    generalSetupArguments.maxTimeout       = pSettings->value("volley/maxTimeout", 2).toInt();
-    generalSetupArguments.maxSet           = pSettings->value("volley/maxSet", 3).toInt();
-    generalSetupArguments.iTimeoutDuration = pSettings->value("volley/TimeoutDuration", 30).toInt();
-    generalSetupArguments.sSlideDir        = pSettings->value("directories/slides", generalSetupArguments.sSlideDir).toString();
-    generalSetupArguments.sSpotDir         = pSettings->value("directories/spots",  generalSetupArguments.sSpotDir).toString();
-    generalSetupArguments.isPanelMirrored  = pSettings->value("panel/orientation",  true).toBool();
+    generalSetupArguments.maxTimeout         = pSettings->value("volley/maxTimeout", 2).toInt();
+    generalSetupArguments.maxSet             = pSettings->value("volley/maxSet", 3).toInt();
+    generalSetupArguments.iTimeoutDuration   = pSettings->value("volley/TimeoutDuration", 30).toInt();
+    generalSetupArguments.sSlideDir          = pSettings->value("directories/slides", generalSetupArguments.sSlideDir).toString();
+    generalSetupArguments.sSpotDir           = pSettings->value("directories/spots",  generalSetupArguments.sSpotDir).toString();
+    generalSetupArguments.isPanelMirrored    = pSettings->value("panel/orientation",  true).toBool();
+    generalSetupArguments.sTeam0Name         = pSettings->value("team1/name", QString(tr("Locali"))).toString();
+    generalSetupArguments.sTeam1Name         = pSettings->value("team2/name", QString(tr("Ospiti"))).toString();
+    generalSetupArguments.sTeam0LogoFilePath = pSettings->value("panel/logo0", "").toString();
+    generalSetupArguments.sTeam1LogoFilePath = pSettings->value("panel/logo1", "").toString();
 
-    sTeam[0]    = pSettings->value("team1/name", QString(tr("Locali"))).toString();
-    sTeam[1]    = pSettings->value("team2/name", QString(tr("Ospiti"))).toString();
+    sTeam[0]    = generalSetupArguments.sTeam0Name;
+    sTeam[1]    = generalSetupArguments.sTeam1Name;
     iTimeout[0] = pSettings->value("team1/timeouts", 0).toInt();
     iTimeout[1] = pSettings->value("team2/timeouts", 0).toInt();
     iSet[0]     = pSettings->value("team1/sets", 0).toInt();
@@ -323,6 +327,8 @@ VolleyController::SaveSettings() { // Save General Setup Values
     pSettings->setValue("volley/maxSet",          generalSetupArguments.maxSet);
     pSettings->setValue("volley/TimeoutDuration", generalSetupArguments.iTimeoutDuration);
     pSettings->setValue("panel/orientation",      generalSetupArguments.isPanelMirrored);
+    pSettings->setValue("panel/logo0",            generalSetupArguments.sTeam0LogoFilePath);
+    pSettings->setValue("panel/logo1",            generalSetupArguments.sTeam1LogoFilePath);
 }
 
 
@@ -642,6 +648,10 @@ void
 VolleyController::onTeamTextChanged(QString sText, int iTeam) {
     sTeam[iTeam] = sText;
     pVolleyPanel->setTeam(iTeam, sTeam[iTeam]);
+    if(iTeam == 0)
+         generalSetupArguments.sTeam0Name = sTeam[iTeam];
+    else
+        generalSetupArguments.sTeam1Name = sTeam[iTeam];
     sText = QString("team%1/name").arg(iTeam+1, 1);
     pSettings->setValue(sText, sTeam[iTeam]);
 }

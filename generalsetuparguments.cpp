@@ -12,7 +12,7 @@ GeneralSetupArguments::GeneralSetupArguments()
     , sSpotDir(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
     , sTeam0Name("Locali")
     , sTeam1Name("Ospiti")
-    , sTeam0LogoFilePath("./Logo_SSD_UniMe.png")
-    , sTeam1LogoFilePath("./Logo_UniMe.png")
+    , sTeam0LogoFilePath(":/Logo_SSD_UniMe.png")
+    , sTeam1LogoFilePath(":/Logo_UniMe.png")
 {
 }

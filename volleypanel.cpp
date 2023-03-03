@@ -11,14 +11,12 @@
 
 VolleyPanel::VolleyPanel(QFile *myLogFile, QWidget *parent)
     : ScorePanel(myLogFile, parent)
-    , sLeftLogo(QString(":/Logo_UniMe.png"))
-    , sRightLogo(QString(":/Logo_SSD_UniMe.png"))
     , iServizio(0)
     , maxTeamNameLen(15)
     , pTimeoutWindow(Q_NULLPTR)
 {
-    pPixmapLeftTop  = new QPixmap(sLeftLogo);
-    pPixmapRightTop = new QPixmap(sRightLogo);
+    pPixmapLogo[0] = new QPixmap(QString(":/Logo_UniMe.png"));
+    pPixmapLogo[1] = new QPixmap(QString(":/Logo_SSD_UniMe.png"));
 
     sFontName = QString("Liberation Sans Bold");
     fontWeight = QFont::Black;
@@ -86,19 +84,19 @@ VolleyPanel::setSets(int iTeam, int iSets) {
 
 void
 VolleyPanel::setServizio(int iServizio) {
-    servizio[0]->setText(" ");
-    servizio[1]->setText(" ");
+    pServizio[0]->setText(" ");
+    pServizio[1]->setText(" ");
     if(iServizio == 0) {
-        servizio[0]->setPixmap(*pPixmapService);
+        pServizio[0]->setPixmap(*pPixmapService);
     } else if(iServizio == 1) {
-        servizio[1]->setPixmap(*pPixmapService);
+        pServizio[1]->setPixmap(*pPixmapService);
     }
 }
 
 
 void
 VolleyPanel::setTimeout(int iTeam, int iTimeout) {
-    timeout[iTeam]->setText(QString("%1").arg(iTimeout));
+    pTimeout[iTeam]->setText(QString("%1").arg(iTimeout));
 }
 
 
@@ -153,13 +151,13 @@ VolleyPanel::createPanelElements() {
     // the widget's children, overriding any system defaults for that role.
 
     // Timeout
-    timeoutLabel = new QLabel("Timeout");
-    timeoutLabel->setFont(QFont(sFontName, iLabelsFontSize/2, fontWeight));
-    timeoutLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    pTimeoutLabel = new QLabel("Timeout");
+    pTimeoutLabel->setFont(QFont(sFontName, iLabelsFontSize/2, fontWeight));
+    pTimeoutLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     for(int i=0; i<2; i++) {
-        timeout[i] = new QLabel("8");
-        timeout[i]->setFrameStyle(QFrame::NoFrame);
-        timeout[i]->setFont(QFont(sFontName, iTimeoutFontSize, fontWeight));
+        pTimeout[i] = new QLabel("8");
+        pTimeout[i]->setFrameStyle(QFrame::NoFrame);
+        pTimeout[i]->setFont(QFont(sFontName, iTimeoutFontSize, fontWeight));
     }
 
     // Set
@@ -185,8 +183,14 @@ VolleyPanel::createPanelElements() {
 
     // Servizio
     for(int i=0; i<2; i++){
-        servizio[i] = new QLabel(" ");
-        servizio[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        pServizio[i] = new QLabel(" ");
+        pServizio[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    }
+
+    // Loghi
+    for(int i=0; i<2; i++){
+        logoLabel[i] = new QLabel(" ");
+        logoLabel[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     }
 
     // Teams
@@ -203,28 +207,6 @@ VolleyPanel::createPanelElements() {
 }
 
 
-void
-VolleyPanel::setLeftLogo(QString sFileLogo) {
-    if(QFile::exists(sFileLogo)) {
-        sLeftLogo = sFileLogo;
-        if(pPixmapLeftTop) delete pPixmapLeftTop;
-        pPixmapLeftTop = new QPixmap(sLeftLogo);
-        buildLayout();
-    }
-}
-
-
-void
-VolleyPanel::setRightLogo(QString sFileLogo) {
-    if(QFile::exists(sFileLogo)) {
-        sRightLogo = sFileLogo;
-        if(pPixmapRightTop) delete pPixmapRightTop;
-        pPixmapRightTop = new QPixmap(sRightLogo);
-        buildLayout();
-    }
-}
-
-
 QGridLayout*
 VolleyPanel::createPanel() {
     QGridLayout *layout = new QGridLayout();
@@ -235,33 +217,28 @@ VolleyPanel::createPanel() {
         ileft  = 1;
         iright = 0;
     }
-    QLabel* leftTopLabel = new QLabel();
-    leftTopLabel->setPixmap(*pPixmapLeftTop);
-
-    QLabel* rightTopLabel = new QLabel();
-    rightTopLabel->setPixmap(*pPixmapRightTop);
 
     pPixmapService = new QPixmap(":/ball2.png");
     *pPixmapService = pPixmapService->scaled(2*iLabelsFontSize/3, 2*iLabelsFontSize/3);
 
-    layout->addWidget(pTeam[ileft],     0, 0, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(pTeam[iright],    0, 6, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pTeam[ileft],      0, 0, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pTeam[iright],     0, 6, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
 
-    layout->addWidget(pScore[ileft],    2, 1, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(servizio[ileft],  2, 4, 4, 1, Qt::AlignLeft   |Qt::AlignTop);
-    layout->addWidget(pScoreLabel,      2, 5, 4, 2, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(servizio[iright], 2, 7, 4, 1, Qt::AlignRight  |Qt::AlignTop);
-    layout->addWidget(pScore[iright],   2, 8, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pScore[ileft],     2, 1, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pServizio[ileft],  2, 4, 4, 1, Qt::AlignLeft   |Qt::AlignTop);
+    layout->addWidget(pScoreLabel,       2, 5, 4, 2, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pServizio[iright], 2, 7, 4, 1, Qt::AlignRight  |Qt::AlignTop);
+    layout->addWidget(pScore[iright],    2, 8, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
 
-    layout->addWidget(pSet[ileft],      6, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(pSetLabel,        6, 3, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(pSet[iright],     6, 9, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pSet[ileft],       6, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pSetLabel,         6, 3, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pSet[iright],      6, 9, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
 
-    layout->addWidget(leftTopLabel,     8, 0, 2, 2, Qt::AlignLeft   |Qt::AlignBottom);
-    layout->addWidget(timeout[ileft],   8, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(timeoutLabel,     8, 3, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(timeout[iright],  8, 9, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(rightTopLabel,    8,10, 2, 2, Qt::AlignRight  |Qt::AlignBottom);
+    layout->addWidget(logoLabel[ileft],  8, 0, 2, 2, Qt::AlignLeft   |Qt::AlignBottom);
+    layout->addWidget(pTimeout[ileft],   8, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pTimeoutLabel,     8, 3, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pTimeout[iright],  8, 9, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(logoLabel[iright], 8,10, 2, 2, Qt::AlignRight  |Qt::AlignBottom);
 
     return layout;
 }
@@ -282,3 +259,12 @@ VolleyPanel::changeEvent(QEvent *event) {
         QWidget::changeEvent(event);
 }
 
+
+void
+VolleyPanel::setLogo(int iTeam, QString sFileLogo) {
+    if(QFile::exists(sFileLogo)) {
+        if(pPixmapLogo[iTeam]) delete pPixmapLogo[iTeam];
+        pPixmapLogo[iTeam] =  new QPixmap(sFileLogo);
+        logoLabel[iTeam]->setPixmap(*pPixmapLogo[iTeam]);
+    }
+}

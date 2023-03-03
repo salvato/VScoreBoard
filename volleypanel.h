@@ -31,38 +31,38 @@ public:
     void setServizio(int iServizio);
     void setMirrored(bool isPanelMirrored);
     bool getMirrored();
-    void setLeftLogo(QString sFileLogo);
-    void setRightLogo(QString sFileLogo);
+    void setLogo(int iTeam, QString sFileLogo);
 
 private:
-    QString           sLeftLogo;
-    QString           sRightLogo;
     QLabel*           pTeam[2];
     QLabel*           pScore[2];
     QLabel*           pScoreLabel;
     QLabel*           pSet[2];
     QLabel*           pSetLabel;
-    QLabel            *servizio[2];
-    QLabel            *timeout[2];
-    QLabel            *timeoutLabel;
-    QString            sFontName;
-    int                fontWeight;
-    QPalette           panelPalette;
-    QLinearGradient    panelGradient;
-    QBrush             panelBrush;
-    int                iServizio;
-    int                iTimeoutFontSize;
-    int                iSetFontSize;
-    int                iScoreFontSize;
-    int                iTeamFontSize;
-    int                iLabelsFontSize;
-    int                maxTeamNameLen;
-    QPixmap*           pPixmapService;
-    QPixmap*           pPixmapLeftTop;
-    QPixmap*           pPixmapRightTop;
-    void               createPanelElements();
-    QGridLayout*       createPanel();
-    TimeoutWindow     *pTimeoutWindow;
+    QLabel*           pServizio[2];
+    QLabel*           pTimeout[2];
+    QLabel*           pTimeoutLabel;
+    QLabel*           logoLabel[2];
+    QPixmap*          pPixmapLogo[2];
+
+    QString           sFontName;
+    int               fontWeight;
+    QPalette          panelPalette;
+    QLinearGradient   panelGradient;
+    QBrush            panelBrush;
+    int               iServizio;
+    int               iTimeoutFontSize;
+    int               iSetFontSize;
+    int               iScoreFontSize;
+    int               iTeamFontSize;
+    int               iLabelsFontSize;
+    int               maxTeamNameLen;
+    QPixmap*          pPixmapService;
+//    QPixmap*          pPixmapLeftTop;
+//    QPixmap*          pPixmapRightTop;
+    void              createPanelElements();
+    QGridLayout*      createPanel();
+    TimeoutWindow*    pTimeoutWindow;
 
 private slots:
     void onTimeoutDone();

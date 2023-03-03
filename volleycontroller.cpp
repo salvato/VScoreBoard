@@ -96,6 +96,7 @@ VolleyController::GeneralSetup() {
             generalSetupArguments.sSpotDir = QStandardPaths::displayName(QStandardPaths::MoviesLocation);
         }
         SaveSettings();
+        sendAll();
     }
     delete pGeneralSetupDialog;
     pGeneralSetupDialog = nullptr;
@@ -260,10 +261,10 @@ VolleyController::GetSettings() {
     generalSetupArguments.sSlideDir          = pSettings->value("directories/slides", generalSetupArguments.sSlideDir).toString();
     generalSetupArguments.sSpotDir           = pSettings->value("directories/spots",  generalSetupArguments.sSpotDir).toString();
     generalSetupArguments.isPanelMirrored    = pSettings->value("panel/orientation",  true).toBool();
+    generalSetupArguments.sTeam0LogoFilePath = pSettings->value("panel/logo0", ":/Logo_UniMe.png").toString();
+    generalSetupArguments.sTeam1LogoFilePath = pSettings->value("panel/logo1", ":/Logo_SSD_UniMe.png").toString();
     generalSetupArguments.sTeam0Name         = pSettings->value("team1/name", QString(tr("Locali"))).toString();
     generalSetupArguments.sTeam1Name         = pSettings->value("team2/name", QString(tr("Ospiti"))).toString();
-    generalSetupArguments.sTeam0LogoFilePath = pSettings->value("panel/logo0", "").toString();
-    generalSetupArguments.sTeam1LogoFilePath = pSettings->value("panel/logo1", "").toString();
 
     sTeam[0]    = generalSetupArguments.sTeam0Name;
     sTeam[1]    = generalSetupArguments.sTeam1Name;
@@ -290,14 +291,14 @@ VolleyController::GetSettings() {
 
 void
 VolleyController::sendAll() {
-    pVolleyPanel->setTeam(0, sTeam[0]);
-    pVolleyPanel->setTeam(1, sTeam[1]);
-    pVolleyPanel->setTimeout(0, iTimeout[0]);
-    pVolleyPanel->setTimeout(1, iTimeout[1]);
-    pVolleyPanel->setSets(0, iSet[0]);
-    pVolleyPanel->setSets(1, iSet[1]);
-    pVolleyPanel->setScore(0, iScore[0]);
-    pVolleyPanel->setScore(1, iScore[1]);
+    for(int i=0; i<2; i++) {
+        pVolleyPanel->setTeam(i, sTeam[i]);
+        pVolleyPanel->setTimeout(i, iTimeout[i]);
+        pVolleyPanel->setSets(i, iSet[i]);
+        pVolleyPanel->setScore(i, iScore[i]);
+    }
+    pVolleyPanel->setLogo(0, generalSetupArguments.sTeam0LogoFilePath);
+    pVolleyPanel->setLogo(1, generalSetupArguments.sTeam1LogoFilePath);
     pVolleyPanel->setServizio(iServizio);
     pVolleyPanel->setMirrored(generalSetupArguments.isPanelMirrored);
 }
@@ -671,6 +672,12 @@ VolleyController::onButtonChangeFieldClicked() {
     pTeamName[0]->setText(sTeam[0]);
     pTeamName[1]->setText(sTeam[1]);
 
+    generalSetupArguments.sTeam0Name = sTeam[1];
+    generalSetupArguments.sTeam1Name = sTeam[0];
+    sText = generalSetupArguments.sTeam0LogoFilePath;
+    generalSetupArguments.sTeam0LogoFilePath = generalSetupArguments.sTeam1LogoFilePath;
+    generalSetupArguments.sTeam1LogoFilePath = sText;
+
     int iVal = iSet[0];
     iSet[0] = iSet[1];
     iSet[1] = iVal;
@@ -750,6 +757,13 @@ VolleyController::onButtonNewSetClicked() {
     sTeam[1] = sText;
     pTeamName[0]->setText(sTeam[0]);
     pTeamName[1]->setText(sTeam[1]);
+
+    generalSetupArguments.sTeam0Name = sTeam[1];
+    generalSetupArguments.sTeam1Name = sTeam[0];
+    sText = generalSetupArguments.sTeam0LogoFilePath;
+    generalSetupArguments.sTeam0LogoFilePath = generalSetupArguments.sTeam1LogoFilePath;
+    generalSetupArguments.sTeam1LogoFilePath = sText;
+
     int iVal = iSet[0];
     iSet[0] = iSet[1];
     iSet[1] = iVal;

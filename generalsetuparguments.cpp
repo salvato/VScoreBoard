@@ -11,8 +11,8 @@ GeneralSetupArguments::GeneralSetupArguments()
     , sSlideDir(QStandardPaths::writableLocation(QStandardPaths::PicturesLocation))
     , sSpotDir(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
 {
-    sTeamName[0] = "Locali";
-    sTeamName[1] = "Ospiti";
+    sTeam[0] = "Locali";
+    sTeam[1] = "Ospiti";
     sTeamLogoFilePath[0] = ":/Logo_SSD_UniMe.png";
     sTeamLogoFilePath[1] = ":/Logo_UniMe.png";
 }

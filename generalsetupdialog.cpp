@@ -105,8 +105,8 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
     QLabel* pNumTimeoutLabel      = new QLabel(tr("Max Timeouts:"));
     QLabel* pMaxSetLabel          = new QLabel(tr("Max Sets:"));
     QLabel* pTimeoutDurationLabel = new QLabel(tr("Timeout sec:"));
-    QLabel* pTeam0Label           = new QLabel("Logo "+pTempArguments->sTeamName[0]);
-    QLabel* pTeam1Label           = new QLabel("Logo "+pTempArguments->sTeamName[1]);
+    QLabel* pTeam0Label           = new QLabel("Logo "+pTempArguments->sTeam[0]);
+    QLabel* pTeam1Label           = new QLabel("Logo "+pTempArguments->sTeam[1]);
 
     numTimeoutEdit.setMaxLength(1);
     maxSetEdit.setMaxLength(1);

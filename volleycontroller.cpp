@@ -263,11 +263,9 @@ VolleyController::GetSettings() {
     gsArgs.isPanelMirrored      = pSettings->value("panel/orientation",  true).toBool();
     gsArgs.sTeamLogoFilePath[0] = pSettings->value("panel/logo0", ":/Logo_UniMe.png").toString();
     gsArgs.sTeamLogoFilePath[1] = pSettings->value("panel/logo1", ":/Logo_SSD_UniMe.png").toString();
-    gsArgs.sTeamName[0]         = pSettings->value("team1/name", QString(tr("Locali"))).toString();
-    gsArgs.sTeamName[1]         = pSettings->value("team2/name", QString(tr("Ospiti"))).toString();
+    gsArgs.sTeam[0]             = pSettings->value("team1/name", QString(tr("Locali"))).toString();
+    gsArgs.sTeam[1]             = pSettings->value("team2/name", QString(tr("Ospiti"))).toString();
 
-    sTeam[0]    = gsArgs.sTeamName[0];
-    sTeam[1]    = gsArgs.sTeamName[1];
     iTimeout[0] = pSettings->value("team1/timeouts", 0).toInt();
     iTimeout[1] = pSettings->value("team2/timeouts", 0).toInt();
     iSet[0]     = pSettings->value("team1/sets", 0).toInt();
@@ -292,7 +290,7 @@ VolleyController::GetSettings() {
 void
 VolleyController::sendAll() {
     for(int i=0; i<2; i++) {
-        pVolleyPanel->setTeam(i, sTeam[i]);
+        pVolleyPanel->setTeam(i, gsArgs.sTeam[i]);
         pVolleyPanel->setTimeout(i, iTimeout[i]);
         pVolleyPanel->setSets(i, iSet[i]);
         pVolleyPanel->setScore(i, iScore[i]);
@@ -307,8 +305,8 @@ VolleyController::sendAll() {
 void
 VolleyController::SaveStatus() {
     // Save Present Game Values
-    pSettings->setValue("team1/name", sTeam[0]);
-    pSettings->setValue("team2/name", sTeam[1]);
+    pSettings->setValue("team1/name", gsArgs.sTeam[0]);
+    pSettings->setValue("team2/name", gsArgs.sTeam[1]);
     pSettings->setValue("team1/timeouts", iTimeout[0]);
     pSettings->setValue("team2/timeouts", iTimeout[1]);
     pSettings->setValue("team1/sets", iSet[0]);
@@ -348,7 +346,7 @@ VolleyController::buildControls() {
     pal.setColor(QPalette::Text, Qt::white);
     for(int iTeam=0; iTeam<2; iTeam++){
         // Teams
-        pTeamName[iTeam] = new Edit(sTeam[iTeam], iTeam);
+        pTeamName[iTeam] = new Edit(gsArgs.sTeam[iTeam], iTeam);
         pTeamName[iTeam]->setAlignment(Qt::AlignHCenter);
         pTeamName[iTeam]->setMaxLength(15);
         pal.setColor(QPalette::Text, Qt::white);
@@ -647,14 +645,10 @@ VolleyController::onScoreDecrement(int iTeam) {
 
 void
 VolleyController::onTeamTextChanged(QString sText, int iTeam) {
-    sTeam[iTeam] = sText;
-    pVolleyPanel->setTeam(iTeam, sTeam[iTeam]);
-    if(iTeam == 0)
-         gsArgs.sTeamName[0] = sTeam[iTeam];
-    else
-        gsArgs.sTeamName[1] = sTeam[iTeam];
+    gsArgs.sTeam[iTeam] = sText;
+    pVolleyPanel->setTeam(iTeam, gsArgs.sTeam[iTeam]);
     sText = QString("team%1/name").arg(iTeam+1, 1);
-    pSettings->setValue(sText, sTeam[iTeam]);
+    pSettings->setValue(sText, gsArgs.sTeam[iTeam]);
 }
 
 
@@ -666,14 +660,12 @@ VolleyController::onButtonChangeFieldClicked() {
                                      QMessageBox::No);
     if(iRes != QMessageBox::Yes) return;
 
-    QString sText = sTeam[0];
-    sTeam[0] = sTeam[1];
-    sTeam[1] = sText;
-    pTeamName[0]->setText(sTeam[0]);
-    pTeamName[1]->setText(sTeam[1]);
+    QString sText = gsArgs.sTeam[0];
+    gsArgs.sTeam[0] = gsArgs.sTeam[1];
+    gsArgs.sTeam[1] = sText;
+    pTeamName[0]->setText(gsArgs.sTeam[0]);
+    pTeamName[1]->setText(gsArgs.sTeam[1]);
 
-    gsArgs.sTeamName[0] = sTeam[1];
-    gsArgs.sTeamName[1] = sTeam[0];
     sText = gsArgs.sTeamLogoFilePath[0];
     gsArgs.sTeamLogoFilePath[0] = gsArgs.sTeamLogoFilePath[1];
     gsArgs.sTeamLogoFilePath[1] = sText;
@@ -752,14 +744,12 @@ VolleyController::onButtonNewSetClicked() {
     if(iRes != QMessageBox::Yes) return;
 
     // Exchange team's order in the field
-    QString sText = sTeam[0];
-    sTeam[0] = sTeam[1];
-    sTeam[1] = sText;
-    pTeamName[0]->setText(sTeam[0]);
-    pTeamName[1]->setText(sTeam[1]);
+    QString sText = gsArgs.sTeam[0];
+    gsArgs.sTeam[0] = gsArgs.sTeam[1];
+    gsArgs.sTeam[1] = sText;
+    pTeamName[0]->setText(gsArgs.sTeam[0]);
+    pTeamName[1]->setText(gsArgs.sTeam[1]);
 
-    gsArgs.sTeamName[0] = sTeam[1];
-    gsArgs.sTeamName[1] = sTeam[0];
     sText = gsArgs.sTeamLogoFilePath[0];
     gsArgs.sTeamLogoFilePath[0] = gsArgs.sTeamLogoFilePath[1];
     gsArgs.sTeamLogoFilePath[1] = sText;
@@ -802,11 +792,11 @@ VolleyController::onButtonNewGameClicked() {
                                      QMessageBox::Yes | QMessageBox::No,
                                      QMessageBox::No);
     if(iRes != QMessageBox::Yes) return;
-    sTeam[0]    = tr("Locali");
-    sTeam[1]    = tr("Ospiti");
+    gsArgs.sTeam[0]    = tr("Locali");
+    gsArgs.sTeam[1]    = tr("Ospiti");
     QString sText;
     for(int iTeam=0; iTeam<2; iTeam++) {
-        pTeamName[iTeam]->setText(sTeam[iTeam]);
+        pTeamName[iTeam]->setText(gsArgs.sTeam[iTeam]);
         iTimeout[iTeam] = 0;
         sText = QString("%1").arg(iTimeout[iTeam], 1);
         pTimeoutEdit[iTeam]->setText(sText);

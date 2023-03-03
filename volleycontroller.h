@@ -59,7 +59,6 @@ private:
 private:
     GeneralSetupArguments gsArgs;
     VolleyPanel*  pVolleyPanel;
-    QString       sTeam[2];
     int           iTimeout[2]{};
     int           iSet[2]{};
     int           iScore[2]{};

@@ -32,7 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ScorePanel::ScorePanel(QFile *myLogFile, QWidget *parent)
     : QWidget(parent)
     , isMirrored(false)
-    , isScoreOnly(false)
     , pLogFile(myLogFile)
     , pVideoPlayer(nullptr)
     , iCurrentSpot(0)
@@ -238,11 +237,6 @@ ScorePanel::onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus) {
         return;
     }
     hide();
-}
-
-
-void
-ScorePanel::getPanelScoreOnly() {
 }
 
 

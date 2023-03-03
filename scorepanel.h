@@ -72,7 +72,6 @@ protected:
 
 protected:
     bool               isMirrored;
-    bool               isScoreOnly;
     QFile*             pLogFile;
     QTranslator        Translator;
 
@@ -104,9 +103,6 @@ private:
     QString            logFileName;
 
     SlideWindow*       pMySlideWindow;
-
-private:
-    void               getPanelScoreOnly();
 
 private:
     QWidget*           pPanel;

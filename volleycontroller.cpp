@@ -224,10 +224,10 @@ VolleyController::CreateGameButtons() {
 
     QPixmap pixmap(":/buttonIcons/ExchangeVolleyField.png");
     QIcon ButtonIcon(pixmap);
-    changeFieldButton = new QPushButton(ButtonIcon, "");
-    changeFieldButton->setIconSize(pixmap.rect().size());
-    changeFieldButton->setFlat(true);
-    changeFieldButton->setToolTip("Inverti Campo");
+    pChangeFieldButton = new QPushButton(ButtonIcon, "");
+    pChangeFieldButton->setIconSize(pixmap.rect().size());
+    pChangeFieldButton->setFlat(true);
+    pChangeFieldButton->setToolTip("Inverti Campo");
 
     pixmap.load(":/buttonIcons/New-Game-Volley.png");
     ButtonIcon.addPixmap(pixmap);
@@ -247,7 +247,7 @@ VolleyController::CreateGameButtons() {
     gameButtonLayout->addStretch();
     gameButtonLayout->addWidget(pNewSetButton);
     gameButtonLayout->addStretch();
-    gameButtonLayout->addWidget(changeFieldButton);
+    gameButtonLayout->addWidget(pChangeFieldButton);
     gameButtonLayout->addStretch();
     return gameButtonLayout;
 }
@@ -461,7 +461,7 @@ VolleyController::setEventHandlers() {
     connect(pNewGameButton, SIGNAL(clicked(bool)),
             this, SLOT(onButtonNewGameClicked()));
     // Exchange Field Position
-    connect(changeFieldButton, SIGNAL(clicked(bool)),
+    connect(pChangeFieldButton, SIGNAL(clicked(bool)),
             this, SLOT(onButtonChangeFieldClicked()));
 
 // Keypress Sound

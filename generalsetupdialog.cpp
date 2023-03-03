@@ -1,6 +1,6 @@
 /*
  *
-Copyright (C) 2016  Gabriele Salvato
+Copyright (C) 2023  Gabriele Salvato
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,10 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QStandardPaths>
 
 
-/*!
- * \brief GeneralSetupDialog::GeneralSetupDialog
- * \param parent
- */
 GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
     : QDialog()
     , pTempArguments(pArguments)
@@ -67,10 +63,10 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
     setSlideDir();
     setSpotDir();
 
-    team0LogoPathEdit.setReadOnly(true);
-    team1LogoPathEdit.setReadOnly(true);
-    team0LogoPathEdit.setStyleSheet("background:red;color:white;");
-    team1LogoPathEdit.setStyleSheet("background:red;color:white;");
+    for(int i=0; i<2; i++) {
+        teamLogoPathEdit[0].setReadOnly(true);
+        teamLogoPathEdit[0].setStyleSheet("background:red;color:white;");
+    }
     setTeam0Path();
     setTeam1Path();
 
@@ -105,8 +101,10 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
     QLabel* pNumTimeoutLabel      = new QLabel(tr("Max Timeouts:"));
     QLabel* pMaxSetLabel          = new QLabel(tr("Max Sets:"));
     QLabel* pTimeoutDurationLabel = new QLabel(tr("Timeout sec:"));
-    QLabel* pTeam0Label           = new QLabel("Logo "+pTempArguments->sTeam[0]);
-    QLabel* pTeam1Label           = new QLabel("Logo "+pTempArguments->sTeam[1]);
+    QLabel* pTeamLabel[2];
+    for(int i=0; i<2; i++) {
+        pTeamLabel[i] = new QLabel("Logo "+pTempArguments->sTeam[i]);
+    }
 
     numTimeoutEdit.setMaxLength(1);
     maxSetEdit.setMaxLength(1);
@@ -143,23 +141,18 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
     pMainLayout->addWidget(pLabelDirection,         5, 0, 1, 2);
     pMainLayout->addWidget(&directionCombo,         5, 2, 1, 6);
 
-    pMainLayout->addWidget(pTeam0Label,             6, 0, 1, 1);
-    pMainLayout->addWidget(&team0LogoPathEdit,      6, 1, 1, 6);
+    pMainLayout->addWidget(pTeamLabel[0],           6, 0, 1, 1);
+    pMainLayout->addWidget(&teamLogoPathEdit[0],    6, 1, 1, 6);
     pMainLayout->addWidget(&buttonSelectTeam0Logo,  6, 7, 1, 1);
 
-    pMainLayout->addWidget(pTeam1Label,             7, 0, 1, 1);
-    pMainLayout->addWidget(&team1LogoPathEdit,      7, 1, 1, 6);
+    pMainLayout->addWidget(pTeamLabel[1],           7, 0, 1, 1);
+    pMainLayout->addWidget(&teamLogoPathEdit[1],    7, 1, 1, 6);
     pMainLayout->addWidget(&buttonSelectTeam1Logo,  7, 7, 1, 1);
 
     pMainLayout->addWidget(&buttonCancel,           8, 6, 1, 1);
     pMainLayout->addWidget(&buttonOk,               8, 7, 1, 1);
 
     setLayout(pMainLayout);
-
-#ifdef Q_OS_ANDROID
-    setWindowFlags(Qt::Window);
-    setAttribute(Qt::WA_DeleteOnClose,true);
-#endif
 }
 
 
@@ -240,7 +233,7 @@ GeneralSetupDialog::onSelectLogo0() {
     QString sFileName =
             QFileDialog::getOpenFileName(this,
                                          tr("Logo File"),
-                                         team0LogoPathEdit.text(),
+                                         teamLogoPathEdit[0].text(),
                                          tr("Image Files (*.png *.jpg *.bmp)"));
     if(sFileName == QString()) return; // "Cancel" has been pressed...
     pTempArguments->sTeamLogoFilePath[0] = sFileName;
@@ -253,7 +246,7 @@ GeneralSetupDialog::onSelectLogo1() {
     QString sFileName =
             QFileDialog::getOpenFileName(this,
                                          tr("Logo File"),
-                                         team1LogoPathEdit.text(),
+                                         teamLogoPathEdit[1].text(),
                                          tr("Image Files (*.png *.jpg *.bmp)"));
     if(sFileName == QString()) return; // "Cancel" has been pressed...
     pTempArguments->sTeamLogoFilePath[1] = sFileName;
@@ -280,8 +273,8 @@ GeneralSetupDialog::onOk() {
     pTempArguments->maxSet               = maxSetEdit.text().toInt();
     pTempArguments->sSlideDir            = slidesDirEdit.text();
     pTempArguments->sSpotDir             = spotsDirEdit.text();
-    pTempArguments->sTeamLogoFilePath[0] = team0LogoPathEdit.text();
-    pTempArguments->sTeamLogoFilePath[1] = team1LogoPathEdit.text();
+    pTempArguments->sTeamLogoFilePath[0] = teamLogoPathEdit[0].text();
+    pTempArguments->sTeamLogoFilePath[1] = teamLogoPathEdit[1].text();
     accept();
 }
 
@@ -294,25 +287,25 @@ GeneralSetupDialog::onCancel() {
 
 void
 GeneralSetupDialog::setTeam0Path() {
-    team0LogoPathEdit.setText(pTempArguments->sTeamLogoFilePath[0]);
+    teamLogoPathEdit[0].setText(pTempArguments->sTeamLogoFilePath[0]);
     QFile logoFile(pTempArguments->sTeamLogoFilePath[0]);
     if(logoFile.exists()) {
-        team0LogoPathEdit.setStyleSheet("background:white;color:black;");
+        teamLogoPathEdit[0].setStyleSheet("background:white;color:black;");
     }
     else {
-        team0LogoPathEdit.setStyleSheet("background:red;color:white;");
+        teamLogoPathEdit[0].setStyleSheet("background:red;color:white;");
     }
 }
 
 
 void
 GeneralSetupDialog::setTeam1Path() {
-    team1LogoPathEdit.setText(pTempArguments->sTeamLogoFilePath[1]);
+    teamLogoPathEdit[1].setText(pTempArguments->sTeamLogoFilePath[1]);
     QFile logoFile(pTempArguments->sTeamLogoFilePath[0]);
     if(logoFile.exists()) {
-        team1LogoPathEdit.setStyleSheet("background:white;color:black;");
+        teamLogoPathEdit[1].setStyleSheet("background:white;color:black;");
     }
     else {
-        team1LogoPathEdit.setStyleSheet("background:red;color:white;");
+        teamLogoPathEdit[1].setStyleSheet("background:red;color:white;");
     }
 }

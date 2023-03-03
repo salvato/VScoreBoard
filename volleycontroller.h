@@ -25,12 +25,12 @@ public:
 protected:
     void          GetSettings();
     void          SaveSettings();
-    void          SaveStatus();
-    void          GeneralSetup();
     void          setWindowLayout();
     QGridLayout*  CreateGamePanel();
     QHBoxLayout*  CreateGameButtons();
     void          buildFontSizes();
+    void          SaveStatus();
+    void          GeneralSetup();
     void          startSpotLoop();
     void          stopSpotLoop();
     void          startSlideShow();
@@ -82,10 +82,10 @@ private:
 
     QPushButton*  pNewSetButton{};
     QPushButton*  pNewGameButton{};
-    QPushButton  *changeFieldButton{};
+    QPushButton*  pChangeFieldButton{};
     bool          bFontBuilt;
-    QPalette           panelPalette;
-    QLinearGradient    panelGradient;
-    QBrush             panelBrush;
+    QPalette        panelPalette;
+    QLinearGradient panelGradient;
+    QBrush          panelBrush;
 };
 

@@ -69,8 +69,7 @@ private:
     QPushButton buttonSelectSlidesDir;
     QPushButton buttonSelectSpotsDir;
 
-    QLineEdit   team0LogoPathEdit;
-    QLineEdit   team1LogoPathEdit;
+    QLineEdit   teamLogoPathEdit[2];
     QPushButton buttonSelectTeam0Logo;
     QPushButton buttonSelectTeam1Logo;
 

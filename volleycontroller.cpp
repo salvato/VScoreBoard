@@ -33,11 +33,15 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     panelBrush = QBrush(panelGradient);
     panelPalette.setBrush(QPalette::Active,   QPalette::Window, panelBrush);
     panelPalette.setBrush(QPalette::Inactive, QPalette::Window, panelBrush);
-    panelPalette.setColor(QPalette::WindowText,    Qt::yellow);
-    panelPalette.setColor(QPalette::Base,          Qt::black);
-    panelPalette.setColor(QPalette::AlternateBase, Qt::blue);
-    panelPalette.setColor(QPalette::Text,          Qt::yellow);
-    panelPalette.setColor(QPalette::BrightText,    Qt::white);
+
+    panelPalette.setColor(QPalette::WindowText,      Qt::yellow);
+    panelPalette.setColor(QPalette::Base,            Qt::black);
+    panelPalette.setColor(QPalette::AlternateBase,   Qt::blue);
+    panelPalette.setColor(QPalette::Text,            Qt::yellow);
+    panelPalette.setColor(QPalette::BrightText,      Qt::white);
+//    panelPalette.setColor(QPalette::HighlightedText, Qt::white);
+//    panelPalette.setColor(QPalette::Highlight,       QColor(0, 0, 0, 0));
+
     setPalette(panelPalette);
 
     GetSettings();
@@ -550,14 +554,15 @@ VolleyController::onTimeOutIncrement(int iTeam) {
     }
     pTimeoutDecrement[iTeam]->setEnabled(true);
     pVolleyPanel->setTimeout(iTeam, iTimeout[iTeam]);
-    pVolleyPanel->startTimeout(generalSetupArguments.iTimeoutDuration);
-    QString sText;
-    sText = QString("%1").arg(iTimeout[iTeam]);
+    if(generalSetupArguments.iTimeoutDuration > 0) {
+        pVolleyPanel->startTimeout(generalSetupArguments.iTimeoutDuration);
+    }
+    QString sText = QString("%1").arg(iTimeout[iTeam]);
     pTimeoutEdit[iTeam]->setText(sText);
     sText = QString("team%1/timeouts").arg(iTeam+1, 1);
     pSettings->setValue(sText, iTimeout[iTeam]);
+    pTimeoutEdit[iTeam]->setFocus();
 }
-
 
 void
 VolleyController::onTimeOutDecrement(int iTeam) {

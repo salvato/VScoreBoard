@@ -8,12 +8,12 @@ public:
     GeneralSetupArguments();
 
 public:
-    int        maxTimeout;
-    int        maxSet;
-    int        iTimeoutDuration;
+    int maxTimeout;
+    int maxSet;
+    int iTimeoutDuration;
 
-    QString    sSlideDir;
-    QString    sSpotDir;
+    QString sSlideDir;
+    QString sSpotDir;
     QString sTeam0Name;
     QString sTeam1Name;
     QString sTeam0LogoFilePath;

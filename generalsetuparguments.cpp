@@ -10,5 +10,9 @@ GeneralSetupArguments::GeneralSetupArguments()
     // The default Directories to look for the slides and spots
     , sSlideDir(QStandardPaths::writableLocation(QStandardPaths::PicturesLocation))
     , sSpotDir(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
+    , sTeam0Name("Locali")
+    , sTeam1Name("Ospiti")
+    , sTeam0LogoFilePath("./Logo_SSD_UniMe.png")
+    , sTeam1LogoFilePath("./Logo_UniMe.png")
 {
 }

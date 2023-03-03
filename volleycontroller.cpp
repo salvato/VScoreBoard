@@ -39,8 +39,8 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     panelPalette.setColor(QPalette::AlternateBase,   Qt::blue);
     panelPalette.setColor(QPalette::Text,            Qt::yellow);
     panelPalette.setColor(QPalette::BrightText,      Qt::white);
-//    panelPalette.setColor(QPalette::HighlightedText, Qt::white);
-//    panelPalette.setColor(QPalette::Highlight,       QColor(0, 0, 0, 0));
+    panelPalette.setColor(QPalette::HighlightedText, Qt::gray);
+    panelPalette.setColor(QPalette::Highlight,       Qt::transparent);
 
     setPalette(panelPalette);
 
@@ -561,7 +561,7 @@ VolleyController::onTimeOutIncrement(int iTeam) {
     pTimeoutEdit[iTeam]->setText(sText);
     sText = QString("team%1/timeouts").arg(iTeam+1, 1);
     pSettings->setValue(sText, iTimeout[iTeam]);
-    pTimeoutEdit[iTeam]->setFocus();
+    pTimeoutEdit[iTeam]->setFocus(); // Per evitare che il focus vada all'edit delle squadre
 }
 
 void

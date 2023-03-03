@@ -68,19 +68,19 @@ VolleyPanel::~VolleyPanel() {
 
 void
 VolleyPanel::setTeam(int iTeam, QString sTeamName) {
-    team[iTeam]->setText(sTeamName.left(maxTeamNameLen));
+    pTeam[iTeam]->setText(sTeamName.left(maxTeamNameLen));
 }
 
 
 void
 VolleyPanel::setScore(int iTeam, int iScore) {
-    score[iTeam]->setText(QString("%1").arg(iScore));
+    pScore[iTeam]->setText(QString("%1").arg(iScore));
 }
 
 
 void
 VolleyPanel::setSets(int iTeam, int iSets) {
-    set[iTeam]->setText(QString("%1").arg(iSets));
+    pSet[iTeam]->setText(QString("%1").arg(iSets));
 }
 
 
@@ -163,24 +163,24 @@ VolleyPanel::createPanelElements() {
     }
 
     // Set
-    setLabel = new QLabel(tr("Set"));
-    setLabel->setFont(QFont(sFontName, iLabelsFontSize/2, fontWeight));
-    setLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    pSetLabel = new QLabel(tr("Set"));
+    pSetLabel->setFont(QFont(sFontName, iLabelsFontSize/2, fontWeight));
+    pSetLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     for(int i=0; i<2; i++) {
-        set[i] = new QLabel("8");
-        set[i]->setFrameStyle(QFrame::NoFrame);
-        set[i]->setFont(QFont(sFontName, iSetFontSize, fontWeight));
+        pSet[i] = new QLabel("8");
+        pSet[i]->setFrameStyle(QFrame::NoFrame);
+        pSet[i]->setFont(QFont(sFontName, iSetFontSize, fontWeight));
     }
 
     // Score
-    scoreLabel = new QLabel(tr(""));
-    scoreLabel->setFont(QFont(sFontName, iLabelsFontSize, fontWeight));
-    scoreLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    pScoreLabel = new QLabel(tr(""));
+    pScoreLabel->setFont(QFont(sFontName, iLabelsFontSize, fontWeight));
+    pScoreLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     for(int i=0; i<2; i++){
-        score[i] = new QLabel("88");
-        score[i]->setAlignment(Qt::AlignHCenter);
-        score[i]->setFont(QFont(sFontName, iScoreFontSize, fontWeight));
-        score[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        pScore[i] = new QLabel("88");
+        pScore[i]->setAlignment(Qt::AlignHCenter);
+        pScore[i]->setFont(QFont(sFontName, iScoreFontSize, fontWeight));
+        pScore[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     }
 
     // Servizio
@@ -193,13 +193,13 @@ VolleyPanel::createPanelElements() {
     QPalette pal = panelPalette;
     pal.setColor(QPalette::WindowText, Qt::white);
     for(int i=0; i<2; i++) {
-        team[i] = new QLabel();
-        team[i]->setPalette(pal);
-        team[i]->setFont(QFont(sFontName, iTeamFontSize, fontWeight));
-        team[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        pTeam[i] = new QLabel();
+        pTeam[i]->setPalette(pal);
+        pTeam[i]->setFont(QFont(sFontName, iTeamFontSize, fontWeight));
+        pTeam[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     }
-    team[0]->setText(tr("Locali"));
-    team[1]->setText(tr("Ospiti"));
+    pTeam[0]->setText(tr("Locali"));
+    pTeam[1]->setText(tr("Ospiti"));
 }
 
 
@@ -244,18 +244,18 @@ VolleyPanel::createPanel() {
     pPixmapService = new QPixmap(":/ball2.png");
     *pPixmapService = pPixmapService->scaled(2*iLabelsFontSize/3, 2*iLabelsFontSize/3);
 
-    layout->addWidget(team[ileft],      0, 0, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(team[iright],     0, 6, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pTeam[ileft],     0, 0, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pTeam[iright],    0, 6, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
 
-    layout->addWidget(score[ileft],     2, 1, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pScore[ileft],    2, 1, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
     layout->addWidget(servizio[ileft],  2, 4, 4, 1, Qt::AlignLeft   |Qt::AlignTop);
-    layout->addWidget(scoreLabel,       2, 5, 4, 2, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pScoreLabel,      2, 5, 4, 2, Qt::AlignHCenter|Qt::AlignVCenter);
     layout->addWidget(servizio[iright], 2, 7, 4, 1, Qt::AlignRight  |Qt::AlignTop);
-    layout->addWidget(score[iright],    2, 8, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pScore[iright],   2, 8, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
 
-    layout->addWidget(set[ileft],       6, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(setLabel,         6, 3, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(set[iright],      6, 9, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pSet[ileft],      6, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pSetLabel,        6, 3, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pSet[iright],     6, 9, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
 
     layout->addWidget(leftTopLabel,     8, 0, 2, 2, Qt::AlignLeft   |Qt::AlignBottom);
     layout->addWidget(timeout[ileft],   8, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
@@ -274,10 +274,10 @@ VolleyPanel::changeEvent(QEvent *event) {
         logMessage(pLogFile,
                    Q_FUNC_INFO,
                    QString("%1  %2")
-                   .arg(setLabel->text(), scoreLabel->text()));
+                   .arg(pSetLabel->text(), pScoreLabel->text()));
 #endif
-        setLabel->setText(tr("Set"));
-        scoreLabel->setText(tr("Punti"));
+        pSetLabel->setText(tr("Set"));
+        pScoreLabel->setText(tr("Punti"));
     } else
         QWidget::changeEvent(event);
 }

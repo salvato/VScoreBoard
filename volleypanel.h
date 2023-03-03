@@ -37,11 +37,11 @@ public:
 private:
     QString           sLeftLogo;
     QString           sRightLogo;
-    QLabel            *team[2];
-    QLabel            *score[2];
-    QLabel            *scoreLabel;
-    QLabel            *set[2];
-    QLabel            *setLabel;
+    QLabel*           pTeam[2];
+    QLabel*           pScore[2];
+    QLabel*           pScoreLabel;
+    QLabel*           pSet[2];
+    QLabel*           pSetLabel;
     QLabel            *servizio[2];
     QLabel            *timeout[2];
     QLabel            *timeoutLabel;

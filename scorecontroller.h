@@ -7,7 +7,6 @@
 #include <QSettings>
 
 #include "panelorientation.h"
-#include "generalsetuparguments.h"
 
 
 QT_FORWARD_DECLARE_CLASS(QHBoxLayout)
@@ -48,7 +47,6 @@ protected:
 
 protected:
     int                   iCurrentSpot;
-    GeneralSetupArguments generalSetupArguments;
     QFile*                pLogFile;
 //    QSoundEffect*         pButtonClick;
     QSettings*            pSettings;

@@ -255,19 +255,19 @@ VolleyController::CreateGameButtons() {
 
 void
 VolleyController::GetSettings() {
-    generalSetupArguments.maxTimeout         = pSettings->value("volley/maxTimeout", 2).toInt();
-    generalSetupArguments.maxSet             = pSettings->value("volley/maxSet", 3).toInt();
-    generalSetupArguments.iTimeoutDuration   = pSettings->value("volley/TimeoutDuration", 30).toInt();
-    generalSetupArguments.sSlideDir          = pSettings->value("directories/slides", generalSetupArguments.sSlideDir).toString();
-    generalSetupArguments.sSpotDir           = pSettings->value("directories/spots",  generalSetupArguments.sSpotDir).toString();
-    generalSetupArguments.isPanelMirrored    = pSettings->value("panel/orientation",  true).toBool();
-    generalSetupArguments.sTeam0LogoFilePath = pSettings->value("panel/logo0", ":/Logo_UniMe.png").toString();
-    generalSetupArguments.sTeam1LogoFilePath = pSettings->value("panel/logo1", ":/Logo_SSD_UniMe.png").toString();
-    generalSetupArguments.sTeam0Name         = pSettings->value("team1/name", QString(tr("Locali"))).toString();
-    generalSetupArguments.sTeam1Name         = pSettings->value("team2/name", QString(tr("Ospiti"))).toString();
+    generalSetupArguments.maxTimeout           = pSettings->value("volley/maxTimeout", 2).toInt();
+    generalSetupArguments.maxSet               = pSettings->value("volley/maxSet", 3).toInt();
+    generalSetupArguments.iTimeoutDuration     = pSettings->value("volley/TimeoutDuration", 30).toInt();
+    generalSetupArguments.sSlideDir            = pSettings->value("directories/slides", generalSetupArguments.sSlideDir).toString();
+    generalSetupArguments.sSpotDir             = pSettings->value("directories/spots",  generalSetupArguments.sSpotDir).toString();
+    generalSetupArguments.isPanelMirrored      = pSettings->value("panel/orientation",  true).toBool();
+    generalSetupArguments.sTeamLogoFilePath[0] = pSettings->value("panel/logo0", ":/Logo_UniMe.png").toString();
+    generalSetupArguments.sTeamLogoFilePath[1] = pSettings->value("panel/logo1", ":/Logo_SSD_UniMe.png").toString();
+    generalSetupArguments.sTeamName[0]         = pSettings->value("team1/name", QString(tr("Locali"))).toString();
+    generalSetupArguments.sTeamName[1]         = pSettings->value("team2/name", QString(tr("Ospiti"))).toString();
 
-    sTeam[0]    = generalSetupArguments.sTeam0Name;
-    sTeam[1]    = generalSetupArguments.sTeam1Name;
+    sTeam[0]    = generalSetupArguments.sTeamName[0];
+    sTeam[1]    = generalSetupArguments.sTeamName[1];
     iTimeout[0] = pSettings->value("team1/timeouts", 0).toInt();
     iTimeout[1] = pSettings->value("team2/timeouts", 0).toInt();
     iSet[0]     = pSettings->value("team1/sets", 0).toInt();
@@ -297,8 +297,8 @@ VolleyController::sendAll() {
         pVolleyPanel->setSets(i, iSet[i]);
         pVolleyPanel->setScore(i, iScore[i]);
     }
-    pVolleyPanel->setLogo(0, generalSetupArguments.sTeam0LogoFilePath);
-    pVolleyPanel->setLogo(1, generalSetupArguments.sTeam1LogoFilePath);
+    pVolleyPanel->setLogo(0, generalSetupArguments.sTeamLogoFilePath[0]);
+    pVolleyPanel->setLogo(1, generalSetupArguments.sTeamLogoFilePath[1]);
     pVolleyPanel->setServizio(iServizio);
     pVolleyPanel->setMirrored(generalSetupArguments.isPanelMirrored);
 }
@@ -328,8 +328,8 @@ VolleyController::SaveSettings() { // Save General Setup Values
     pSettings->setValue("volley/maxSet",          generalSetupArguments.maxSet);
     pSettings->setValue("volley/TimeoutDuration", generalSetupArguments.iTimeoutDuration);
     pSettings->setValue("panel/orientation",      generalSetupArguments.isPanelMirrored);
-    pSettings->setValue("panel/logo0",            generalSetupArguments.sTeam0LogoFilePath);
-    pSettings->setValue("panel/logo1",            generalSetupArguments.sTeam1LogoFilePath);
+    pSettings->setValue("panel/logo0",            generalSetupArguments.sTeamLogoFilePath[0]);
+    pSettings->setValue("panel/logo1",            generalSetupArguments.sTeamLogoFilePath[1]);
 }
 
 
@@ -650,9 +650,9 @@ VolleyController::onTeamTextChanged(QString sText, int iTeam) {
     sTeam[iTeam] = sText;
     pVolleyPanel->setTeam(iTeam, sTeam[iTeam]);
     if(iTeam == 0)
-         generalSetupArguments.sTeam0Name = sTeam[iTeam];
+         generalSetupArguments.sTeamName[0] = sTeam[iTeam];
     else
-        generalSetupArguments.sTeam1Name = sTeam[iTeam];
+        generalSetupArguments.sTeamName[1] = sTeam[iTeam];
     sText = QString("team%1/name").arg(iTeam+1, 1);
     pSettings->setValue(sText, sTeam[iTeam]);
 }
@@ -672,11 +672,11 @@ VolleyController::onButtonChangeFieldClicked() {
     pTeamName[0]->setText(sTeam[0]);
     pTeamName[1]->setText(sTeam[1]);
 
-    generalSetupArguments.sTeam0Name = sTeam[1];
-    generalSetupArguments.sTeam1Name = sTeam[0];
-    sText = generalSetupArguments.sTeam0LogoFilePath;
-    generalSetupArguments.sTeam0LogoFilePath = generalSetupArguments.sTeam1LogoFilePath;
-    generalSetupArguments.sTeam1LogoFilePath = sText;
+    generalSetupArguments.sTeamName[0] = sTeam[1];
+    generalSetupArguments.sTeamName[1] = sTeam[0];
+    sText = generalSetupArguments.sTeamLogoFilePath[0];
+    generalSetupArguments.sTeamLogoFilePath[0] = generalSetupArguments.sTeamLogoFilePath[1];
+    generalSetupArguments.sTeamLogoFilePath[1] = sText;
 
     int iVal = iSet[0];
     iSet[0] = iSet[1];
@@ -758,11 +758,11 @@ VolleyController::onButtonNewSetClicked() {
     pTeamName[0]->setText(sTeam[0]);
     pTeamName[1]->setText(sTeam[1]);
 
-    generalSetupArguments.sTeam0Name = sTeam[1];
-    generalSetupArguments.sTeam1Name = sTeam[0];
-    sText = generalSetupArguments.sTeam0LogoFilePath;
-    generalSetupArguments.sTeam0LogoFilePath = generalSetupArguments.sTeam1LogoFilePath;
-    generalSetupArguments.sTeam1LogoFilePath = sText;
+    generalSetupArguments.sTeamName[0] = sTeam[1];
+    generalSetupArguments.sTeamName[1] = sTeam[0];
+    sText = generalSetupArguments.sTeamLogoFilePath[0];
+    generalSetupArguments.sTeamLogoFilePath[0] = generalSetupArguments.sTeamLogoFilePath[1];
+    generalSetupArguments.sTeamLogoFilePath[1] = sText;
 
     int iVal = iSet[0];
     iSet[0] = iSet[1];

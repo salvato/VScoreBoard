@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scorecontroller.h"
+#include "generalsetuparguments.h"
 #include "panelorientation.h"
 
 
@@ -35,8 +36,6 @@ protected:
     void          startSlideShow();
     void          stopSlideShow();
 
-
-
 private slots:
     void closeEvent(QCloseEvent*);
     void onTimeOutIncrement(int iTeam);
@@ -58,6 +57,7 @@ private:
     void          sendAll();
 
 private:
+    GeneralSetupArguments generalSetupArguments;
     VolleyPanel*  pVolleyPanel;
     QString       sTeam[2];
     int           iTimeout[2]{};

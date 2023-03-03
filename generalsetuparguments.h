@@ -16,8 +16,6 @@ public:
 
     QString sSlideDir;
     QString sSpotDir;
-    QString sTeam0Name;
-    QString sTeam1Name;
-    QString sTeam0LogoFilePath;
-    QString sTeam1LogoFilePath;
+    QString sTeamName[2];
+    QString sTeamLogoFilePath[2];
 };

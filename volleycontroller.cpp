@@ -436,48 +436,52 @@ VolleyController::setEventHandlers() {
                 this, SLOT(onTeamTextChanged(QString,int)));
         connect(pTimeoutIncrement[iTeam], SIGNAL(buttonClicked(int)),
                 this, SLOT(onTimeOutIncrement(int)));
-        connect(pTimeoutIncrement[iTeam], SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
         connect(pTimeoutDecrement[iTeam], SIGNAL(buttonClicked(int)),
                 this, SLOT(onTimeOutDecrement(int)));
-        connect(pTimeoutDecrement[iTeam], SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
         connect(pSetsIncrement[iTeam], SIGNAL(buttonClicked(int)),
                 this, SLOT(onSetIncrement(int)));
-        connect(pSetsIncrement[iTeam], SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
         connect(pSetsDecrement[iTeam], SIGNAL(buttonClicked(int)),
                 this, SLOT(onSetDecrement(int)));
-        connect(pSetsDecrement[iTeam], SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
         connect(pService[iTeam], SIGNAL(buttonClicked(int)),
                 this, SLOT(onServiceClicked(int)));
-        connect(pService[iTeam], SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
         connect(pScoreIncrement[iTeam], SIGNAL(buttonClicked(int)),
                 this, SLOT(onScoreIncrement(int)));
-        connect(pScoreIncrement[iTeam], SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
         connect(pScoreDecrement[iTeam], SIGNAL(buttonClicked(int)),
                 this, SLOT(onScoreDecrement(int)));
-        connect(pScoreDecrement[iTeam], SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
     }
     // New Set
     connect(pNewSetButton, SIGNAL(clicked(bool)),
             this, SLOT(onButtonNewSetClicked()));
-    connect(pNewSetButton, SIGNAL(clicked()),
-            pButtonClick, SLOT(play()));
     // New Game
     connect(pNewGameButton, SIGNAL(clicked(bool)),
             this, SLOT(onButtonNewGameClicked()));
-    connect(pNewGameButton, SIGNAL(clicked()),
-            pButtonClick, SLOT(play()));
     // Exchange Field Position
     connect(changeFieldButton, SIGNAL(clicked(bool)),
             this, SLOT(onButtonChangeFieldClicked()));
-    connect(changeFieldButton, SIGNAL(clicked()),
-            pButtonClick, SLOT(play()));
+
+// Keypress Sound
+//    for(int iTeam=0; iTeam <2; iTeam++) {
+//        connect(pTimeoutIncrement[iTeam], SIGNAL(clicked()),
+//                pButtonClick, SLOT(play()));
+//        connect(pTimeoutDecrement[iTeam], SIGNAL(clicked()),
+//                pButtonClick, SLOT(play()));
+//        connect(pSetsIncrement[iTeam], SIGNAL(clicked()),
+//                pButtonClick, SLOT(play()));
+//        connect(pSetsDecrement[iTeam], SIGNAL(clicked()),
+//                pButtonClick, SLOT(play()));
+//        connect(pService[iTeam], SIGNAL(clicked()),
+//                pButtonClick, SLOT(play()));
+//        connect(pScoreIncrement[iTeam], SIGNAL(clicked()),
+//                pButtonClick, SLOT(play()));
+//        connect(pScoreDecrement[iTeam], SIGNAL(clicked()),
+//                pButtonClick, SLOT(play()));
+//    }
+//    connect(pNewSetButton, SIGNAL(clicked()),
+//            pButtonClick, SLOT(play()));
+//    connect(pNewGameButton, SIGNAL(clicked()),
+//            pButtonClick, SLOT(play()));
+//    connect(changeFieldButton, SIGNAL(clicked()),
+//            pButtonClick, SLOT(play()));
 }
 
 

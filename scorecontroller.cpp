@@ -16,7 +16,7 @@
 ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
     : QMainWindow(parent)
     , pLogFile(myLogFile)
-    , pButtonClick(nullptr)
+//    , pButtonClick(nullptr)
     , pSettings(new QSettings("Gabriele Salvato", "Volley Controller"))
 {
     QList<QScreen*> screens = QApplication::screens();
@@ -34,8 +34,8 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
     setWindowTitle("Score Controller");
 
     // The click sound for button press.
-    pButtonClick = new QSoundEffect(this);
-    pButtonClick->setSource(QUrl::fromLocalFile(":/key.wav"));
+//    pButtonClick = new QSoundEffect(this);
+//    pButtonClick->setSource(QUrl::fromLocalFile(":/key.wav"));
 
     iCurrentSpot  = 0;
 
@@ -70,25 +70,25 @@ ScoreController::CreateSpotButtons() {
 
     pixmap.load(":/buttonIcons/PanelSetup.png");
     ButtonIcon.addPixmap(pixmap);
-    generalSetupButton = new QPushButton(ButtonIcon, "");
-    generalSetupButton->setIconSize(pixmap.rect().size());
-    generalSetupButton->setFlat(true);
-    generalSetupButton->setToolTip("General Setup");
+    pGeneralSetupButton = new QPushButton(ButtonIcon, "");
+    pGeneralSetupButton->setIconSize(pixmap.rect().size());
+    pGeneralSetupButton->setFlat(true);
+    pGeneralSetupButton->setToolTip("General Setup");
 
     pixmap.load(":/buttonIcons/video-display.png");
     ButtonIcon.addPixmap(pixmap);
-    shutdownButton = new QPushButton(ButtonIcon, "");
-    shutdownButton->setIconSize(pixmap.rect().size());
-    shutdownButton->setFlat(true);
-    shutdownButton->setToolTip("Shutdown System");
+    pShutdownButton = new QPushButton(ButtonIcon, "");
+    pShutdownButton->setIconSize(pixmap.rect().size());
+    pShutdownButton->setFlat(true);
+    pShutdownButton->setToolTip("Shutdown System");
 
     spotButtonLayout->addWidget(pSpotButton);
     spotButtonLayout->addStretch();
     spotButtonLayout->addWidget(pSlideShowButton);
     spotButtonLayout->addStretch();
-    spotButtonLayout->addWidget(generalSetupButton);
+    spotButtonLayout->addWidget(pGeneralSetupButton);
     spotButtonLayout->addStretch();
-    spotButtonLayout->addWidget(shutdownButton);
+    spotButtonLayout->addWidget(pShutdownButton);
 
     return spotButtonLayout;
 }
@@ -96,25 +96,26 @@ ScoreController::CreateSpotButtons() {
 
 void
 ScoreController::connectButtonSignals() {
-        connect(pSpotButton, SIGNAL(clicked(bool)),
-                this, SLOT(onButtonStartStopSpotLoopClicked()));
-        connect(pSpotButton, SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
+    connect(pSpotButton, SIGNAL(clicked(bool)),
+            this, SLOT(onButtonSpotLoopClicked()));
 
-        connect(pSlideShowButton, SIGNAL(clicked(bool)),
-                this, SLOT(onButtonStartStopSlideShowClicked()));
-        connect(pSlideShowButton, SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
+    connect(pSlideShowButton, SIGNAL(clicked(bool)),
+            this, SLOT(onButtonSlideShowClicked()));
+    connect(pGeneralSetupButton, SIGNAL(clicked(bool)),
+            this, SLOT(onButtonSetupClicked()));
 
-        connect(generalSetupButton, SIGNAL(clicked(bool)),
-                this, SLOT(onButtonSetupClicked()));
-        connect(generalSetupButton, SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
+    connect(pShutdownButton, SIGNAL(clicked(bool)),
+            this, SLOT(onButtonShutdownClicked()));
 
-        connect(shutdownButton, SIGNAL(clicked(bool)),
-                this, SLOT(onButtonShutdownClicked()));
-        connect(shutdownButton, SIGNAL(clicked()),
-                pButtonClick, SLOT(play()));
+// Keypress Sound
+//    connect(pSpotButton, SIGNAL(clicked()),
+//            pButtonClick, SLOT(play()));
+//    connect(pSlideShowButton, SIGNAL(clicked()),
+//            pButtonClick, SLOT(play()));
+//    connect(pGeneralSetupButton, SIGNAL(clicked()),
+//            pButtonClick, SLOT(play()));
+//    connect(pShutdownButton, SIGNAL(clicked()),
+//            pButtonClick, SLOT(play()));
 }
 
 
@@ -140,7 +141,7 @@ void
 ScoreController::UpdateUI() {
     pSpotButton->setEnabled(true);
     pSlideShowButton->setEnabled(true);
-    shutdownButton->setEnabled(true);
+    pShutdownButton->setEnabled(true);
 }
 
 
@@ -165,7 +166,7 @@ ScoreController::stopSlideShow() {
 
 
 void
-ScoreController::onButtonStartStopSpotLoopClicked() {
+ScoreController::onButtonSpotLoopClicked() {
     QPixmap pixmap;
     QIcon ButtonIcon;
     if(myStatus == showPanel) {
@@ -174,7 +175,7 @@ ScoreController::onButtonStartStopSpotLoopClicked() {
         pSpotButton->setIcon(ButtonIcon);
         pSpotButton->setIconSize(pixmap.rect().size());
         pSlideShowButton->setDisabled(true);
-        generalSetupButton->setDisabled(true);
+        pGeneralSetupButton->setDisabled(true);
         startSpotLoop();
         myStatus = showSpots;
     }
@@ -184,7 +185,7 @@ ScoreController::onButtonStartStopSpotLoopClicked() {
         pSpotButton->setIcon(ButtonIcon);
         pSpotButton->setIconSize(pixmap.rect().size());
         pSlideShowButton->setEnabled(true);
-        generalSetupButton->setEnabled(true);
+        pGeneralSetupButton->setEnabled(true);
         stopSpotLoop();
         myStatus = showPanel;
     }
@@ -209,12 +210,12 @@ ScoreController::onSetPanelDirection(PanelOrientation direction) {
 
 
 void
-ScoreController::onButtonStartStopSlideShowClicked() {
+ScoreController::onButtonSlideShowClicked() {
     QPixmap pixmap;
     QIcon ButtonIcon;
     if(myStatus == showPanel) {
         pSpotButton->setDisabled(true);
-        generalSetupButton->setDisabled(true);
+        pGeneralSetupButton->setDisabled(true);
         pixmap.load(":/buttonIcons/sign_stop.png");
         ButtonIcon.addPixmap(pixmap);
         pSlideShowButton->setIcon(ButtonIcon);
@@ -224,7 +225,7 @@ ScoreController::onButtonStartStopSlideShowClicked() {
     }
     else {
         pSpotButton->setEnabled(true);
-        generalSetupButton->setEnabled(true);
+        pGeneralSetupButton->setEnabled(true);
         pixmap.load(":/buttonIcons/PlaySlides.png");
         ButtonIcon.addPixmap(pixmap);
         pSlideShowButton->setIcon(ButtonIcon);

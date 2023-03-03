@@ -2,7 +2,7 @@
 
 #include <QMainWindow>
 #include <QFile>
-#include <QSoundEffect>
+//#include <QSoundEffect>
 #include <QFileInfoList>
 #include <QSettings>
 
@@ -25,8 +25,8 @@ public:
 signals:
 
 protected slots:
-    void onButtonStartStopSpotLoopClicked();
-    void onButtonStartStopSlideShowClicked();
+    void onButtonSpotLoopClicked();
+    void onButtonSlideShowClicked();
     void onButtonSetupClicked();
     void onButtonShutdownClicked();
 
@@ -47,15 +47,15 @@ protected:
     virtual void    stopSlideShow();
 
 protected:
+    int                   iCurrentSpot;
     GeneralSetupArguments generalSetupArguments;
     QFile*                pLogFile;
-    QSoundEffect*         pButtonClick;
-    int                   iCurrentSpot;
+//    QSoundEffect*         pButtonClick;
     QSettings*            pSettings;
     QPushButton*          pSpotButton{};
     QPushButton*          pSlideShowButton{};
-    QPushButton*          generalSetupButton{};
-    QPushButton*          shutdownButton{};
+    QPushButton*          pGeneralSetupButton{};
+    QPushButton*          pShutdownButton{};
     QHBoxLayout*          pSpotButtonsLayout;
     enum status {
         showPanel,

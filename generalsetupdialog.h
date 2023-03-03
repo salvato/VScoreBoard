@@ -36,7 +36,6 @@ class GeneralSetupDialog : public QDialog
     Q_OBJECT
 public:
     explicit GeneralSetupDialog(GeneralSetupArguments* pArguments);
-    void setCurrrentOrientaton(PanelOrientation newDirection);
 
 signals:
     void changeOrientation(PanelOrientation newOrientation);

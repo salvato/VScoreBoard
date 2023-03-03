@@ -17,7 +17,6 @@
 VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     : ScoreController(myLogFile, parent)
     , pVolleyPanel(new VolleyPanel(myLogFile))
-    , isPanelMirrored(true)
     , bFontBuilt(false)
 {
     setWindowIcon(QIcon(":/Logo.ico"));
@@ -45,8 +44,6 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     setPalette(panelPalette);
 
     GetSettings();
-
-    prepareDirectories();
 
     buildControls();
     setWindowLayout();
@@ -82,52 +79,26 @@ VolleyController::resizeEvent(QResizeEvent *event) {
 void
 VolleyController::GeneralSetup() {
     GeneralSetupDialog* pGeneralSetupDialog = new GeneralSetupDialog(&generalSetupArguments);
-    if(isPanelMirrored)
-        pGeneralSetupDialog->setCurrrentOrientaton(PanelOrientation::Reflected);
-    else
-        pGeneralSetupDialog->setCurrrentOrientaton(PanelOrientation::Reflected);
     connect(pGeneralSetupDialog, SIGNAL(changeOrientation(PanelOrientation)),
             this, SLOT(onChangePanelOrientation(PanelOrientation)));
     int iResult = pGeneralSetupDialog->exec();
     if(iResult == QDialog::Accepted) {
-        sSlideDir = generalSetupArguments.sSlideDir;
-        if(!sSlideDir.endsWith(QString("/"))) sSlideDir+= QString("/");
-        QDir slideDir(sSlideDir);
-        if(sSlideDir != QString() && slideDir.exists()) {
-            QStringList filter(QStringList() << "*.jpg" << "*.jpeg" << "*.png" << "*.JPG" << "*.JPEG" << "*.PNG");
-            slideDir.setNameFilters(filter);
-            slideList = slideDir.entryInfoList();
+        if(!generalSetupArguments.sSlideDir.endsWith(QString("/")))
+            generalSetupArguments.sSlideDir+= QString("/");
+        QDir slideDir(generalSetupArguments.sSlideDir);
+        if(!slideDir.exists()) {
+            generalSetupArguments.sSlideDir = QStandardPaths::displayName(QStandardPaths::GenericDataLocation);
         }
-        else {
-            sSlideDir = QStandardPaths::displayName(QStandardPaths::GenericDataLocation);
-            slideList = QFileInfoList();
+        if(!generalSetupArguments.sSpotDir.endsWith(QString("/")))
+            generalSetupArguments.sSpotDir+= QString("/");
+        QDir spotDir(generalSetupArguments.sSpotDir);
+        if(!spotDir.exists()) {
+            generalSetupArguments.sSpotDir = QStandardPaths::displayName(QStandardPaths::GenericDataLocation);
         }
-#ifdef LOG_MESSAGE
-        logMessage(pLogFile,
-                   Q_FUNC_INFO,
-                   QString("Found %1 slides").arg(slideList.count()));
-#endif
-        sSpotDir = generalSetupArguments.sSpotDir;
-        if(!sSpotDir.endsWith(QString("/"))) sSpotDir+= QString("/");
-        QDir spotDir(sSpotDir);
-        if(sSpotDir != QString() && spotDir.exists()) {
-            QStringList nameFilter(QStringList() << "*.mp4" << "*.MP4");
-            spotDir.setNameFilters(nameFilter);
-            spotDir.setFilter(QDir::Files);
-            spotList = spotDir.entryInfoList();
-        }
-        else {
-            sSpotDir = QStandardPaths::displayName(QStandardPaths::GenericDataLocation);
-            spotList = QFileInfoList();
-        }
-#ifdef LOG_MESSAGE
-        logMessage(pLogFile,
-                   Q_FUNC_INFO,
-                   QString("Found %1 spots")
-                   .arg(spotList.count()));
-#endif
         SaveSettings();
     }
+    delete pGeneralSetupDialog;
+    pGeneralSetupDialog = nullptr;
 }
 
 
@@ -286,8 +257,9 @@ VolleyController::GetSettings() {
     generalSetupArguments.maxTimeout       = pSettings->value("volley/maxTimeout", 2).toInt();
     generalSetupArguments.maxSet           = pSettings->value("volley/maxSet", 3).toInt();
     generalSetupArguments.iTimeoutDuration = pSettings->value("volley/TimeoutDuration", 30).toInt();
-    generalSetupArguments.sSlideDir        = pSettings->value("directories/slides", sSlideDir).toString();
-    generalSetupArguments.sSpotDir         = pSettings->value("directories/spots",  sSpotDir).toString();
+    generalSetupArguments.sSlideDir        = pSettings->value("directories/slides", generalSetupArguments.sSlideDir).toString();
+    generalSetupArguments.sSpotDir         = pSettings->value("directories/spots",  generalSetupArguments.sSpotDir).toString();
+    generalSetupArguments.isPanelMirrored  = pSettings->value("panel/orientation",  true).toBool();
 
     sTeam[0]    = pSettings->value("team1/name", QString(tr("Locali"))).toString();
     sTeam[1]    = pSettings->value("team2/name", QString(tr("Ospiti"))).toString();
@@ -299,11 +271,6 @@ VolleyController::GetSettings() {
     iScore[1]   = pSettings->value("team2/score", 0).toInt();
     iServizio   = pSettings->value("set/service", 0).toInt();
     lastService = pSettings->value("set/lastservice", 0).toInt();
-
-    sSlideDir   = generalSetupArguments.sSlideDir;
-    sSpotDir    = generalSetupArguments.sSpotDir;
-
-    isPanelMirrored  = pSettings->value("panel/orientation",  true).toBool();
 
     // Check Stored Values vs Maximum Values
     for(int i=0; i<2; i++) {
@@ -328,8 +295,7 @@ VolleyController::sendAll() {
     pVolleyPanel->setScore(0, iScore[0]);
     pVolleyPanel->setScore(1, iScore[1]);
     pVolleyPanel->setServizio(iServizio);
-    pVolleyPanel->setMirrored(isPanelMirrored);
-    // Le Directories ???
+    pVolleyPanel->setMirrored(generalSetupArguments.isPanelMirrored);
 }
 
 
@@ -346,7 +312,6 @@ VolleyController::SaveStatus() {
     pSettings->setValue("team2/score", iScore[1]);
     pSettings->setValue("set/service", iServizio);
     pSettings->setValue("set/lastservice", lastService);
-    pSettings->setValue("panel/orientation", pVolleyPanel->getMirrored());
 }
 
 
@@ -357,6 +322,7 @@ VolleyController::SaveSettings() { // Save General Setup Values
     pSettings->setValue("volley/maxTimeout",      generalSetupArguments.maxTimeout);
     pSettings->setValue("volley/maxSet",          generalSetupArguments.maxSet);
     pSettings->setValue("volley/TimeoutDuration", generalSetupArguments.iTimeoutDuration);
+    pSettings->setValue("panel/orientation",      generalSetupArguments.isPanelMirrored);
 }
 
 
@@ -517,7 +483,7 @@ VolleyController::setEventHandlers() {
 
 void
 VolleyController::startSpotLoop() {
-    pVolleyPanel->setSpotDir(sSpotDir);
+    pVolleyPanel->setSpotDir(generalSetupArguments.sSpotDir);
     pVolleyPanel->startSpotLoop();
 }
 
@@ -530,7 +496,7 @@ VolleyController::stopSpotLoop() {
 
 void
 VolleyController::startSlideShow() {
-    pVolleyPanel->setSlideDir(sSlideDir);
+    pVolleyPanel->setSlideDir(generalSetupArguments.sSlideDir);
     pVolleyPanel->startSlideShow();
 }
 
@@ -563,6 +529,7 @@ VolleyController::onTimeOutIncrement(int iTeam) {
     pSettings->setValue(sText, iTimeout[iTeam]);
     pTimeoutEdit[iTeam]->setFocus(); // Per evitare che il focus vada all'edit delle squadre
 }
+
 
 void
 VolleyController::onTimeOutDecrement(int iTeam) {
@@ -846,7 +813,6 @@ VolleyController::onChangePanelOrientation(PanelOrientation orientation) {
                QString("Direction %1")
                .arg(static_cast<int>(orientation)));
 #endif
-    isPanelMirrored = orientation == PanelOrientation::Reflected;
-    pVolleyPanel->setMirrored(isPanelMirrored);
+    pVolleyPanel->setMirrored(generalSetupArguments.isPanelMirrored);
 }
 

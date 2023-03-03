@@ -36,7 +36,6 @@ ScorePanel::ScorePanel(QFile *myLogFile, QWidget *parent)
     , pLogFile(myLogFile)
     , pVideoPlayer(nullptr)
     , iCurrentSpot(0)
-    , iCurrentSlide(0)
     , pMySlideWindow(new SlideWindow())
     , pPanel(nullptr)
 #ifdef Q_OS_WINDOWS

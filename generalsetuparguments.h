@@ -12,6 +12,8 @@ public:
     int maxSet;
     int iTimeoutDuration;
 
+    bool isPanelMirrored;
+
     QString sSlideDir;
     QString sSpotDir;
     QString sTeam0Name;

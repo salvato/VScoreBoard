@@ -35,32 +35,25 @@ protected slots:
 
 protected:
     bool            prepareLogFile();
-    void            prepareDirectories();
-    virtual void    SaveStatus();
-    virtual void    GeneralSetup();
     void            prepareServices();
     void            UpdateUI();
     QHBoxLayout*    CreateSpotButtons();
     void            connectButtonSignals();
+    virtual void    SaveStatus();
+    virtual void    GeneralSetup();
     virtual void    startSpotLoop();
     virtual void    stopSpotLoop();
     virtual void    startSlideShow();
     virtual void    stopSlideShow();
 
-
 protected:
     GeneralSetupArguments generalSetupArguments;
     QFile*                pLogFile;
     QSoundEffect*         pButtonClick;
-    QString               sSlideDir;
-    QFileInfoList         slideList;
-    int                   iCurrentSlide;
-    QString               sSpotDir;
-    QFileInfoList         spotList;
     int                   iCurrentSpot;
     QSettings*            pSettings;
-    QPushButton*          startStopLoopSpotButton{};
-    QPushButton*          startStopSlideShowButton{};
+    QPushButton*          pSpotButton{};
+    QPushButton*          pSlideShowButton{};
     QPushButton*          generalSetupButton{};
     QPushButton*          shutdownButton{};
     QHBoxLayout*          pSpotButtonsLayout;

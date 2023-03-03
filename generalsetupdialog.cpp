@@ -72,7 +72,10 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
     QLabel* pLabelDirection = new QLabel(("Orientamento"));
     directionCombo.addItem(tr("Normale"));
     directionCombo.addItem(tr("Riflesso"));
-    directionCombo.setDisabled(true);
+    if(pArguments->isPanelMirrored)
+        directionCombo.setCurrentText(tr("Riflesso"));
+    else
+        directionCombo.setCurrentText(tr("Normale"));
 
     buttonSelectSlidesDir.setText("Change");
     buttonSelectSpotsDir.setText("Change");
@@ -163,18 +166,6 @@ GeneralSetupDialog::setSpotDir(const QString& sDir){
 
 
 void
-GeneralSetupDialog::setCurrrentOrientaton(PanelOrientation newDirection) {
-    directionCombo.setEnabled(true);
-    if(newDirection == PanelOrientation::Normal) {
-        directionCombo.setCurrentText(tr("Normale"));
-    }
-    else {
-        directionCombo.setCurrentText(tr("Riflesso"));
-    }
-}
-
-
-void
 GeneralSetupDialog::onSelectSlideDir() {
     QString sSlideDir = slidesDirEdit.text();
     QDir slideDir = QDir(sSlideDir);
@@ -220,9 +211,12 @@ GeneralSetupDialog::onSelectSpotDir() {
 
 void
 GeneralSetupDialog::onChangePanelOrientation(int iOrientation) {
+    pTempArguments->isPanelMirrored = false;
     PanelOrientation newOrientation = PanelOrientation::Normal;
-    if(iOrientation == 1)
+    if(iOrientation == 1) {
         newOrientation = PanelOrientation::Reflected;
+        pTempArguments->isPanelMirrored = true;
+    }
     emit changeOrientation(newOrientation);
 }
 

@@ -37,15 +37,6 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
     pButtonClick = new QSoundEffect(this);
     pButtonClick->setSource(QUrl::fromLocalFile(":/key.wav"));
 
-    // The default Directories to look for the slides and spots
-    sSlideDir   = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
-    if(!sSlideDir.endsWith(QString("/"))) sSlideDir+= QString("/");
-    sSpotDir    = QStandardPaths::writableLocation(QStandardPaths::MoviesLocation);
-    if(!sSpotDir.endsWith(QString("/"))) sSpotDir+= QString("/");
-
-    slideList     = QFileInfoList();
-    spotList      = QFileInfoList();
-    iCurrentSlide = 0;
     iCurrentSpot  = 0;
 
     pSpotButtonsLayout = CreateSpotButtons();
@@ -65,17 +56,17 @@ ScoreController::CreateSpotButtons() {
 
     QPixmap pixmap(":/buttonIcons/PlaySpots.png");
     QIcon ButtonIcon(pixmap);
-    startStopLoopSpotButton = new QPushButton(ButtonIcon, "");
-    startStopLoopSpotButton->setIconSize(pixmap.rect().size());
-    startStopLoopSpotButton->setFlat(true);
-    startStopLoopSpotButton->setToolTip("Start/Stop Spot Loop");
+    pSpotButton = new QPushButton(ButtonIcon, "");
+    pSpotButton->setIconSize(pixmap.rect().size());
+    pSpotButton->setFlat(true);
+    pSpotButton->setToolTip("Start/Stop Spot Loop");
 
     pixmap.load(":/buttonIcons/PlaySlides.png");
     ButtonIcon.addPixmap(pixmap);
-    startStopSlideShowButton = new QPushButton(ButtonIcon, "");
-    startStopSlideShowButton->setIconSize(pixmap.rect().size());
-    startStopSlideShowButton->setFlat(true);
-    startStopSlideShowButton->setToolTip("Start/Stop Slide Show");
+    pSlideShowButton = new QPushButton(ButtonIcon, "");
+    pSlideShowButton->setIconSize(pixmap.rect().size());
+    pSlideShowButton->setFlat(true);
+    pSlideShowButton->setToolTip("Start/Stop Slide Show");
 
     pixmap.load(":/buttonIcons/PanelSetup.png");
     ButtonIcon.addPixmap(pixmap);
@@ -91,9 +82,9 @@ ScoreController::CreateSpotButtons() {
     shutdownButton->setFlat(true);
     shutdownButton->setToolTip("Shutdown System");
 
-    spotButtonLayout->addWidget(startStopLoopSpotButton);
+    spotButtonLayout->addWidget(pSpotButton);
     spotButtonLayout->addStretch();
-    spotButtonLayout->addWidget(startStopSlideShowButton);
+    spotButtonLayout->addWidget(pSlideShowButton);
     spotButtonLayout->addStretch();
     spotButtonLayout->addWidget(generalSetupButton);
     spotButtonLayout->addStretch();
@@ -105,14 +96,14 @@ ScoreController::CreateSpotButtons() {
 
 void
 ScoreController::connectButtonSignals() {
-        connect(startStopLoopSpotButton, SIGNAL(clicked(bool)),
+        connect(pSpotButton, SIGNAL(clicked(bool)),
                 this, SLOT(onButtonStartStopSpotLoopClicked()));
-        connect(startStopLoopSpotButton, SIGNAL(clicked()),
+        connect(pSpotButton, SIGNAL(clicked()),
                 pButtonClick, SLOT(play()));
 
-        connect(startStopSlideShowButton, SIGNAL(clicked(bool)),
+        connect(pSlideShowButton, SIGNAL(clicked(bool)),
                 this, SLOT(onButtonStartStopSlideShowClicked()));
-        connect(startStopSlideShowButton, SIGNAL(clicked()),
+        connect(pSlideShowButton, SIGNAL(clicked()),
                 pButtonClick, SLOT(play()));
 
         connect(generalSetupButton, SIGNAL(clicked(bool)),
@@ -124,50 +115,6 @@ ScoreController::connectButtonSignals() {
                 this, SLOT(onButtonShutdownClicked()));
         connect(shutdownButton, SIGNAL(clicked()),
                 pButtonClick, SLOT(play()));
-}
-
-
-void
-ScoreController::prepareDirectories() {
-    QDir slideDir(sSlideDir);
-    QDir spotDir(sSpotDir);
-
-    if(!slideDir.exists() || !spotDir.exists()) {
-        onButtonSetupClicked();
-        slideDir.setPath(sSlideDir);
-        if(!slideDir.exists())
-            sSlideDir = QStandardPaths::displayName(QStandardPaths::GenericDataLocation);
-        if(!sSlideDir.endsWith(QString("/"))) sSlideDir+= QString("/");
-        spotDir.setPath(sSpotDir);
-        if(!spotDir.exists())
-            sSpotDir = QStandardPaths::displayName(QStandardPaths::GenericDataLocation);
-        if(!sSpotDir.endsWith(QString("/"))) sSpotDir+= QString("/");
-        pSettings->setValue("directories/slides", sSlideDir);
-        pSettings->setValue("directories/spots", sSpotDir);
-    }
-    else {
-        QStringList filter(QStringList() << "*.jpg" << "*.jpeg" << "*.png" << "*.JPG" << "*.JPEG" << "*.PNG");
-        slideDir.setNameFilters(filter);
-        slideList = slideDir.entryInfoList();
-#ifdef LOG_VERBOSE
-        logMessage(pLogFile,
-                   Q_FUNC_INFO,
-                   QString("Slides directory: %1 Found %2 Slides")
-                   .arg(sSlideDir)
-                   .arg(slideList.count()));
-#endif
-        QStringList nameFilter(QStringList() << "*.mp4"<< "*.MP4");
-        spotDir.setNameFilters(nameFilter);
-        spotDir.setFilter(QDir::Files);
-        spotList = spotDir.entryInfoList();
-#ifdef LOG_VERBOSE
-        logMessage(pLogFile,
-                   Q_FUNC_INFO,
-                   QString("Spot directory: %1 Found %2 Spots")
-                   .arg(sSpotDir)
-                   .arg(spotList.count()));
-#endif
-    }
 }
 
 
@@ -191,8 +138,8 @@ ScoreController::SaveStatus() {
 
 void
 ScoreController::UpdateUI() {
-    startStopLoopSpotButton->setEnabled(true);
-    startStopSlideShowButton->setEnabled(true);
+    pSpotButton->setEnabled(true);
+    pSlideShowButton->setEnabled(true);
     shutdownButton->setEnabled(true);
 }
 
@@ -224,9 +171,9 @@ ScoreController::onButtonStartStopSpotLoopClicked() {
     if(myStatus == showPanel) {
         pixmap.load(":/buttonIcons/sign_stop.png");
         ButtonIcon.addPixmap(pixmap);
-        startStopLoopSpotButton->setIcon(ButtonIcon);
-        startStopLoopSpotButton->setIconSize(pixmap.rect().size());
-        startStopSlideShowButton->setDisabled(true);
+        pSpotButton->setIcon(ButtonIcon);
+        pSpotButton->setIconSize(pixmap.rect().size());
+        pSlideShowButton->setDisabled(true);
         generalSetupButton->setDisabled(true);
         startSpotLoop();
         myStatus = showSpots;
@@ -234,9 +181,9 @@ ScoreController::onButtonStartStopSpotLoopClicked() {
     else {
         pixmap.load(":/buttonIcons/PlaySpots.png");
         ButtonIcon.addPixmap(pixmap);
-        startStopLoopSpotButton->setIcon(ButtonIcon);
-        startStopLoopSpotButton->setIconSize(pixmap.rect().size());
-        startStopSlideShowButton->setEnabled(true);
+        pSpotButton->setIcon(ButtonIcon);
+        pSpotButton->setIconSize(pixmap.rect().size());
+        pSlideShowButton->setEnabled(true);
         generalSetupButton->setEnabled(true);
         stopSpotLoop();
         myStatus = showPanel;
@@ -266,22 +213,22 @@ ScoreController::onButtonStartStopSlideShowClicked() {
     QPixmap pixmap;
     QIcon ButtonIcon;
     if(myStatus == showPanel) {
-        startStopLoopSpotButton->setDisabled(true);
+        pSpotButton->setDisabled(true);
         generalSetupButton->setDisabled(true);
         pixmap.load(":/buttonIcons/sign_stop.png");
         ButtonIcon.addPixmap(pixmap);
-        startStopSlideShowButton->setIcon(ButtonIcon);
-        startStopSlideShowButton->setIconSize(pixmap.rect().size());
+        pSlideShowButton->setIcon(ButtonIcon);
+        pSlideShowButton->setIconSize(pixmap.rect().size());
         startSlideShow();
         myStatus = showSlides;
     }
     else {
-        startStopLoopSpotButton->setEnabled(true);
+        pSpotButton->setEnabled(true);
         generalSetupButton->setEnabled(true);
         pixmap.load(":/buttonIcons/PlaySlides.png");
         ButtonIcon.addPixmap(pixmap);
-        startStopSlideShowButton->setIcon(ButtonIcon);
-        startStopSlideShowButton->setIconSize(pixmap.rect().size());
+        pSlideShowButton->setIcon(ButtonIcon);
+        pSlideShowButton->setIconSize(pixmap.rect().size());
         stopSlideShow();
         myStatus = showPanel;
     }

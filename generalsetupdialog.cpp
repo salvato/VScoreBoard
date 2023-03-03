@@ -205,7 +205,7 @@ GeneralSetupDialog::onSelectSlideDir() {
     else {
         sSlideDir = QFileDialog::getExistingDirectory(this,
                                                       "Slide Directory",
-                                                      QStandardPaths::displayName(QStandardPaths::GenericDataLocation));
+                                                      QStandardPaths::displayName(QStandardPaths::PicturesLocation));
     }
     if(sSlideDir == QString()) return; // "Cancel" has been pressed...
     if(!sSlideDir.endsWith(QString("/"))) sSlideDir+= QString("/");
@@ -226,7 +226,7 @@ GeneralSetupDialog::onSelectSpotDir() {
     else {
         sSpotDir = QFileDialog::getExistingDirectory(this,
                                                      "Spot Directory",
-                                                     QStandardPaths::displayName(QStandardPaths::GenericDataLocation));
+                                                     QStandardPaths::displayName(QStandardPaths::MoviesLocation));
     }
     if(sSpotDir == QString()) return; // "Cancel" has been pressed...
     if(!sSpotDir.endsWith(QString("/"))) sSpotDir+= QString("/");

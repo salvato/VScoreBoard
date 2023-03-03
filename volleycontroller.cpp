@@ -87,13 +87,13 @@ VolleyController::GeneralSetup() {
             generalSetupArguments.sSlideDir+= QString("/");
         QDir slideDir(generalSetupArguments.sSlideDir);
         if(!slideDir.exists()) {
-            generalSetupArguments.sSlideDir = QStandardPaths::displayName(QStandardPaths::GenericDataLocation);
+            generalSetupArguments.sSlideDir = QStandardPaths::displayName(QStandardPaths::PicturesLocation);
         }
         if(!generalSetupArguments.sSpotDir.endsWith(QString("/")))
             generalSetupArguments.sSpotDir+= QString("/");
         QDir spotDir(generalSetupArguments.sSpotDir);
         if(!spotDir.exists()) {
-            generalSetupArguments.sSpotDir = QStandardPaths::displayName(QStandardPaths::GenericDataLocation);
+            generalSetupArguments.sSpotDir = QStandardPaths::displayName(QStandardPaths::MoviesLocation);
         }
         SaveSettings();
     }

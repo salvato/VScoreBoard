@@ -33,6 +33,13 @@ public:
     bool getMirrored();
     void setLogo(int iTeam, QString sFileLogo);
 
+private slots:
+    void onTimeoutDone();
+
+private:
+    void         createPanelElements();
+    QGridLayout* createPanel();
+
 private:
     QLabel*           pTeam[2];
     QLabel*           pScore[2];
@@ -58,12 +65,5 @@ private:
     int               iLabelsFontSize;
     int               maxTeamNameLen;
     QPixmap*          pPixmapService;
-//    QPixmap*          pPixmapLeftTop;
-//    QPixmap*          pPixmapRightTop;
-    void              createPanelElements();
-    QGridLayout*      createPanel();
     TimeoutWindow*    pTimeoutWindow;
-
-private slots:
-    void onTimeoutDone();
 };

@@ -9,6 +9,7 @@
 #include "timeoutwindow.h"
 #include "utility.h"
 
+
 VolleyPanel::VolleyPanel(QFile *myLogFile, QWidget *parent)
     : ScorePanel(myLogFile, parent)
     , iServizio(0)
@@ -136,19 +137,7 @@ VolleyPanel::closeEvent(QCloseEvent *event) {
 
 
 void
-VolleyPanel::onTimeoutDone() {
-    showFullScreen();
-    pTimeoutWindow->hide();
-}
-
-
-void
 VolleyPanel::createPanelElements() {
-    // QWidget propagates explicit palette roles from parent to child.
-    // If you assign a brush or color to a specific role on a palette and
-    // assign that palette to a widget, that role will propagate to all
-    // the widget's children, overriding any system defaults for that role.
-
     // Timeout
     pTimeoutLabel = new QLabel("Timeout");
     pTimeoutLabel->setFont(QFont(sFontName, iLabelsFontSize/2, fontWeight));
@@ -267,3 +256,11 @@ VolleyPanel::setLogo(int iTeam, QString sFileLogo) {
         logoLabel[iTeam]->setPixmap(*pPixmapLogo[iTeam]);
     }
 }
+
+
+void
+VolleyPanel::onTimeoutDone() {
+    showFullScreen();
+    pTimeoutWindow->hide();
+}
+

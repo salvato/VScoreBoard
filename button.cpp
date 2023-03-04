@@ -1,6 +1,6 @@
 /*
  *
-Copyright (C) 2016  Gabriele Salvato
+Copyright (C) 2023  Gabriele Salvato
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,12 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "button.h"
 
-/*!
- * \brief Button::Button
- * \param text
- * \param team
- * \param parent
- */
+
 Button::Button(const QString &text, int team, QWidget *parent)
     : QPushButton(text, parent)
     , myTeam(team)
@@ -42,19 +37,12 @@ Button::Button(const QString &text, int team, QWidget *parent)
 }
 
 
-/*!
- * \brief Button::onButtonClicked
- */
 void
 Button::onButtonClicked() {
     emit buttonClicked(myTeam);
 }
 
 
-/*!
- * \brief Button::hasHeightForWidth
- * \return
- */
 bool
 Button::hasHeightForWidth() const
 {
@@ -62,11 +50,6 @@ Button::hasHeightForWidth() const
 }
 
 
-/*!
- * \brief Button::heightForWidth
- * \param w
- * \return
- */
 int
 Button::heightForWidth(int w) const
 {

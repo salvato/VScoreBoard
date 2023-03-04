@@ -26,8 +26,14 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
         exit(EXIT_FAILURE);
     }
     // Move the Panel on the Primary Display
-    move(QPoint(screens.at(0)->geometry().x(),
-                screens.at(0)->geometry().y()));
+    QRect screenRect = screens.at(0)->geometry();
+    QRect myRect = frameGeometry();
+    int x0 = (screenRect.width() - myRect.width())/2;
+    int y0 = (screenRect.height()-myRect.height())/2;
+    move(x0,y0);
+//    move(QPoint(screens.at(0)->geometry().x(),
+//                screens.at(0)->geometry().y()));
+
     setWindowTitle("Score Controller");
 
     pSpotButtonsLayout = CreateSpotButtons();
@@ -38,6 +44,18 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
 
 
 ScoreController::~ScoreController() {
+}
+
+
+void
+ScoreController::resizeEvent(QResizeEvent* pEvent) {
+    Q_UNUSED(pEvent)
+    QList<QScreen*> screens = QApplication::screens();
+    QRect screenRect = screens.at(0)->geometry();
+    QRect myRect = frameGeometry();
+    int x0 = (screenRect.width() - myRect.width())/2;
+    int y0 = (screenRect.height()-myRect.height())/2;
+    move(x0,y0);
 }
 
 

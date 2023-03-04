@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QFileInfoList>
 #include <QSettings>
+#include <QResizeEvent>
 
 
 QT_FORWARD_DECLARE_CLASS(QHBoxLayout)
@@ -27,6 +28,7 @@ protected slots:
     void onButtonShutdownClicked();
 
 protected:
+    void            resizeEvent(QResizeEvent* pEvent);
     bool            prepareLogFile();
     void            prepareServices();
     void            UpdateUI();

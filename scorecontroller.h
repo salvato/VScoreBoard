@@ -28,7 +28,6 @@ protected slots:
     void onButtonShutdownClicked();
 
 protected:
-    void            resizeEvent(QResizeEvent* pEvent);
     bool            prepareLogFile();
     void            prepareServices();
     void            UpdateUI();

@@ -22,8 +22,7 @@ SOURCES += \
     utility.cpp \
     volleyapplication.cpp \
     volleycontroller.cpp \
-    volleypanel.cpp \
-    vscoreboard.cpp
+    volleypanel.cpp
 
 HEADERS += \
     button.h \
@@ -38,8 +37,7 @@ HEADERS += \
     utility.h \
     volleyapplication.h \
     volleycontroller.h \
-    volleypanel.h \
-    vscoreboard.h
+    volleypanel.h
 
 TRANSLATIONS += \
     VScoreBoard_en_US.ts

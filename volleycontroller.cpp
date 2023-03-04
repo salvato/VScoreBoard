@@ -68,6 +68,12 @@ VolleyController::closeEvent(QCloseEvent *event) {
 
 void
 VolleyController::resizeEvent(QResizeEvent *event) {
+    QList<QScreen*> screens = QApplication::screens();
+    QRect screenRect = screens.at(0)->geometry();
+    QRect myRect = frameGeometry();
+    int x0 = (screenRect.width() - myRect.width())/2;
+    int y0 = (screenRect.height()-myRect.height())/2;
+    move(x0,y0);
     if(!bFontBuilt) {
         bFontBuilt = true;
         buildFontSizes();

@@ -31,10 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 
-/*!
- * \brief TimeoutWindow::TimeoutWindow A black window for timeout countdown
- * \param parent The parent QWidget
- */
 TimeoutWindow::TimeoutWindow(QWidget *parent)
     : QWidget(parent)
 {
@@ -91,17 +87,10 @@ TimeoutWindow::TimeoutWindow(QWidget *parent)
 }
 
 
-/*!
- * \brief TimeoutWindow::~TimeoutWindow
- */
 TimeoutWindow::~TimeoutWindow() {
 }
 
 
-/*!
- * \brief TimeoutWindow::updateTime Update the time shown in the window
- * and hide the window when the countdown reach zero
- */
 void
 TimeoutWindow::updateTime() {
     int remainingTime = TimerTimeout.remainingTime();
@@ -116,10 +105,6 @@ TimeoutWindow::updateTime() {
 }
 
 
-/*!
- * \brief TimeoutWindow::startTimeout Start the countdown
- * \param msecTime
- */
 void
 TimeoutWindow::startTimeout(int msecTime) {
     TimerTimeout.start(msecTime);
@@ -128,9 +113,6 @@ TimeoutWindow::startTimeout(int msecTime) {
 }
 
 
-/*!
- * \brief TimeoutWindow::stopTimeout Stop the countdown and hide the window
- */
 void
 TimeoutWindow::stopTimeout() {
     TimerUpdate.stop();

@@ -23,12 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utility.h"
 
 
-/*!
- * \brief logMessage Log messages on a file (if enabled) or on stdout
- * \param logFile The file where to write the log
- * \param sFunctionName The Function which requested to write the message
- * \param sMessage The informative message
- */
 void
 logMessage(QFile *logFile, QString sFunctionName, QString sMessage) {
     QDateTime dateTime;

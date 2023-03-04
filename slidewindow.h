@@ -1,6 +1,6 @@
 /*
  *
-Copyright (C) 2016  Gabriele Salvato
+Copyright (C) 2023  Gabriele Salvato
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
-#ifndef SLIDEWINDOW_H
-#define SLIDEWINDOW_H
+#pragma once
 
 #include <QTimer>
 #include <QLabel>
@@ -44,9 +43,6 @@ public:
     bool isRunning();
 
 public:
-    /*!
-     * \brief The transitionMode enum
-     */
     enum transitionMode {
         transition_Abrupt,/*!< Abrupt transition */
         transition_FromLeft,/*!< Enter from Left */
@@ -92,4 +88,3 @@ private:
     QBrush             panelBrush;
 };
 
-#endif // SLIDEWINDOW_H

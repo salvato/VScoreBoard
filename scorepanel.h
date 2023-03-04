@@ -1,6 +1,6 @@
 /*
  *
-Copyright (C) 2016  Gabriele Salvato
+Copyright (C) 2023  Gabriele Salvato
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -49,8 +49,6 @@ public:
     ~ScorePanel();
     void keyPressEvent(QKeyEvent *event);
     void closeEvent(QCloseEvent *event);
-    void setScoreOnly(bool bScoreOnly);
-    bool getScoreOnly();
     void setSlideDir(QString sDir);
     void setSpotDir(QString sDir);
     void startSpotLoop();
@@ -59,7 +57,7 @@ public:
     void stopSlideShow();
 
 signals:
-    void panelClosed(); /*!< \brief emitted to signal that the Panel has been closed */
+    void panelClosed();
 
 private slots:
     void onSpotClosed(int exitCode, QProcess::ExitStatus exitStatus);
@@ -79,7 +77,6 @@ private:
     QProcess*          pVideoPlayer;
     QString            sProcess;
     QString            sProcessArguments;
-
     // Spots management
     QString            sSpotDir;
     QFileInfoList      spotList;
@@ -89,20 +86,12 @@ private:
     };
     QList<spot>        availabeSpotList;
     int                iCurrentSpot;
-
     // Slides management
-    QString            sSlideDir;
-    QFileInfoList      slideList;
-    struct slide {
-        QString slideFilename;
-        qint64  slideFileSize;
-    };
-    QList<slide>       availabeSlideList;
-    int                iCurrentSlide;
-
-    QString            logFileName;
-
     SlideWindow*       pMySlideWindow;
+    QString            sSlideDir;
+    int                iCurrentSlide;
+    // Logging Messages
+    QString            logFileName;
 
 private:
     QWidget*           pPanel;

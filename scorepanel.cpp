@@ -114,9 +114,11 @@ ScorePanel::doProcessCleanup() {
     if(pVideoPlayer) {
         pVideoPlayer->disconnect();
         pVideoPlayer->close();
+#ifdef LOG_MESG
         logMessage(pLogFile,
                    Q_FUNC_INFO,
                    QString("Closing Video Player..."));
+#endif
         pVideoPlayer->waitForFinished(3000);
         pVideoPlayer->deleteLater();
         pVideoPlayer = Q_NULLPTR;

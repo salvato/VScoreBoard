@@ -48,7 +48,6 @@ VolleyPanel::VolleyPanel(QFile *myLogFile, QWidget *parent)
     panelPalette.setColor(QPalette::BrightText,    Qt::white);
     setPalette(panelPalette);
 
-
     pTimeoutWindow = new TimeoutWindow(Q_NULLPTR);
     connect(pTimeoutWindow, SIGNAL(doneTimeout()),
             this, SLOT(onTimeoutDone()));

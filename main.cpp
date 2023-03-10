@@ -15,7 +15,7 @@ main(int argc, char *argv[]) {
     QSurfaceFormat::setDefaultFormat(format);
 
     VolleyApplication a(argc, argv);
-    QString sVersion = QString("1.0");
+    QString sVersion = QString("2.0");
     a.setApplicationVersion(sVersion);
 
     QTranslator translator;

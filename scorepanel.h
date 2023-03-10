@@ -26,7 +26,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTranslator>
 #include <QTimer>
 
-#include "slidewindow.h"
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 11, 0))
     #define horizontalAdvance width
@@ -35,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 QT_BEGIN_NAMESPACE
 QT_FORWARD_DECLARE_CLASS(QFile)
-QT_FORWARD_DECLARE_CLASS(SlideWindow)
+QT_FORWARD_DECLARE_CLASS(SlideWidget)
 QT_FORWARD_DECLARE_CLASS(QGridLayout)
 QT_END_NAMESPACE
 
@@ -87,7 +86,7 @@ private:
     QList<spot>        availabeSpotList;
     int                iCurrentSpot;
     // Slides management
-    SlideWindow*       pMySlideWindow;
+    SlideWidget*       pMySlideWindow;
     QString            sSlideDir;
     int                iCurrentSlide;
     // Logging Messages

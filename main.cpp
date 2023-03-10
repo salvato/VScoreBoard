@@ -4,10 +4,15 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QMessageBox>
+#include <QSurfaceFormat>
 
 int
 main(int argc, char *argv[]) {
     qputenv("QT_LOGGING_RULES","*.debug=false;qt.qpa.*=false"); // supress anoying messages
+
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    QSurfaceFormat::setDefaultFormat(format);
 
     VolleyApplication a(argc, argv);
     QString sVersion = QString("1.0");

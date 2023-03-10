@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDebug>
 
 
-#include "slidewindow.h"
+#include "slidewidget.h"
 #include "scorepanel.h"
 #include "utility.h"
 
@@ -35,7 +35,7 @@ ScorePanel::ScorePanel(QFile *myLogFile, QWidget *parent)
     , pLogFile(myLogFile)
     , pVideoPlayer(nullptr)
     , iCurrentSpot(0)
-    , pMySlideWindow(new SlideWindow())
+    , pMySlideWindow(new SlideWidget())
     , pPanel(nullptr)
 #ifdef Q_OS_WINDOWS
     , sVideoPlayer(QString("ffplay.exe"))

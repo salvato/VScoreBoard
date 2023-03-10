@@ -78,7 +78,7 @@ SlideWidget::startSlideShow() {
     pCurrentProgram = pPrograms.at(currentAnimation);
     if(!pCurrentProgram->bind()) {
         qCritical() << __FUNCTION__ << __LINE__;
-        exit(EXIT_FAILURE);
+        close();
     }
     getLocations();
     doneCurrent();
@@ -115,7 +115,7 @@ bool
 SlideWidget::prepareNextSlide() {
     if(slideList.count() == 0) {
         qCritical() << "No Slides in directory: exiting ...";
-        exit(EXIT_FAILURE);
+        close();
     }
     if(iCurrentSlide >= slideList.count()) {
         iCurrentSlide = iCurrentSlide % slideList.count();
@@ -146,14 +146,14 @@ SlideWidget::prepareNextRound() {
     pCurrentProgram = pPrograms.at(currentAnimation);
     if(!pCurrentProgram->bind()) {
         qCritical() << __FUNCTION__ << __LINE__;
-        exit(EXIT_FAILURE);
+        close();
     }
     getLocations();
 
     // Prepare the next slide...
 
     if(!prepareNextSlide()) {
-        exit(EXIT_FAILURE);
+        close();
     }
     pTexture0->release();
     delete pTexture0;
@@ -174,13 +174,13 @@ bool
 SlideWidget::getLocations() {
     if(!pCurrentProgram->isLinked()) {
         qCritical() << "Program not linked";
-        exit(EXIT_FAILURE);
+        close();
     }
     int vertexLocation   = pCurrentProgram->attributeLocation("a_position");
     int texcoordLocation = pCurrentProgram->attributeLocation("a_texcoord");
     if((vertexLocation   == -1) || (texcoordLocation == -1)) {
         qCritical() << "Shader attributes not found";
-        exit(EXIT_FAILURE);
+        close();
     }
 
     // Offset for position
@@ -208,7 +208,7 @@ SlideWidget::getLocations() {
            (iAngleLoc == -1) || (iLeftLoc  == -1))
         {
             qCritical() << __FUNCTION__ << __LINE__ << "Shader uniforms not found";
-            exit(EXIT_FAILURE);
+            close();
         }
     } // currentAnimation == 0: Fold effect
 
@@ -217,7 +217,7 @@ SlideWidget::getLocations() {
         iAlphaLoc = pCurrentProgram->uniformLocation("alpha");
         if(iAlphaLoc == -1) {
             qCritical() << __FUNCTION__ << __LINE__ << "alpha uniform not found";
-            exit(EXIT_FAILURE);
+            close();
         }
     } // currentAnimation == 1: Fade effect
 
@@ -268,7 +268,7 @@ SlideWidget::initializeGL() {
     pCurrentProgram = pPrograms.at(currentAnimation);
     if(!pCurrentProgram->bind()) {
         qCritical() << __FUNCTION__ << __LINE__;
-        exit(EXIT_FAILURE);
+        close();
     }
     getLocations();
 
@@ -281,57 +281,57 @@ void
 SlideWidget::initShaders() {
     QOpenGLShaderProgram* pNewProgram = new QOpenGLShaderProgram(this);
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshaderFold.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshaderFold.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->link())
-        exit(EXIT_FAILURE);
+        close();
     pNewProgram->setObjectName("Fold");
     pPrograms.append(pNewProgram);// Fold page effect at 0
 
     pNewProgram = new QOpenGLShaderProgram(this);
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshaderFade.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshaderFade.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->link())
-        exit(EXIT_FAILURE);
+        close();
     pNewProgram->setObjectName("Fade");
     pPrograms.append(pNewProgram); // Fade effect at 1
     pNewProgram = new QOpenGLShaderProgram(this);
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->link())
-        exit(EXIT_FAILURE);
+        close();
     pNewProgram->setObjectName("Zoom Out");
     pPrograms.append(pNewProgram); // Zoom out effect at                2
     pNewProgram = new QOpenGLShaderProgram(this);
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->link())
-        exit(EXIT_FAILURE);
+        close();
     pNewProgram->setObjectName("Zoom In");
     pPrograms.append(pNewProgram); // Zoom in  effect at                3
     pNewProgram = new QOpenGLShaderProgram(this);
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->link())
-        exit(EXIT_FAILURE);
+        close();
     pNewProgram->setObjectName("Rotate Bottom Left");
     pPrograms.append(pNewProgram); // Rotate from bottom left effect at 4
     pNewProgram = new QOpenGLShaderProgram(this);
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl"))
-        exit(EXIT_FAILURE);
+        close();
     if (!pNewProgram->link())
-        exit(EXIT_FAILURE);
+        close();
     pNewProgram->setObjectName("Rotate Top Left");
     pPrograms.append(pNewProgram); // Rotate from top left effect at    5
     nAnimationTypes = pPrograms.count();
@@ -342,14 +342,14 @@ void
 SlideWidget::initTextures() {
     // Setup the first texture
     if(!prepareNextSlide())
-        exit(EXIT_FAILURE);
+        close();
     pTexture0 = new QOpenGLTexture(*pBaseImage);
     pTexture0->setMinificationFilter(QOpenGLTexture::Nearest);
     pTexture0->setMagnificationFilter(QOpenGLTexture::Linear);
     pTexture0->setWrapMode(QOpenGLTexture::Repeat);
     // Now the second texture
     if(!prepareNextSlide())
-        exit(EXIT_FAILURE);
+        close();
     pTexture1 = new QOpenGLTexture(*pBaseImage);
     pTexture1->setMinificationFilter(QOpenGLTexture::Nearest);
     pTexture1->setMagnificationFilter(QOpenGLTexture::Linear);

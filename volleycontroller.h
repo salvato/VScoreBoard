@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include "scorecontroller.h"
-#include "generalsetuparguments.h"
 #include "panelorientation.h"
 
 
@@ -50,10 +49,6 @@ protected:
     void          buildFontSizes();
     void          SaveStatus();
     void          GeneralSetup();
-    void          startSpotLoop();
-    void          stopSpotLoop();
-    void          startSlideShow();
-    void          stopSlideShow();
 
 private slots:
     void closeEvent(QCloseEvent*);
@@ -76,7 +71,6 @@ private:
     void          sendAll();
 
 private:
-    GeneralSetupArguments gsArgs;
     VolleyPanel*  pVolleyPanel;
     int           iTimeout[2]{};
     int           iSet[2]{};

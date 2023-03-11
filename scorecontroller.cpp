@@ -16,20 +16,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
+
 #include <QMessageBox>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QApplication>
 #include <QScreen>
-
+#include <QDir>
 
 #include "scorecontroller.h"
+#include "slidewidget.h"
+#include "utility.h"
 
 
 ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
     : QMainWindow(parent)
     , pLogFile(myLogFile)
     , pSettings(new QSettings("Gabriele Salvato", "Volley Controller"))
+    , pVideoPlayer(nullptr)
+    , pMySlideWindow(new SlideWidget())
+    #ifdef Q_OS_WINDOWS
+        , sVideoPlayer(QString("ffplay.exe"))
+    #else
+        , sVideoPlayer(QString("/usr/bin/ffplay"))
+    #endif
 {
     QList<QScreen*> screens = QApplication::screens();
     if(screens.count() < 2) {
@@ -42,6 +52,7 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
 
     setWindowTitle("Score Controller");
 
+    iCurrentSpot = 0;
     pSpotButtonsLayout = CreateSpotButtons();
     connectButtonSignals();
 
@@ -50,6 +61,33 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
 
 
 ScoreController::~ScoreController() {
+    doProcessCleanup();
+}
+
+
+void
+ScoreController::doProcessCleanup() {
+#ifdef LOG_VERBOSE
+    logMessage(pLogFile,
+               Q_FUNC_INFO,
+               QString("Cleaning all processes"));
+#endif
+
+    if(pMySlideWindow) {
+        pMySlideWindow->close();
+    }
+    if(pVideoPlayer) {
+        pVideoPlayer->disconnect();
+        pVideoPlayer->close();
+#ifdef LOG_MESG
+        logMessage(pLogFile,
+                   Q_FUNC_INFO,
+                   QString("Closing Video Player..."));
+#endif
+        pVideoPlayer->waitForFinished(3000);
+        pVideoPlayer->deleteLater();
+        pVideoPlayer = Q_NULLPTR;
+    }
 }
 
 
@@ -130,27 +168,110 @@ ScoreController::SaveStatus() {
 }
 
 
-// Dummy... see Volley Panel
 void
 ScoreController::startSpotLoop() {
+    QDir spotDir(gsArgs.sSpotDir);
+    spotList = QFileInfoList();
+    if(spotDir.exists()) {
+        QStringList nameFilter(QStringList() << "*.mp4" << "*.MP4");
+        spotDir.setNameFilters(nameFilter);
+        spotDir.setFilter(QDir::Files);
+        spotList = spotDir.entryInfoList();
+    }
+#ifdef LOG_VERBOSE
+    logMessage(pLogFile,
+               Q_FUNC_INFO,
+               QString("Found %1 spots").arg(spotList.count()));
+#endif
+    if(!spotList.isEmpty()) {
+        iCurrentSpot = iCurrentSpot % spotList.count();
+        if(!pVideoPlayer) {
+            pVideoPlayer = new QProcess(this);
+            connect(pVideoPlayer, SIGNAL(finished(int,QProcess::ExitStatus)),
+                    this, SLOT(onStartNextSpot(int,QProcess::ExitStatus)));
+
+            QStringList sArguments;
+            sArguments = QStringList{"-noborder",
+                                     "-sn",
+                                     "-autoexit",
+                                     "-fs"
+                                    };
+            QList<QScreen*> screens = QApplication::screens();
+            if(screens.count() > 1) {
+                QRect screenres = screens.at(1)->geometry();
+                sArguments.append(QString("-left"));
+                sArguments.append(QString("%1").arg(screenres.x()));
+                sArguments.append(QString("-top"));
+                sArguments.append(QString("%1").arg(screenres.y()));
+                sArguments.append(QString("-x"));
+                sArguments.append(QString("%1").arg(screenres.width()));
+                sArguments.append(QString("-y"));
+                sArguments.append(QString("%1").arg(screenres.height()));
+            }
+            sArguments.append(spotList.at(iCurrentSpot).absoluteFilePath());
+
+            pVideoPlayer->start(sVideoPlayer, sArguments);
+#ifdef LOG_VERBOSE
+            logMessage(pLogFile,
+                       Q_FUNC_INFO,
+                       QString("Now playing: %1")
+                       .arg(spotList.at(iCurrentSpot).absoluteFilePath()));
+#endif
+            iCurrentSpot = (iCurrentSpot+1) % spotList.count();// Prepare Next Spot
+            if(!pVideoPlayer->waitForStarted(3000)) {
+                pVideoPlayer->close();
+                logMessage(pLogFile,
+                           Q_FUNC_INFO,
+                           QString("Impossibile mandare lo spot."));
+                pVideoPlayer->disconnect();
+                delete pVideoPlayer;
+                pVideoPlayer = nullptr;
+                return;
+            }
+        } // if(!videoPlayer)
+    }
 }
 
 
-// Dummy... see Volley Panel
 void
 ScoreController::stopSpotLoop() {
+    if(pVideoPlayer) {
+        pVideoPlayer->disconnect();
+        connect(pVideoPlayer, SIGNAL(finished(int,QProcess::ExitStatus)),
+                this, SLOT(onSpotClosed(int,QProcess::ExitStatus)));
+        pVideoPlayer->terminate();
+    }
 }
 
 
-// Dummy... see Volley Panel
-void
+bool
 ScoreController::startSlideShow() {
+    if(pVideoPlayer)
+        return false;// No Slide Show if movies are playing or camera is active
+    if(!pMySlideWindow) {
+        logMessage(pLogFile,
+                   Q_FUNC_INFO,
+                   QString("Invalid Slide Window"));
+        return false;
+    }
+    if(!pMySlideWindow->setSlideDir(gsArgs.sSlideDir)) {
+        return false;
+    }
+    pMySlideWindow->showFullScreen();
+    if(!pMySlideWindow->startSlideShow()) {
+        pMySlideWindow->hide();
+        return false;
+    }
+    return true;
 }
 
 
-// Dummy... see Volley Panel
 void
 ScoreController::stopSlideShow() {
+    if(pMySlideWindow) {
+        pMySlideWindow->stopSlideShow();
+        pMySlideWindow->hide();
+    }
 }
 
 
@@ -194,14 +315,15 @@ ScoreController::onButtonSlideShowClicked() {
     QPixmap pixmap;
     QIcon ButtonIcon;
     if(myStatus == showPanel) {
-        pSpotButton->setDisabled(true);
-        pGeneralSetupButton->setDisabled(true);
-        pixmap.load(":/buttonIcons/sign_stop.png");
-        ButtonIcon.addPixmap(pixmap);
-        pSlideShowButton->setIcon(ButtonIcon);
-        pSlideShowButton->setIconSize(pixmap.rect().size());
-        startSlideShow();
-        myStatus = showSlides;
+        if(startSlideShow()) {
+            pSpotButton->setDisabled(true);
+            pGeneralSetupButton->setDisabled(true);
+            pixmap.load(":/buttonIcons/sign_stop.png");
+            ButtonIcon.addPixmap(pixmap);
+            pSlideShowButton->setIcon(ButtonIcon);
+            pSlideShowButton->setIconSize(pixmap.rect().size());
+            myStatus = showSlides;
+        }
     }
     else {
         pSpotButton->setEnabled(true);
@@ -226,5 +348,91 @@ ScoreController::onButtonShutdownClicked() {
     int answer = msgBox.exec();
     if(answer != QMessageBox::Yes) return;
     close();
+}
+
+
+void
+ScoreController::onSpotClosed(int exitCode, QProcess::ExitStatus exitStatus) {
+    Q_UNUSED(exitCode);
+    Q_UNUSED(exitStatus);
+    if(pVideoPlayer) {
+        pVideoPlayer->disconnect();
+        pVideoPlayer->close();// Closes all communication with the process and kills it.
+        delete pVideoPlayer;
+        pVideoPlayer = nullptr;
+    } // if(pVideoPlayer)
+}
+
+
+void
+ScoreController::onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus) {
+    Q_UNUSED(exitCode);
+    Q_UNUSED(exitStatus);
+    // Update spot list just in case we are updating the spot list...
+    QDir spotDir(gsArgs.sSpotDir);
+    spotList = QFileInfoList();
+    QStringList nameFilter(QStringList() << "*.mp4" << "*.MP4");
+    spotDir.setNameFilters(nameFilter);
+    spotDir.setFilter(QDir::Files);
+    spotList = spotDir.entryInfoList();
+    if(spotList.count() == 0) {
+#ifdef LOG_VERBOSE
+        logMessage(pLogFile,
+                   Q_FUNC_INFO,
+                   QString("No spots available !"));
+#endif
+        if(pVideoPlayer) {
+            pVideoPlayer->disconnect();
+            delete pVideoPlayer;
+            pVideoPlayer = nullptr;
+        }
+        return;
+    }
+
+    iCurrentSpot = iCurrentSpot % spotList.count();
+    if(!pVideoPlayer) {
+        pVideoPlayer = new QProcess(this);
+        connect(pVideoPlayer, SIGNAL(finished(int,QProcess::ExitStatus)),
+                this, SLOT(onStartNextSpot(int,QProcess::ExitStatus)));
+    }
+
+    QStringList sArguments;
+    sArguments = QStringList{"-noborder",
+                             "-sn",
+                             "-autoexit",
+                             "-fs"
+                            };
+    QList<QScreen*> screens = QApplication::screens();
+    if(screens.count() > 1) {
+        QRect screenres = screens.at(1)->geometry();
+        sArguments.append(QString("-left"));
+        sArguments.append(QString("%1").arg(screenres.x()));
+        sArguments.append(QString("-top"));
+        sArguments.append(QString("%1").arg(screenres.y()));
+        sArguments.append(QString("-x"));
+        sArguments.append(QString("%1").arg(screenres.width()));
+        sArguments.append(QString("-y"));
+        sArguments.append(QString("%1").arg(screenres.height()));
+    }
+    sArguments.append(spotList.at(iCurrentSpot).absoluteFilePath());
+
+    pVideoPlayer->start(sVideoPlayer, sArguments);
+#ifdef LOG_VERBOSE
+    logMessage(pLogFile,
+               Q_FUNC_INFO,
+               QString("Now playing: %1")
+               .arg(spotList.at(iCurrentSpot).absoluteFilePath()));
+#endif
+    iCurrentSpot = (iCurrentSpot+1) % spotList.count();// Prepare Next Spot
+    if(!pVideoPlayer->waitForStarted(3000)) {
+        pVideoPlayer->close();
+        logMessage(pLogFile,
+                   Q_FUNC_INFO,
+                   QString("Impossibile mandare lo spot"));
+        pVideoPlayer->disconnect();
+        delete pVideoPlayer;
+        pVideoPlayer = Q_NULLPTR;
+        return;
+    }
 }
 

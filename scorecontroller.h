@@ -16,15 +16,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
+
 #pragma once
 
 #include <QMainWindow>
 #include <QFile>
 #include <QSettings>
+#include <QProcess>
+#include <QFileInfoList>
+
+#include "generalsetuparguments.h"
 
 
 QT_FORWARD_DECLARE_CLASS(QHBoxLayout)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
+QT_FORWARD_DECLARE_CLASS(SlideWidget)
 
 
 class ScoreController : public QMainWindow
@@ -35,13 +41,13 @@ public:
     ScoreController(QFile *myLogFile, QWidget *parent = nullptr);
     ~ScoreController();
 
-signals:
-
 protected slots:
     void onButtonSpotLoopClicked();
     void onButtonSlideShowClicked();
     void onButtonSetupClicked();
     void onButtonShutdownClicked();
+    void onSpotClosed(int exitCode, QProcess::ExitStatus exitStatus);
+    void onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus);
 
 protected:
     bool            prepareLogFile();
@@ -49,14 +55,16 @@ protected:
     void            UpdateUI();
     QHBoxLayout*    CreateSpotButtons();
     void            connectButtonSignals();
+    bool            startSlideShow();
+    void            stopSlideShow();
+    void            startSpotLoop();
+    void            stopSpotLoop();
     virtual void    SaveStatus();
     virtual void    GeneralSetup();
-    virtual void    startSpotLoop();
-    virtual void    stopSpotLoop();
-    virtual void    startSlideShow();
-    virtual void    stopSlideShow();
+    void            doProcessCleanup();
 
 protected:
+    GeneralSetupArguments gsArgs;
     QFile*                pLogFile;
     QSettings*            pSettings;
     QPushButton*          pSpotButton{};
@@ -71,4 +79,16 @@ protected:
         showCamera
     };
     status                myStatus;
+    QProcess*       pVideoPlayer;
+    QString         sProcess;
+    QString         sProcessArguments;
+    SlideWidget*    pMySlideWindow;
+    QFileInfoList   spotList;
+    struct spot {
+        QString spotFilename;
+        qint64  spotFileSize;
+    };
+    QList<spot>        availabeSpotList;
+    int                iCurrentSpot;
+    QString            sVideoPlayer;
 };

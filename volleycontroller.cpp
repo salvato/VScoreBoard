@@ -515,32 +515,6 @@ VolleyController::setEventHandlers() {
 }
 
 
-void
-VolleyController::startSpotLoop() {
-    pVolleyPanel->setSpotDir(gsArgs.sSpotDir);
-    pVolleyPanel->startSpotLoop();
-}
-
-
-void
-VolleyController::stopSpotLoop() {
-    pVolleyPanel->stopSpotLoop();
-}
-
-
-void
-VolleyController::startSlideShow() {
-    pVolleyPanel->setSlideDir(gsArgs.sSlideDir);
-    pVolleyPanel->startSlideShow();
-}
-
-
-void
-VolleyController::stopSlideShow() {
-    pVolleyPanel->stopSlideShow();
-}
-
-
 // =========================
 // Event management routines
 // =========================

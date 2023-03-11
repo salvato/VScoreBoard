@@ -22,8 +22,8 @@ public:
     ~SlideWidget();
 
 public:
-    void setSlideDir(QString sNewDir);
-    void startSlideShow();
+    bool setSlideDir(QString sNewDir);
+    bool startSlideShow();
     void stopSlideShow();
 
 protected:
@@ -41,15 +41,15 @@ protected:
 public slots:
     void ontimerAnimateEvent();
     void onTimerSteadyEvent();
+    void closeEvent(QCloseEvent*) override;
 
 private:
     void initGeometry();
     void drawGeometry(QOpenGLShaderProgram *program);
-    void updateSlideList();
+    bool updateSlideList();
 
 private:
-    struct VertexData
-    {
+    struct VertexData {
         QVector3D position;
         QVector2D texCoord;
     };

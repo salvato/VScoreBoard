@@ -20,8 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QObject>
 #include <QMainWindow>
-#include <QProcess>
-#include <QFileInfoList>
 #include <QtGlobal>
 #include <QTranslator>
 #include <QTimer>
@@ -34,7 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 QT_BEGIN_NAMESPACE
 QT_FORWARD_DECLARE_CLASS(QFile)
-QT_FORWARD_DECLARE_CLASS(SlideWidget)
 QT_FORWARD_DECLARE_CLASS(QGridLayout)
 QT_END_NAMESPACE
 
@@ -48,24 +45,13 @@ public:
     ~ScorePanel();
     void keyPressEvent(QKeyEvent *event);
     void closeEvent(QCloseEvent *event);
-    void setSlideDir(QString sDir);
-    void setSpotDir(QString sDir);
-    void startSpotLoop();
-    void stopSpotLoop();
-    void startSlideShow();
-    void stopSlideShow();
 
 signals:
     void panelClosed();
 
-private slots:
-    void onSpotClosed(int exitCode, QProcess::ExitStatus exitStatus);
-    void onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus);
-
 protected:
     virtual QGridLayout* createPanel();
     void buildLayout();
-    void doProcessCleanup();
 
 protected:
     bool               isMirrored;
@@ -73,26 +59,7 @@ protected:
     QTranslator        Translator;
 
 private:
-    QProcess*          pVideoPlayer;
-    QString            sProcess;
-    QString            sProcessArguments;
-    // Spots management
-    QString            sSpotDir;
-    QFileInfoList      spotList;
-    struct spot {
-        QString spotFilename;
-        qint64  spotFileSize;
-    };
-    QList<spot>        availabeSpotList;
-    int                iCurrentSpot;
-    // Slides management
-    SlideWidget*       pMySlideWindow;
-    QString            sSlideDir;
-    int                iCurrentSlide;
     // Logging Messages
     QString            logFileName;
-
-private:
     QWidget*           pPanel;
-    QString            sVideoPlayer;
 };

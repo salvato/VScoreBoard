@@ -74,7 +74,7 @@ VolleyApplication::PrepareLogFile() {
     if (!pLogFile->open(QIODevice::WriteOnly)) {
         QMessageBox::information(Q_NULLPTR, "Segnapunti Volley",
                                  QString("Impossibile aprire il file %1: %2.")
-                                 .arg(logFileName).arg(pLogFile->errorString()));
+                                 .arg(logFileName, pLogFile->errorString()));
         delete pLogFile;
         pLogFile = nullptr;
     }

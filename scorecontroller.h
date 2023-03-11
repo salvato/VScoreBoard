@@ -48,6 +48,7 @@ protected slots:
     void onButtonShutdownClicked();
     void onSpotClosed(int exitCode, QProcess::ExitStatus exitStatus);
     void onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus);
+    void closeEvent(QCloseEvent*) override;
 
 protected:
     bool            prepareLogFile();

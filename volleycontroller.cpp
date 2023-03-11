@@ -81,6 +81,7 @@ void
 VolleyController::closeEvent(QCloseEvent *event) {
     SaveSettings();
     delete pVolleyPanel;
+    ScoreController::closeEvent(event);
     event->accept();
 }
 

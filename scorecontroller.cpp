@@ -66,6 +66,12 @@ ScoreController::~ScoreController() {
 
 
 void
+ScoreController::closeEvent(QCloseEvent*) {
+    doProcessCleanup();
+}
+
+
+void
 ScoreController::doProcessCleanup() {
 #ifdef LOG_VERBOSE
     logMessage(pLogFile,

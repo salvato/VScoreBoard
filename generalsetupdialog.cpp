@@ -161,8 +161,19 @@ GeneralSetupDialog::setSlideDir() {
     slidesDirEdit.setText(pTempArguments->sSlideDir);
     QDir slideDir(pTempArguments->sSlideDir);
     if(slideDir.exists()) {
-        slidesDirEdit.setStyleSheet("background:white;color:black;");
-        buttonOk.setEnabled(true);
+        QFileInfoList slideList = QFileInfoList();
+        QStringList nameFilter = QStringList() << "*.jpg" << "*.jpeg" << "*.png";
+        slideDir.setNameFilters(nameFilter);
+        slideDir.setFilter(QDir::Files);
+        slideList = slideDir.entryInfoList();
+        if(!slideList.isEmpty()) {
+            slidesDirEdit.setStyleSheet("background:white;color:black;");
+            buttonOk.setEnabled(true);
+        }
+        else {
+            slidesDirEdit.setStyleSheet("background:red;color:white;");
+            buttonOk.setDisabled(true);
+        }
     }
     else {
         slidesDirEdit.setStyleSheet("background:red;color:white;");
@@ -176,8 +187,18 @@ GeneralSetupDialog::setSpotDir() {
     spotsDirEdit.setText(pTempArguments->sSpotDir);
     QDir spotDir(pTempArguments->sSpotDir);
     if(spotDir.exists()) {
-        spotsDirEdit.setStyleSheet("background:white;color:black;");
-        buttonOk.setEnabled(true);
+        QStringList nameFilter(QStringList() << "*.mp4" << "*.MP4");
+        spotDir.setNameFilters(nameFilter);
+        spotDir.setFilter(QDir::Files);
+        QFileInfoList spotList = spotDir.entryInfoList();
+        if(!spotList.isEmpty()) {
+            spotsDirEdit.setStyleSheet("background:white;color:black;");
+            buttonOk.setEnabled(true);
+        }
+        else {
+            spotsDirEdit.setStyleSheet("background:red;color:white;");
+            buttonOk.setDisabled(true);
+        }
     }
     else {
         spotsDirEdit.setStyleSheet("background:red;color:white;");

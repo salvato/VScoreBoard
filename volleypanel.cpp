@@ -43,8 +43,8 @@ VolleyPanel::VolleyPanel(QFile *myLogFile, QWidget *parent)
     QSize panelSize = QGuiApplication::primaryScreen()->geometry().size();
     iTeamFontSize    = std::min(panelSize.height()/8,
                                 int(panelSize.width()/(2.2*maxTeamNameLen)));
-    iScoreFontSize   = std::min(panelSize.height()/4,
-                                int(panelSize.width()/9));
+    iScoreFontSize   = std::min(panelSize.height()/5,
+                                int(panelSize.width()/10));
     iLabelsFontSize  = panelSize.height()/8; // 2 Righe
     iTimeoutFontSize = panelSize.height()/8; // 2 Righe
     iSetFontSize     = panelSize.height()/8; // 2 Righe
@@ -236,15 +236,15 @@ VolleyPanel::createPanel() {
     layout->addWidget(pServizio[iright], 2, 7, 4, 1, Qt::AlignRight  |Qt::AlignTop);
     layout->addWidget(pScore[iright],    2, 8, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
 
-    layout->addWidget(pSet[ileft],       6, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(pSetLabel,         6, 3, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(pSet[iright],      6, 9, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pSet[ileft],       6, 3, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pSetLabel,         6, 4, 2, 4, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pSet[iright],      6, 8, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
 
-    layout->addWidget(logoLabel[ileft],  8, 0, 2, 2, Qt::AlignLeft   |Qt::AlignBottom);
-    layout->addWidget(pTimeout[ileft],   8, 2, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(pTimeoutLabel,     8, 3, 2, 6, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(pTimeout[iright],  8, 9, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(logoLabel[iright], 8,10, 2, 2, Qt::AlignRight  |Qt::AlignBottom);
+    layout->addWidget(logoLabel[ileft],  6, 0, 4, 3, Qt::AlignHCenter   |Qt::AlignVCenter);
+    layout->addWidget(pTimeout[ileft],   8, 3, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pTimeoutLabel,     8, 4, 2, 4, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(pTimeout[iright],  8, 8, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+    layout->addWidget(logoLabel[iright], 6, 9, 4, 3, Qt::AlignHCenter  |Qt::AlignVCenter);
 
     return layout;
 }
@@ -271,7 +271,7 @@ VolleyPanel::setLogo(int iTeam, QString sFileLogo) {
     if(QFile::exists(sFileLogo)) {
         if(pPixmapLogo[iTeam]) delete pPixmapLogo[iTeam];
         pPixmapLogo[iTeam] =  new QPixmap(sFileLogo);
-        logoLabel[iTeam]->setPixmap(*pPixmapLogo[iTeam]);
+        logoLabel[iTeam]->setPixmap(pPixmapLogo[iTeam]->scaled(192, 192, Qt::KeepAspectRatio));
     }
 }
 

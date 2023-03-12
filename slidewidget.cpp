@@ -370,36 +370,7 @@ SlideWidget::initShaders() {
     }
     pNewProgram->setObjectName("Zoom In");
     pPrograms.append(pNewProgram); // Zoom in  effect at                3
-    pNewProgram = new QOpenGLShaderProgram(this);
-    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl")) {
-        close();
-        return;
-    }
-    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl")) {
-        close();
-        return;
-    }
-    if (!pNewProgram->link()) {
-        close();
-        return;
-    }
-    pNewProgram->setObjectName("Rotate Bottom Left");
-    pPrograms.append(pNewProgram); // Rotate from bottom left effect at 4
-    pNewProgram = new QOpenGLShaderProgram(this);
-    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl")) {
-        close();
-        return;
-    }
-    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl")) {
-        close();
-        return;
-    }
-    if (!pNewProgram->link()) {
-        close();
-        return;
-    }
-    pNewProgram->setObjectName("Rotate Top Left");
-    pPrograms.append(pNewProgram); // Rotate from top left effect at    5
+
     nAnimationTypes = pPrograms.count();
 }
 
@@ -567,49 +538,7 @@ SlideWidget::paintGL() {
         drawGeometry(pCurrentProgram);
     } // currentAnimation == 3
 
-    else if(currentAnimation == 4) { // Rotate from bottom left
-        pCurrentProgram->setUniformValue(iTex0Loc, 0);
-        pTexture0->bind(0);
-        matrix.setToIdentity();
-        matrix.translate(0.0f, 0.0f, -viewingDistance+0.01);
-        matrix.translate(-1.0f*GLfloat(width())/GLfloat(height()),-1.0f, 0.0f);
-        matrix.rotate(fRot, 0.0, 0.0, -1.0);
-        matrix.translate(1.0f*GLfloat(width())/GLfloat(height()),  1.0f, 0.0f);
-        // Set modelview-projection matrix
-        pCurrentProgram->setUniformValue("mvp_matrix", projection * matrix);
-        drawGeometry(pCurrentProgram);
-
-        pCurrentProgram->setUniformValue(iTex1Loc, 0);
-        pTexture1->bind(0);
-        matrix.setToIdentity();
-        matrix.translate(0.0f, 0.0f, -viewingDistance);
-        // Set modelview-projection matrix
-        pCurrentProgram->setUniformValue("mvp_matrix", projection * matrix);
-        drawGeometry(pCurrentProgram);
-    } // currentAnimation == 4
-
-    else if(currentAnimation == 5) { // Rotate from top left
-        pCurrentProgram->setUniformValue(iTex0Loc, 0);
-        pTexture0->bind(0);
-        matrix.setToIdentity();
-        matrix.translate(0.0f, 0.0f, -viewingDistance+0.01);
-        matrix.translate(-1.0*GLfloat(width())/GLfloat(height()), 1.0f, 0.0f);
-        matrix.rotate(fRot, 0.0f, 0.0f, -1.0f);
-        matrix.translate(1.0*GLfloat(width())/GLfloat(height()), -1.0f, 0.0f);
-        // Set modelview-projection matrix
-        pCurrentProgram->setUniformValue("mvp_matrix", projection * matrix);
-        drawGeometry(pCurrentProgram);
-
-        pCurrentProgram->setUniformValue(iTex1Loc, 0);
-        pTexture1->bind(0);
-        matrix.setToIdentity();
-        matrix.translate(0.0f, 0.0f, -viewingDistance);
-        // Set modelview-projection matrix
-        pCurrentProgram->setUniformValue("mvp_matrix", projection * matrix);
-        drawGeometry(pCurrentProgram);
-    } // currentAnimation == 5
     glDisable(GL_DEPTH_TEST);
-// paintGL()
 }
 
 

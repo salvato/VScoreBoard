@@ -7,6 +7,43 @@
 #include <QPainter>
 #include <QStandardPaths>
 
+/*
+ * A GL Transition is a GLSL code that implements a transition coloring function:
+ * For a given uv pixel position, returns a color representing the mix of the source
+ *  to the destination textures based on the variation of a contextual progress
+ *  value from 0.0 to 1.0.
+ *
+ *  How can we use it in practice for effects ?
+ *
+ *  Implement getFromColor() and getToColor() in the application shaders
+ *  (Fragment shaders). For example:
+ *
+ *  vec4
+ *  getFromColor() {
+ *      vec4 tempc;
+ *      tempc=texture2D(uSampler0, vec2(vTextureCoord.x, 1.0-vTextureCoord.y));
+ *      return tempc;
+ *  }
+ *
+ *  vec4
+ *  getToColor() {
+ *      vec4 tempc;
+ *      tempc=vec4(0.0, 0.0, 0.0, 1.0);
+ *      return tempc;
+ *  }
+ *
+ *  Then add any of the shaders available in gl-transitions.com
+ *
+ *  Note — all shaders in gl-transitions.com require the below implementation in the fragment shader,
+ *
+ *  - getFromColor() — shader that returns a vec4 of source color
+ *  - getToColor() — shader that returns a vec4 of target color
+ *  - gluniform named “progress” — that tells the shader to provide a transition
+ *    corresponding to progress, varies from 0–1
+ *
+ *  Some shaders require additional uniforms to be setup.
+ */
+
 
 #define STEADY_SHOW_TIME       3000 // Change slide time
 #define TRANSITION_TIME        1500 // Transition duration

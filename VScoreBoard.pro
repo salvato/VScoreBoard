@@ -57,6 +57,7 @@ DISTFILES += \
     fshader.glsl \
     fshaderFade.glsl \
     fshaderFold.glsl \
+    gl-transitions.txt \
     vshader.glsl \
     vshaderFade.glsl \
     vshaderFold.glsl

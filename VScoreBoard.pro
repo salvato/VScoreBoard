@@ -54,6 +54,8 @@ RESOURCES += \
     shaders.qrc
 
 DISTFILES += \
+    fAngular.glsl \
+    fBookFlip.glsl \
     fshader.glsl \
     fshaderFade.glsl \
     fshaderFold.glsl \

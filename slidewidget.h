@@ -53,7 +53,6 @@ private:
         QVector3D position;
         QVector2D texCoord;
     };
-    QBasicTimer timer;
     QTimer timerAnimate;
     QTimer timerSteady;
     QVector<QOpenGLShaderProgram*> pPrograms;
@@ -100,4 +99,7 @@ private:
     GLfloat   xLeft;
     float viewingDistance;
     QMatrix4x4 matrix;
+    GLint     iProgressLoc;
+    GLfloat   progress;
+    GLfloat   aspectRatio;
 };

@@ -61,11 +61,24 @@ SlideWidget::SlideWidget()
     updateSlideList();
 
     QList<QScreen*> screens = QApplication::screens();
+    QRect screenres = screens.at(0)->geometry();
     if(screens.count() > 1) {
-        QRect screenres = screens.at(1)->geometry();
+        screenres = screens.at(1)->geometry();
         QPoint point = QPoint(screenres.x(), screenres.y());
         move(point);
     }
+    pBaseImage = new QImage(screenres.width(),
+                            screenres.height(),
+                            QImage::Format_RGBA8888_Premultiplied);
+
+    // Reset projection matrix
+    projection.setToIdentity();
+    viewingDistance       = 20.0f;
+    aspectRatio           = GLfloat(screenres.width())/GLfloat(screenres.height());
+    GLfloat verticalAngle = 2.0*atan(1.0/viewingDistance)*180.0/M_PI;
+    GLfloat nearPlane     = viewingDistance - 1.0;
+    GLfloat farPlane      = viewingDistance + 1.0;
+    projection.perspective(verticalAngle, aspectRatio, nearPlane, farPlane);
 
     iCurrentSlide    = 0;
 
@@ -75,9 +88,8 @@ SlideWidget::SlideWidget()
     alpha  = alpha0  = 1.0f;
     fScale = fScale0 = 1.0f;
     fRot   = fRot0   = 0.0f;
-    xLeft  =-GLfloat(width())/GLfloat(height());
+    xLeft  =-GLfloat(screenres.width())/GLfloat(screenres.height());
 
-    viewingDistance  = 20.0f;
 
     timerSteady.setSingleShot(true);
     connect(&timerAnimate, SIGNAL(timeout()),
@@ -128,7 +140,7 @@ SlideWidget::setSlideDir(QString sNewDir) {
 
 bool
 SlideWidget::startSlideShow() {
-    currentAnimation = rand() % nAnimationTypes;
+    currentAnimation = 2;//rand() % nAnimationTypes;
     makeCurrent();
     pCurrentProgram = pPrograms.at(currentAnimation);
     if(!pCurrentProgram->bind()) {
@@ -171,23 +183,13 @@ SlideWidget::updateSlideList() {
 
 bool
 SlideWidget::prepareNextSlide() {
-    if(slideList.count() == 0) {
-        qCritical() << "No Slides in directory: exiting ...";
-        close();
-        return false;
-    }
-    if(iCurrentSlide >= slideList.count()) {
-        iCurrentSlide = iCurrentSlide % slideList.count();
-        qCritical() << "Errore: iCurrentSlide >= slideList.count()";
-    }
     QImage newImage(slideList.at(iCurrentSlide).absoluteFilePath());
-    image = newImage.scaled(pBaseImage->width(), pBaseImage->height(), Qt::KeepAspectRatio).mirrored();
-
+    image = newImage.scaled(pBaseImage->size(),
+                            Qt::KeepAspectRatio).mirrored();
     QPainter painter(pBaseImage);
-    painter.setCompositionMode(QPainter::CompositionMode_Source);
-    painter.fillRect(0, 0, pBaseImage->width(), pBaseImage->height(), Qt::white);
-    int x = (pBaseImage->width()-image.width())/2;
-    int y = (pBaseImage->height()-image.height())/2;
+    painter.fillRect(pBaseImage->rect(), Qt::white);
+    int x = (pBaseImage->width()  - image.width())  / 2;
+    int y = (pBaseImage->height() - image.height()) / 2;
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
     painter.drawImage(x, y, image);
     painter.end();
@@ -200,7 +202,7 @@ SlideWidget::prepareNextSlide() {
 bool
 SlideWidget::prepareNextRound() {
     makeCurrent(); // Fondamentale !!!
-    currentAnimation = rand() % nAnimationTypes;
+    currentAnimation = 2;//rand() % nAnimationTypes;
     pCurrentProgram->release();
     pCurrentProgram = pPrograms.at(currentAnimation);
     if(!pCurrentProgram->bind()) {
@@ -211,7 +213,6 @@ SlideWidget::prepareNextRound() {
     getLocations();
 
     // Prepare the next slide...
-
     if(!prepareNextSlide()) {
         close();
         return false;
@@ -261,7 +262,19 @@ SlideWidget::getLocations() {
     pCurrentProgram->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
 
     iTex0Loc = pCurrentProgram->uniformLocation("texture0");
+    iTex1Loc = pCurrentProgram->uniformLocation("texture1");
 
+    iProgressLoc = pCurrentProgram->uniformLocation("progress");
+    if(iProgressLoc == -1) {
+        qCritical() << __FUNCTION__ << __LINE__ << "Shader uniform not found";
+        close();
+        return false;
+    }
+    progress = 0.0;
+
+    if(currentAnimation == 0) {// Fold effect
+    } // currentAnimation == 0: Fold effect
+/*
     if(currentAnimation == 0) {// Fold effect
         iALoc     = pCurrentProgram->uniformLocation("a");
         iThetaLoc = pCurrentProgram->uniformLocation("theta");
@@ -285,7 +298,7 @@ SlideWidget::getLocations() {
             return false;
         }
     } // currentAnimation == 1: Fade effect
-
+*/
     return true;
 }
 
@@ -321,15 +334,13 @@ SlideWidget::initializeGL() {
     glClearColor(1, 1, 1, 1);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    if(pBaseImage) delete pBaseImage;
-    pBaseImage = new QImage(width(),
-                            height(),
-                            QImage::Format_RGBA8888_Premultiplied);
+
     initShaders();
     initTextures();
     initGeometry();
 
-    currentAnimation = 1;
+    if(currentAnimation >= pPrograms.count())
+        currentAnimation = 0;
     pCurrentProgram = pPrograms.at(currentAnimation);
     if(!pCurrentProgram->bind()) {
         qCritical() << __FUNCTION__ << __LINE__;
@@ -337,21 +348,17 @@ SlideWidget::initializeGL() {
         return;
     }
     getLocations();
-
-    // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
 }
 
 
 void
 SlideWidget::initShaders() {
     QOpenGLShaderProgram* pNewProgram = new QOpenGLShaderProgram(this);
-    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshaderFold.glsl")) {
+    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vBookFlip.glsl")) {
         close();
         return;
     }
-
-    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshaderFold.glsl")) {
+    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fBookFlip.glsl")) {
         close();
         return;
     }
@@ -359,9 +366,42 @@ SlideWidget::initShaders() {
         close();
         return;
     }
-    pNewProgram->setObjectName("Fold");
-    pPrograms.append(pNewProgram);// Fold page effect at 0
+    pNewProgram->setObjectName("Book");
+    pPrograms.append(pNewProgram);// Book effect at 0
 
+    pNewProgram = new QOpenGLShaderProgram(this);
+    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vBookFlip.glsl")) {
+        close();
+        return;
+    }
+    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fAngular.glsl")) {
+        close();
+        return;
+    }
+    if (!pNewProgram->link()) {
+        close();
+        return;
+    }
+    pNewProgram->setObjectName("Angular");
+    pPrograms.append(pNewProgram); // Angular effect at 1
+
+    pNewProgram = new QOpenGLShaderProgram(this);
+    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vBookFlip.glsl")) {
+        close();
+        return;
+    }
+    if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fBounce.glsl")) {
+        close();
+        return;
+    }
+    if (!pNewProgram->link()) {
+        close();
+        return;
+    }
+    pNewProgram->setObjectName("Bounce");
+    pPrograms.append(pNewProgram); // Angular effect at 2
+
+/*
     pNewProgram = new QOpenGLShaderProgram(this);
     if (!pNewProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshaderFade.glsl")) {
         close();
@@ -407,7 +447,7 @@ SlideWidget::initShaders() {
     }
     pNewProgram->setObjectName("Zoom In");
     pPrograms.append(pNewProgram); // Zoom in  effect at                3
-
+*/
     nAnimationTypes = pPrograms.count();
 }
 
@@ -437,7 +477,6 @@ SlideWidget::initTextures() {
 
 void
 SlideWidget::initGeometry() {
-    float aspectRatio = float(width())/float(height());
     QVector<VertexData> vertices;
     int nxStep = 54;
     int nyStep = 36;
@@ -469,7 +508,7 @@ SlideWidget::initGeometry() {
         x = xdx;
     }
     nVertices = vertices.count();
-    // Transfer vertex data to VBO 0
+    // Transfer vertex data to VBO
     arrayBuf.create();
     arrayBuf.bind();
     arrayBuf.allocate(vertices.data(), nVertices*sizeof(VertexData));
@@ -478,20 +517,8 @@ SlideWidget::initGeometry() {
 
 void
 SlideWidget::resizeGL(int w, int h) {
-    // Reset projection matrix
-    projection.setToIdentity();
-    float aspectRatio   = GLfloat(w)/GLfloat(h);
-    float verticalAngle = 2.0*atan(1.0/viewingDistance)*180.0/M_PI;
-    float nearPlane     = viewingDistance - 1.0;
-    float farPlane      = viewingDistance + 1.0;
-    projection.perspective(verticalAngle, aspectRatio, nearPlane, farPlane);
-    if(pBaseImage) {
-        delete pBaseImage;
-        pBaseImage = new QImage(w,
-                                h,
-                                QImage::Format_RGBA8888_Premultiplied);
-
-    }
+    Q_UNUSED(w)
+    Q_UNUSED(h)
 }
 
 
@@ -502,6 +529,19 @@ SlideWidget::paintGL() {
     glDepthFunc(GL_LEQUAL);
     glClearDepthf(5.0f);
 
+//    if(currentAnimation == 0) { // Book Effect
+        pCurrentProgram->setUniformValue(iTex0Loc, 0);
+        pCurrentProgram->setUniformValue(iTex1Loc, 1);
+        pTexture0->bind(0);
+        pTexture1->bind(1);
+        pCurrentProgram->setUniformValue(iProgressLoc, progress);
+        matrix.setToIdentity();
+        matrix.translate(0.0f, 0.0f, -viewingDistance+0.01);
+        // Set modelview-projection matrix
+        pCurrentProgram->setUniformValue("mvp_matrix", projection * matrix);
+        drawGeometry(pCurrentProgram);
+//    } // currentAnimation == 0
+/*
     if(currentAnimation == 0) { // Fold Effect
         pTexture0->bind(0);
         pCurrentProgram->setUniformValue(iALoc, A.x(), A.y(), A.z(), A.w());
@@ -574,27 +614,20 @@ SlideWidget::paintGL() {
         pCurrentProgram->setUniformValue("mvp_matrix", projection * matrix);
         drawGeometry(pCurrentProgram);
     } // currentAnimation == 3
-
+*/
     glDisable(GL_DEPTH_TEST);
 }
 
 
 void
 SlideWidget::ontimerAnimateEvent() {
-    if(currentAnimation == 0) {
-        A += QVector4D(0.0f, -0.02f, 0.0f, 0.0f);
-        if(theta > 0.2f)
-            theta -= 0.04f;
-        else if(angle < M_PI_2)
-            angle+= 0.15f;
-        if(A.y() < -1.88f) {
-            timerAnimate.stop();
-            prepareNextRound();
-            A      = A0;
-            theta  = theta0;
-            angle  = angle0;
-        }
+    progress += 0.01;
+    if(progress >= 0.99f) {
+        timerAnimate.stop();
+        prepareNextRound();
+        progress = 0.0;
     }
+/*
     else if(currentAnimation == 1) {
         alpha -= 0.02f;
         if(alpha < 0.0) {
@@ -635,6 +668,7 @@ SlideWidget::ontimerAnimateEvent() {
                 fRot = fRot0;
             }
     }
+*/
     update();
 }
 

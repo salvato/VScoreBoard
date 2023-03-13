@@ -6,5 +6,9 @@
         <file>vshaderFade.glsl</file>
         <file>fshader.glsl</file>
         <file>vshader.glsl</file>
+        <file>vBookFlip.glsl</file>
+        <file>fBookFlip.glsl</file>
+        <file>fAngular.glsl</file>
+        <file>fBounce.glsl</file>
     </qresource>
 </RCC>

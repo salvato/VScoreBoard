@@ -1,15 +1,22 @@
 // Author: Adrian Purser
 // License: MIT
 
+#ifdef GL_ES
+// Set default precision to medium
+precision highp int;
+precision highp float;
+#endif
+
+
 uniform vec4 shadow_colour = vec4(0.,0.,0.,.6);
 uniform float shadow_height = 0.075;
 uniform float bounces = 3.0;
-uniform float progress;
-
 const float PI = 3.14159265358;
 
+uniform float progress;
 uniform sampler2D texture0;
 uniform sampler2D texture1;
+
 varying vec2 v_texcoord;
 
 
@@ -48,4 +55,10 @@ transition (vec2 uv) {
     getFromColor(vec2(uv.x, uv.y + (1.0 - y))),
     step(d, 0.0)
   );
+}
+
+
+void
+main(void) {
+    gl_FragColor = transition(v_texcoord);
 }

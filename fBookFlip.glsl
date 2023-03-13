@@ -10,6 +10,7 @@ precision highp float;
 uniform sampler2D texture0;
 uniform sampler2D texture1;
 uniform float progress;
+
 varying vec2 v_texcoord;
 
 
@@ -51,7 +52,6 @@ addShade() {
 vec4
 transition (vec2 p) {
   float pr = step(1.0 - progress, p.x);
-
   if (p.x < 0.5) {
     return mix(getFromColor(p), getToColor(skewLeft(p)) * addShade(), pr);
   } else {
@@ -62,5 +62,5 @@ transition (vec2 p) {
 
 void
 main(void) {
-    gl_FragColor=transition(v_texcoord);
+    gl_FragColor = transition(v_texcoord);
 }

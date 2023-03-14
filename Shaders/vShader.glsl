@@ -1,3 +1,4 @@
+#version 150
 #ifdef GL_ES
 precision highp int;
 precision highp float;
@@ -17,4 +18,3 @@ main() {
     // Value will be automatically interpolated to fragments inside polygon faces
     v_texcoord = a_texcoord;
 }
-//! [0]

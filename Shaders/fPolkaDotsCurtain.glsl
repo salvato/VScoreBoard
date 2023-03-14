@@ -1,3 +1,4 @@
+#version 150
 // author: bobylito
 // license: MIT
 const float SQRT_2 = 1.414213562373;

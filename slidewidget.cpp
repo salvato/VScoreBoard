@@ -268,7 +268,8 @@ SlideWidget::initializeGL() {
     initTextures();
     initGeometry();
 
-    if(currentAnimation >= pPrograms.count())
+    if((currentAnimation >= pPrograms.count()) ||
+       (currentAnimation < 0))
         currentAnimation = 0;
     pCurrentProgram = pPrograms.at(currentAnimation);
     if(!pCurrentProgram->bind()) {
@@ -328,6 +329,7 @@ SlideWidget::initShaders() {
     }
 
     nAnimationTypes = pPrograms.count();
+    currentAnimation = rand() % nAnimationTypes;
 }
 
 
@@ -425,11 +427,11 @@ SlideWidget::paintGL() {
 
 void
 SlideWidget::ontimerAnimateEvent() {
-    progress += 0.02;
+    progress += 0.02f;
     if(progress >= 1.0f) {
         timerAnimate.stop();
         prepareNextRound();
-        progress = 0.0;
+        progress = 0.0f;
     }
 
     update();

@@ -5,14 +5,8 @@
         <file>Shaders/fBounce.glsl</file>
         <file>Shaders/fDoomScreen.glsl</file>
         <file>Shaders/fFilmBurn.glsl</file>
-        <file>Shaders/fshader.glsl</file>
-        <file>Shaders/fshaderFade.glsl</file>
-        <file>Shaders/fshaderFold.glsl</file>
         <file>Shaders/fWaterDrop.glsl</file>
-        <file>Shaders/vBookFlip.glsl</file>
         <file>Shaders/vShader.glsl</file>
-        <file>Shaders/vshaderFade.glsl</file>
-        <file>Shaders/vshaderFold.glsl</file>
         <file>Shaders/fFlyEye.glsl</file>
         <file>Shaders/fPrefix.glsl</file>
         <file>Shaders/fMain.glsl</file>

@@ -215,8 +215,8 @@ ScoreController::startSpotLoop() {
                 sArguments.append(QString("%1").arg(screenres.height()));
             }
             sArguments.append(spotList.at(iCurrentSpot).absoluteFilePath());
-
             pVideoPlayer->start(sVideoPlayer, sArguments);
+
 #ifdef LOG_VERBOSE
             logMessage(pLogFile,
                        Q_FUNC_INFO,
@@ -235,7 +235,7 @@ ScoreController::startSpotLoop() {
                 return;
             }
         } // if(!videoPlayer)
-    }
+    } // if(!spotList.isEmpty())
 }
 
 

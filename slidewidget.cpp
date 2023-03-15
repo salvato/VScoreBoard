@@ -1,5 +1,6 @@
 #include "slidewidget.h"
 
+
 #include <QMouseEvent>
 #include <QDir>
 #include <cmath>
@@ -32,7 +33,6 @@ SlideWidget::SlideWidget()
     pBaseImage = new QImage(screenres.width(),
                             screenres.height(),
                             QImage::Format_RGBA8888_Premultiplied);
-
     // Reset projection matrix
     projection.setToIdentity();
     viewingDistance       = 20.0f;
@@ -91,10 +91,39 @@ SlideWidget::setSlideDir(QString sNewDir) {
 }
 
 
+void
+SlideWidget::showFullScreen() {
+    // Let's Capture a Screenshot of the panel as the first image
+    QList<QScreen*> screens = QApplication::screens();
+    QImage image = screens.at(1)->grabWindow(0).toImage();
+    image = image.scaled(pBaseImage->size(),
+                         Qt::KeepAspectRatio).mirrored();
+    QImage* pTempImage = new QImage(screens.at(1)->geometry().width(),
+                                    screens.at(1)->geometry().height(),
+                                    QImage::Format_RGBA8888_Premultiplied);
+    QPainter painter(pTempImage);
+    painter.fillRect(pTempImage->rect(), Qt::white);
+    int x = (pTempImage->width()  - image.width())  / 2;
+    int y = (pTempImage->height() - image.height()) / 2;
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter.drawImage(x, y, image);
+    painter.end();
+    // Now we are ready to initializie OpenGl (if not already done)
+    QOpenGLWidget::showFullScreen();
+    // The very first texture is a screenshot of the panel
+    // captured from SlideWidget::showFullScreen() in pBaseImage
+    makeCurrent();
+    pTexture0 = new QOpenGLTexture(*pTempImage);
+    pTexture0->setMinificationFilter(QOpenGLTexture::Nearest);
+    pTexture0->setMagnificationFilter(QOpenGLTexture::Linear);
+    pTexture0->setWrapMode(QOpenGLTexture::Repeat);
+    doneCurrent();
+}
+
+
 bool
 SlideWidget::startSlideShow() {
     makeCurrent();
-    progress = 0.0f;
     pCurrentProgram = pPrograms.at(currentAnimation);
     if(!pCurrentProgram->bind()) {
         qCritical() << __FUNCTION__ << __LINE__;
@@ -104,8 +133,9 @@ SlideWidget::startSlideShow() {
     getLocations();
     doneCurrent();
     setWindowTitle(pCurrentProgram->objectName());
+    progress = 0.0f;
     update();
-    timerSteady.start(STEADY_SHOW_TIME);
+    timerAnimate.start(UPDATE_TIME);
     bRunning = true;
     return true;
 }
@@ -115,6 +145,13 @@ void
 SlideWidget::stopSlideShow() {
     timerSteady.stop();
     timerAnimate.stop();
+    makeCurrent();
+    pTexture1->release();
+    delete pTexture1;
+    pTexture0->release();
+    pTexture1 = pTexture0;
+    pTexture0 = nullptr;
+    doneCurrent();
     bRunning = false;
 }
 
@@ -330,17 +367,9 @@ SlideWidget::initShaders() {
 }
 
 
+// Called just once in SlideWidget::initializeGL()
 void
 SlideWidget::initTextures() {
-    // Setup the first texture
-    if(!prepareNextSlide()) {
-        close();
-        return;
-    }
-    pTexture0 = new QOpenGLTexture(*pBaseImage);
-    pTexture0->setMinificationFilter(QOpenGLTexture::Nearest);
-    pTexture0->setMagnificationFilter(QOpenGLTexture::Linear);
-    pTexture0->setWrapMode(QOpenGLTexture::Repeat);
     // Now the second texture
     if(!prepareNextSlide()) {
         close();
@@ -400,17 +429,18 @@ SlideWidget::paintGL() {
     glDepthFunc(GL_LEQUAL);
     glClearDepthf(5.0f);
 
-    pCurrentProgram->setUniformValue(iTex0Loc, 0);
-    pCurrentProgram->setUniformValue(iTex1Loc, 1);
-    pTexture0->bind(0);
-    pTexture1->bind(1);
-    pCurrentProgram->setUniformValue(iProgressLoc, progress);
-    matrix.setToIdentity();
-    matrix.translate(0.0f, 0.0f, -viewingDistance);
-    // Set modelview-projection matrix
-    pCurrentProgram->setUniformValue("mvp_matrix", projection * matrix);
-    drawGeometry(pCurrentProgram);
-
+    if(pTexture0 && pTexture1) {
+        pCurrentProgram->setUniformValue(iTex0Loc, 0);
+        pCurrentProgram->setUniformValue(iTex1Loc, 1);
+        pTexture0->bind(0);
+        pTexture1->bind(1);
+        pCurrentProgram->setUniformValue(iProgressLoc, progress);
+        matrix.setToIdentity();
+        matrix.translate(0.0f, 0.0f, -viewingDistance);
+        // Set modelview-projection matrix
+        pCurrentProgram->setUniformValue("mvp_matrix", projection * matrix);
+        drawGeometry(pCurrentProgram);
+    }
     glDisable(GL_DEPTH_TEST);
 }
 

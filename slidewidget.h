@@ -25,6 +25,7 @@ public:
     bool setSlideDir(QString sNewDir);
     bool startSlideShow();
     void stopSlideShow();
+    void showFullScreen();
 
 protected:
     void initializeGL() override;

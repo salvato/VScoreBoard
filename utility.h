@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QString>
 #include <QFile>
 
-#define LOG_MESG
-#define LOG_VERBOSE
-#define LOG_VERBOSE_VERBOSE
+//#define LOG_MESG
+//#define LOG_VERBOSE
+//#define LOG_VERBOSE_VERBOSE
 
 #define START_GRADIENT   8
 #define END_GRADIENT   128

@@ -123,7 +123,6 @@ SlideWidget::stopSlideShow() {
 
 bool
 SlideWidget::updateSlideList() {
-    // Update slide list just in case we are updating the slide directory...
     slideList = QFileInfoList();
     QDir slideDir(sSlideDir);
     if(slideDir.exists()) {

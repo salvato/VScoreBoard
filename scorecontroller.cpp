@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <QScreen>
 #include <QDir>
+#include <QKeyEvent>
 
 #include "scorecontroller.h"
 #include "slidewidget.h"
@@ -41,6 +42,7 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
         , sVideoPlayer(QString("/usr/bin/ffplay"))
     #endif
 {
+    qApp->installEventFilter(this);
     QList<QScreen*> screens = QApplication::screens();
     if(screens.count() < 2) {
         QMessageBox::critical(nullptr,
@@ -68,6 +70,23 @@ ScoreController::~ScoreController() {
 void
 ScoreController::closeEvent(QCloseEvent*) {
     doProcessCleanup();
+}
+
+
+bool
+ScoreController::eventFilter(QObject *obj, QEvent *event) {
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if(((keyEvent->key() == Qt::Key_Left)   ||
+            (keyEvent->key() == Qt::Key_Right)) &&
+           (keyEvent->modifiers() == Qt::AltModifier))
+        {
+//            qSwap(iPrimaryScreen, iSecondaryScreen);
+//            changeScreen();
+            qCritical() << "key " << keyEvent->key() << "from" << obj;
+        }
+    }
+    return QObject::eventFilter(obj, event);
 }
 
 

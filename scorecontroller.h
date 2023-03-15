@@ -51,6 +51,7 @@ protected slots:
     void closeEvent(QCloseEvent*) override;
 
 protected:
+    bool            eventFilter(QObject *obj, QEvent *event) override;
     bool            prepareLogFile();
     void            prepareServices();
     void            UpdateUI();

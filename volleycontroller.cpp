@@ -826,6 +826,7 @@ VolleyController::onButtonNewGameClicked() {
 
 void
 VolleyController::onChangePanelOrientation(PanelOrientation orientation) {
+    Q_UNUSED(orientation)
 #ifdef LOG_VERBOSE
     logMessage(pLogFile,
                Q_FUNC_INFO,

@@ -38,6 +38,7 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     , pVolleyPanel(new VolleyPanel(myLogFile))
     , bFontBuilt(false)
 {
+    setWindowTitle("Score Controller - © Gabriele Salvato (2023)");
     setWindowIcon(QIcon(":/Logo.ico"));
 
     // QWidget propagates explicit palette roles from parent to child.

@@ -52,7 +52,8 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
         exit(EXIT_FAILURE);
     }
 
-    setWindowTitle("Score Controller");
+    setWindowTitle("Score Controller - ©Gabriele Salvato (2023)");
+    setWindowIcon(QIcon(":/Logo.ico"));
 
     iCurrentSpot = 0;
     pSpotButtonsLayout = CreateSpotButtons();

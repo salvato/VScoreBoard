@@ -39,8 +39,7 @@ HEADERS += \
     volleycontroller.h \
     volleypanel.h
 
-TRANSLATIONS += \
-    VScoreBoard_en_US.ts
+TRANSLATIONS += VScoreBoard_en_US.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -63,3 +62,5 @@ DISTFILES += \
     vshader.glsl \
     vshaderFade.glsl \
     vshaderFold.glsl
+
+win32:RC_ICONS += Logo.ico

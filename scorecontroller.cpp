@@ -340,6 +340,7 @@ void
 ScoreController::onButtonSlideShowClicked() {
     QPixmap pixmap;
     QIcon ButtonIcon;
+    setCursor(Qt::WaitCursor);
     if(myStatus == showPanel) {
         if(startSlideShow()) {
             pSpotButton->setDisabled(true);
@@ -361,6 +362,7 @@ ScoreController::onButtonSlideShowClicked() {
         stopSlideShow();
         myStatus = showPanel;
     }
+    unsetCursor();
 }
 
 

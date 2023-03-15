@@ -9,7 +9,6 @@
 
 
 #define STEADY_SHOW_TIME       3000 // Change slide time
-#define TRANSITION_TIME        1500 // Transition duration
 #define UPDATE_TIME              30 // Time between screen updates
 
 
@@ -94,9 +93,8 @@ SlideWidget::setSlideDir(QString sNewDir) {
 
 bool
 SlideWidget::startSlideShow() {
-//    currentAnimation = nAnimationTypes-1;
-    currentAnimation = rand() % nAnimationTypes;
     makeCurrent();
+    progress = 0.0f;
     pCurrentProgram = pPrograms.at(currentAnimation);
     if(!pCurrentProgram->bind()) {
         qCritical() << __FUNCTION__ << __LINE__;
@@ -396,13 +394,6 @@ SlideWidget::initGeometry() {
 
 
 void
-SlideWidget::resizeGL(int w, int h) {
-    Q_UNUSED(w)
-    Q_UNUSED(h)
-}
-
-
-void
 SlideWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -415,7 +406,7 @@ SlideWidget::paintGL() {
     pTexture1->bind(1);
     pCurrentProgram->setUniformValue(iProgressLoc, progress);
     matrix.setToIdentity();
-    matrix.translate(0.0f, 0.0f, -viewingDistance+0.01);
+    matrix.translate(0.0f, 0.0f, -viewingDistance);
     // Set modelview-projection matrix
     pCurrentProgram->setUniformValue("mvp_matrix", projection * matrix);
     drawGeometry(pCurrentProgram);

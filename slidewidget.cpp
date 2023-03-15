@@ -95,18 +95,20 @@ void
 SlideWidget::showFullScreen() {
     // Let's Capture a Screenshot of the panel as the first image
     QList<QScreen*> screens = QApplication::screens();
-    QImage image = screens.at(1)->grabWindow(0).toImage();
-    image = image.scaled(pBaseImage->size(),
-                         Qt::KeepAspectRatio).mirrored();
     QImage* pTempImage = new QImage(screens.at(1)->geometry().width(),
                                     screens.at(1)->geometry().height(),
                                     QImage::Format_RGBA8888_Premultiplied);
     QPainter painter(pTempImage);
     painter.fillRect(pTempImage->rect(), Qt::white);
-    int x = (pTempImage->width()  - image.width())  / 2;
-    int y = (pTempImage->height() - image.height()) / 2;
-    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    painter.drawImage(x, y, image);
+    QImage image = screens.at(1)->grabWindow(0).toImage();
+    if(!image.isNull()) {
+        image = image.scaled(pBaseImage->size(),
+                             Qt::KeepAspectRatio).mirrored();
+        int x = (pTempImage->width()  - image.width())  / 2;
+        int y = (pTempImage->height() - image.height()) / 2;
+        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+        painter.drawImage(x, y, image);
+    }
     painter.end();
     // Now we are ready to initializie OpenGl (if not already done)
     QOpenGLWidget::showFullScreen();

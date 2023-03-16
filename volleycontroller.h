@@ -73,6 +73,7 @@ private:
     void          sendAll();
     void          logScore();
     bool          prepareScoreFile();
+    void          updateChart();
 
 
 private:

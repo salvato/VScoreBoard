@@ -43,6 +43,8 @@ ChartWindow::ChartWindow(QWidget *parent)
         move(point);
     }
 
+    setWindowIcon(QIcon(":/buttonIcons/plot.png"));
+
     panelPalette = QWidget::palette();
     panelGradient = QLinearGradient(0.0, 0.0, 0.0, screenGeometry.height());
     panelGradient.setColorAt(0, QColor(0, 0, START_GRADIENT));
@@ -70,8 +72,7 @@ ChartWindow::ChartWindow(QWidget *parent)
 
 
 QChart*
-ChartWindow::createLineChart()
-{
+ChartWindow::createLineChart() {
     QChart* pChart = new QChart();
 
     QLineSeries* pScoreSequence;
@@ -96,7 +97,7 @@ ChartWindow::createLineChart()
 
 
 void
-ChartWindow::newScore(int team0Score, int team1Score, int iSet) {
+ChartWindow::updateScore(int team0Score, int team1Score, int iSet) {
     int iMax = std::max(team0Score, team1Score);
     QChart* pChart = chartVector.at(iSet);
     QLineSeries* pScoreSequence;

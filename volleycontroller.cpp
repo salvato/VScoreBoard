@@ -37,6 +37,7 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     : ScoreController(myLogFile, parent)
     , pVolleyPanel(new VolleyPanel(myLogFile))
     , bFontBuilt(false)
+    , pCharts(nullptr)
     , pScoreFile(nullptr)
 {
     setWindowTitle("Score Controller - © Gabriele Salvato (2023)");
@@ -74,7 +75,8 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     prepareScoreFile();
 
     pVolleyPanel->showFullScreen();
-//    pCharts = new ChartWindow(nullptr);
+    pCharts = new ChartWindow(nullptr);
+
 //    pCharts->showFullScreen();
 }
 
@@ -156,6 +158,13 @@ VolleyController::logScore() {
     }
     else
         qCritical() << sMessage;
+}
+
+
+void
+VolleyController::updateChart() {
+    if(!pCharts) return;
+    pCharts->updateScore(iScore[0], iScore[1], iSet[0]+iSet[1]);
 }
 
 
@@ -678,6 +687,7 @@ VolleyController::onScoreIncrement(int iTeam) {
     sText = QString("team%1/score").arg(iTeam+1, 1);
     pSettings->setValue(sText, iScore[iTeam]);
     logScore();
+    updateChart();
 }
 
 
@@ -699,6 +709,7 @@ VolleyController::onScoreDecrement(int iTeam) {
     sText = QString("team%1/score").arg(iTeam+1, 1);
     pSettings->setValue(sText, iScore[iTeam]);
     logScore();
+    updateChart();
 }
 
 

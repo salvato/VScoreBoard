@@ -44,4 +44,3 @@ logMessage(QFile *logFile, QString sFunctionName, QString sMessage) {
         qDebug() << sDebugMessage;
 }
 
-

@@ -18,6 +18,7 @@ QT += gui
 QT += widgets
 QT += opengl
 QT += openglwidgets
+QT += charts
 
 
 CONFIG += c++17
@@ -26,6 +27,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 SOURCES += \
     button.cpp \
+    chartwindow.cpp \
     edit.cpp \
     generalsetuparguments.cpp \
     generalsetupdialog.cpp \
@@ -41,6 +43,7 @@ SOURCES += \
 
 HEADERS += \
     button.h \
+    chartwindow.h \
     edit.h \
     generalsetuparguments.h \
     generalsetupdialog.h \

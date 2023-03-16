@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "scorecontroller.h"
 #include "panelorientation.h"
+#include "chartwindow.h"
 
 
 QT_FORWARD_DECLARE_CLASS(QSettings)
@@ -31,6 +32,7 @@ QT_FORWARD_DECLARE_CLASS(QLabel)
 QT_FORWARD_DECLARE_CLASS(QGridLayout)
 QT_FORWARD_DECLARE_CLASS(VolleyPanel)
 QT_FORWARD_DECLARE_CLASS(ClientListDialog)
+QT_FORWARD_DECLARE_CLASS(QFile)
 
 
 class VolleyController : public ScoreController
@@ -69,6 +71,9 @@ private:
     void          buildControls();
     void          setEventHandlers();
     void          sendAll();
+    void          logScore();
+    bool          prepareScoreFile();
+
 
 private:
     VolleyPanel*  pVolleyPanel;
@@ -100,5 +105,7 @@ private:
     QPalette        panelPalette;
     QLinearGradient panelGradient;
     QBrush          panelBrush;
+    ChartWindow*    pCharts;
+    QFile*          pScoreFile;
 };
 

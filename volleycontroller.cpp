@@ -37,14 +37,11 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     : ScoreController(myLogFile, parent)
     , pVolleyPanel(new VolleyPanel(myLogFile))
     , bFontBuilt(false)
+    , pScoreFile(nullptr)
 {
     setWindowTitle("Score Controller - © Gabriele Salvato (2023)");
     setWindowIcon(QIcon(":/Logo.ico"));
 
-    // QWidget propagates explicit palette roles from parent to child.
-    // If you assign a brush or color to a specific role on a palette and
-    // assign that palette to a widget, that role will propagate to all
-    // the widget's children, overriding any system defaults for that role.
     panelPalette = QWidget::palette();
     panelGradient = QLinearGradient(0.0, 0.0, 0.0, height());
     panelGradient.setColorAt(0, QColor(0, 0, START_GRADIENT));
@@ -74,12 +71,21 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     pService[iServizio ? 0 : 1]->setChecked(false);
     pService[iServizio ? 0 : 1]->setFocus();
 
+    prepareScoreFile();
+
     pVolleyPanel->showFullScreen();
+    pCharts = new ChartWindow(nullptr);
+    pCharts->showFullScreen();
 }
 
 
 void
 VolleyController::closeEvent(QCloseEvent *event) {
+    if(pScoreFile) {
+        pScoreFile->close();
+        delete pScoreFile;
+        pScoreFile = nullptr;
+    }
     SaveSettings();
     delete pVolleyPanel;
     ScoreController::closeEvent(event);
@@ -100,6 +106,56 @@ VolleyController::resizeEvent(QResizeEvent *event) {
         buildFontSizes();
         event->setAccepted(true);
     }
+}
+
+
+bool
+VolleyController::prepareScoreFile() {
+    QString sPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/";
+    QString sScoreFileName = "Volley_" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm");
+    sScoreFileName = sPath + sScoreFileName + ".txt";
+    QFileInfo checkFile(sScoreFileName);
+    if(checkFile.exists() && checkFile.isFile()) {
+        QDir renamed;
+        renamed.remove(sScoreFileName+QString(".bkp"));
+        renamed.rename(sScoreFileName, sScoreFileName+QString(".bkp"));
+    }
+    if(pScoreFile) {
+        pScoreFile->close();
+        delete pScoreFile;
+        pScoreFile = nullptr;
+    }
+    pScoreFile = new QFile(sScoreFileName);
+    if (!pScoreFile->open(QIODevice::WriteOnly)) {
+        QMessageBox::information(Q_NULLPTR, "Segnapunti Volley",
+                                 QString("Impossibile aprire il file %1: %2.")
+                                 .arg(sScoreFileName, pScoreFile->errorString()));
+        delete pScoreFile;
+        pScoreFile = nullptr;
+    }
+    return true;
+}
+
+
+void
+VolleyController::logScore() {
+    QString sMessage = QString("Set %1, %2, %3, %4, %5, %6\n")
+                               .arg(iSet[0]+iSet[1]+1)
+                               .arg(pTeamName[0]->text())
+                               .arg(iScore[0])
+                               .arg(pTeamName[1]->text())
+                               .arg(iScore[1])
+                               .arg(QTime::currentTime().toString("hh:mm:ss"));
+    if(pScoreFile) {
+        if(pScoreFile->isOpen()) {
+            pScoreFile->write(sMessage.toLatin1()); // toLatin1() -- > converted to ASCII
+            pScoreFile->flush();
+        }
+        else
+            qCritical() << sMessage;
+    }
+    else
+        qCritical() << sMessage;
 }
 
 
@@ -621,6 +677,7 @@ VolleyController::onScoreIncrement(int iTeam) {
     pScoreEdit[iTeam]->setText(sText);
     sText = QString("team%1/score").arg(iTeam+1, 1);
     pSettings->setValue(sText, iScore[iTeam]);
+    logScore();
 }
 
 
@@ -641,6 +698,7 @@ VolleyController::onScoreDecrement(int iTeam) {
     pScoreEdit[iTeam]->setText(sText);
     sText = QString("team%1/score").arg(iTeam+1, 1);
     pSettings->setValue(sText, iScore[iTeam]);
+    logScore();
 }
 
 
@@ -793,6 +851,7 @@ VolleyController::onButtonNewGameClicked() {
                                      QMessageBox::Yes | QMessageBox::No,
                                      QMessageBox::No);
     if(iRes != QMessageBox::Yes) return;
+    prepareScoreFile();
     gsArgs.sTeam[0]    = tr("Locali");
     gsArgs.sTeam[1]    = tr("Ospiti");
     QString sText;

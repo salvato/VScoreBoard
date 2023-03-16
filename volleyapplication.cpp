@@ -32,6 +32,7 @@ VolleyApplication::VolleyApplication(int &argc, char **argv)
     , pLogFile(nullptr)
     , pScoreController(nullptr)
 {
+    (void)START_GRADIENT; // Just to Silent a Warning
     pSettings = new QSettings("Gabriele Salvato", "Volley ScoreBoard");
     sLanguage = pSettings->value("language/current",  QString("Italiano")).toString();
 

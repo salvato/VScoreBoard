@@ -113,17 +113,17 @@ void
 SlideWidget::showFullScreen() {
     // Let's Capture a Screenshot of the panel as the first image
     QList<QScreen*> screens = QApplication::screens();
-    QImage* pTempImage = new QImage(screens.at(1)->geometry().width(),
-                                    screens.at(1)->geometry().height(),
-                                    QImage::Format_RGBA8888_Premultiplied);
-    QPainter painter(pTempImage);
-    painter.fillRect(pTempImage->rect(), Qt::white);
+    QImage tempImage = QImage(screens.at(1)->geometry().width(),
+                              screens.at(1)->geometry().height(),
+                              QImage::Format_RGBA8888_Premultiplied);
+    QPainter painter(&tempImage);
+    painter.fillRect(tempImage.rect(), Qt::white);
     QImage image = screens.at(1)->grabWindow(0).toImage();
     if(!image.isNull()) {
         image = image.scaled(pBaseImage->size(),
                              Qt::KeepAspectRatio).mirrored();
-        int x = (pTempImage->width()  - image.width())  / 2;
-        int y = (pTempImage->height() - image.height()) / 2;
+        int x = (tempImage.width()  - image.width())  / 2;
+        int y = (tempImage.height() - image.height()) / 2;
         painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
         painter.drawImage(x, y, image);
     }
@@ -133,7 +133,7 @@ SlideWidget::showFullScreen() {
     // The very first texture is a screenshot of the panel
     // captured from SlideWidget::showFullScreen() in pBaseImage
     makeCurrent();
-    pTexture0 = new QOpenGLTexture(*pTempImage);
+    pTexture0 = new QOpenGLTexture(tempImage);
     pTexture0->setMinificationFilter(QOpenGLTexture::Nearest);
     pTexture0->setMagnificationFilter(QOpenGLTexture::Linear);
     pTexture0->setWrapMode(QOpenGLTexture::Repeat);
@@ -390,7 +390,9 @@ SlideWidget::initShaders() {
 // Called just once in SlideWidget::initializeGL()
 void
 SlideWidget::initTextures() {
-    // Now the second texture
+    // The very first texture is a screenshot of the panel
+    // captured from SlideWidget::showFullScreen()
+    // Now we get the second texture
     if(!prepareNextSlide()) {
         close();
         return;

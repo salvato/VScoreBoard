@@ -74,8 +74,8 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     prepareScoreFile();
 
     pVolleyPanel->showFullScreen();
-    pCharts = new ChartWindow(nullptr);
-    pCharts->showFullScreen();
+//    pCharts = new ChartWindow(nullptr);
+//    pCharts->showFullScreen();
 }
 
 

@@ -34,6 +34,7 @@ ScorePanel::ScorePanel(QFile *myLogFile, QWidget *parent)
     , pLogFile(myLogFile)
     , pPanel(nullptr)
 {
+    (void)START_GRADIENT; // Just to Silent a Warning
     QList<QScreen*> screens = QApplication::screens();
     if(screens.count() < 2) {
         QMessageBox::critical(nullptr,

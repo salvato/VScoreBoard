@@ -33,7 +33,7 @@ main(int argc, char *argv[]) {
     QSurfaceFormat::setDefaultFormat(format);
 
     VolleyApplication a(argc, argv);
-    QString sVersion = QString("2.20");
+    QString sVersion = QString("3.00");
     a.setApplicationVersion(sVersion);
 
     QTranslator translator;

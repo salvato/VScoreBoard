@@ -35,6 +35,7 @@ class ChartWindow : public QWidget
 public:
     explicit ChartWindow(QWidget *parent = nullptr);
     void updateScore(int team0Score, int team1Score, int iSet);
+    void updateLabel(int iTeam, QString sLabel, int iSet);
     void resetScore(int iSet);
     void resetAll();
 

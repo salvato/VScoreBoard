@@ -84,7 +84,7 @@ ScoreController::eventFilter(QObject *obj, QEvent *event) {
         {
 //            qSwap(iPrimaryScreen, iSecondaryScreen);
 //            changeScreen();
-            qCritical() << "key " << keyEvent->key() << "from" << obj;
+//            qCritical() << "key " << keyEvent->key() << "from" << obj;
         }
     }
     return QObject::eventFilter(obj, event);

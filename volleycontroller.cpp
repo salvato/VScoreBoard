@@ -77,6 +77,8 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
 
     pVolleyPanel->showFullScreen();
     pCharts = new ChartWindow();
+    pCharts->updateLabel(0, gsArgs.sTeam[0], iSet[0]+iSet[1]);
+    pCharts->updateLabel(1, gsArgs.sTeam[1], iSet[0]+iSet[1]);
 }
 
 
@@ -88,7 +90,8 @@ VolleyController::closeEvent(QCloseEvent *event) {
         pScoreFile = nullptr;
     }
     SaveSettings();
-    delete pVolleyPanel;
+    if(pVolleyPanel) delete pVolleyPanel;
+    if(pCharts) delete pCharts;
     ScoreController::closeEvent(event);
     event->accept();
 }
@@ -730,6 +733,7 @@ VolleyController::onTeamTextChanged(QString sText, int iTeam) {
     pVolleyPanel->setTeam(iTeam, gsArgs.sTeam[iTeam]);
     sText = QString("team%1/name").arg(iTeam+1, 1);
     pSettings->setValue(sText, gsArgs.sTeam[iTeam]);
+    pCharts->updateLabel(iTeam, gsArgs.sTeam[iTeam], iSet[0]+iSet[1]);
 }
 
 
@@ -901,6 +905,7 @@ VolleyController::onButtonNewGameClicked() {
     pService[iServizio ? 1 : 0]->setChecked(true);
     pService[iServizio ? 0 : 1]->setChecked(false);
     sendAll();
+    pCharts->resetAll();
     SaveStatus();
 }
 
@@ -917,7 +922,7 @@ VolleyController::onButtonStatisticsClicked() {
         pCharts->showFullScreen();
         pPixmap->load(":/buttonIcons/sign_stop.png");
     }
-    pStatisticButton  = new QPushButton(QIcon(*pPixmap), "");
+    pStatisticButton->setIcon(QIcon(*pPixmap));
     pStatisticButton->setIconSize(iconSize);
 }
 

@@ -126,38 +126,38 @@ ChartWindow::createLineChart() {
 
 void
 ChartWindow::updateLabel(int iTeam, QString sLabel, int iSet) {
-//  TODO:
-//  Check that parameters are in range
+    if((iTeam < 0) || (iTeam > 1)) return;
+    if((iSet < 1) || (iSet > 5)) return;
     QChart* pChart = chartVector.at(iSet);
     QLineSeries* pScoreSequence;
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(iTeam));
     pScoreSequence->setName(sLabel);
+    update();
 }
 
 
 void
 ChartWindow::updateScore(int team0Score, int team1Score, int iSet) {
-    //  TODO:
-    //  Check that parameters are in range
+    if((iSet < 1) || (iSet > 5)) return;
     int iMax = std::max(team0Score, team1Score);
     QChart* pChart = chartVector.at(iSet);
     QLineSeries* pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
-    pScoreSequence->append(QPointF(iMax, team0Score));
+    pScoreSequence->append(iMax, team0Score);
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
-    pScoreSequence->append(QPointF(iMax, team1Score));
+    pScoreSequence->append(iMax, team1Score);
     if(iMax > maxScore) {
         maxScore = iMax;
         pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxScore);
         pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxScore);
     }
+    update();
 }
 
 
 
 void
 ChartWindow::resetScore(int iSet) {
-    //  TODO:
-    //  Check that parameter is in range
+    if((iSet < 1) || (iSet > 5)) return;
     maxScore = 25;
     QChart* pChart = chartVector.at(iSet);
     QLineSeries* pScoreSequence;
@@ -172,6 +172,7 @@ ChartWindow::resetScore(int iSet) {
 
     pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxScore);
     pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxScore);
+    update();
 }
 
 
@@ -190,4 +191,5 @@ ChartWindow::resetAll() {
         pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxScore);
         pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxScore);
     }
+    update();
 }

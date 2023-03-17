@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "button.h"
 #include "volleypanel.h"
 #include "utility.h"
+#include "chartwindow.h"
 
 
 VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
@@ -75,9 +76,7 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     prepareScoreFile();
 
     pVolleyPanel->showFullScreen();
-    pCharts = new ChartWindow(nullptr);
-
-//    pCharts->showFullScreen();
+    pCharts = new ChartWindow();
 }
 
 
@@ -141,7 +140,8 @@ VolleyController::prepareScoreFile() {
 
 void
 VolleyController::logScore() {
-    QString sMessage = QString("Set %1, %2, %3, %4, %5, %6\n")
+    // Set, Team0Name, Team0Score, Team1Name, Team1Score, Time
+    QString sMessage = QString("%1, %2, %3, %4, %5, %6\n")
                                .arg(iSet[0]+iSet[1]+1)
                                .arg(pTeamName[0]->text())
                                .arg(iScore[0])
@@ -150,7 +150,7 @@ VolleyController::logScore() {
                                .arg(QTime::currentTime().toString("hh:mm:ss"));
     if(pScoreFile) {
         if(pScoreFile->isOpen()) {
-            pScoreFile->write(sMessage.toLatin1()); // toLatin1() -- > converted to ASCII
+            pScoreFile->write(sMessage.toLatin1()); // toLatin1() --> converted to ASCII
             pScoreFile->flush();
         }
         else
@@ -313,33 +313,41 @@ VolleyController::CreateGamePanel() {
 QHBoxLayout*
 VolleyController::CreateGameButtons() {
     auto* gameButtonLayout = new QHBoxLayout();
+    QSize iconSize = QSize(48,48);
 
-    QPixmap pixmap(":/buttonIcons/ExchangeVolleyField.png");
-    QIcon ButtonIcon(pixmap);
-    pChangeFieldButton = new QPushButton(ButtonIcon, "");
-    pChangeFieldButton->setIconSize(pixmap.rect().size());
+    QPixmap* pPixmap = new QPixmap(":/buttonIcons/ExchangeVolleyField.png");
+    pChangeFieldButton = new QPushButton(QIcon(*pPixmap), "");
+    pChangeFieldButton->setIconSize(iconSize);
     pChangeFieldButton->setFlat(true);
     pChangeFieldButton->setToolTip("Inverti Campo");
 
-    pixmap.load(":/buttonIcons/New-Game-Volley.png");
-    ButtonIcon.addPixmap(pixmap);
-    pNewGameButton = new QPushButton(ButtonIcon, "");
-    pNewGameButton->setIconSize(pixmap.rect().size());
+    pPixmap->load(":/buttonIcons/New-Game-Volley.png");
+    pNewGameButton = new QPushButton(QIcon(*pPixmap), "");
+    pNewGameButton->setIconSize(iconSize);
     pNewGameButton->setFlat(true);
     pNewGameButton->setToolTip("Nuova Partita");
 
-    pixmap.load(":/buttonIcons/New-Set-Volley.png");
-    ButtonIcon.addPixmap(pixmap);
-    pNewSetButton  = new QPushButton(ButtonIcon, "");
-    pNewSetButton->setIconSize(pixmap.rect().size());
+    pPixmap->load(":/buttonIcons/New-Set-Volley.png");
+    pNewSetButton  = new QPushButton(*pPixmap, "");
+    pNewSetButton->setIconSize(iconSize);
     pNewSetButton->setFlat(true);
     pNewSetButton->setToolTip("Nuovo Set");
+
+    pPixmap->load(":/buttonIcons/plot.png");
+    pStatisticButton  = new QPushButton(QIcon(*pPixmap), "");
+    pStatisticButton->setIconSize(iconSize);
+    pStatisticButton->setFlat(true);
+    pStatisticButton->setToolTip("Statistiche");
+
+    delete pPixmap;
 
     gameButtonLayout->addWidget(pNewGameButton);
     gameButtonLayout->addStretch();
     gameButtonLayout->addWidget(pNewSetButton);
     gameButtonLayout->addStretch();
     gameButtonLayout->addWidget(pChangeFieldButton);
+    gameButtonLayout->addStretch();
+    gameButtonLayout->addWidget(pStatisticButton);
     gameButtonLayout->addStretch();
     return gameButtonLayout;
 }
@@ -555,6 +563,9 @@ VolleyController::setEventHandlers() {
     // Exchange Field Position
     connect(pChangeFieldButton, SIGNAL(clicked(bool)),
             this, SLOT(onButtonChangeFieldClicked()));
+    // Show Statistics
+    connect(pStatisticButton, SIGNAL(clicked(bool)),
+            this, SLOT(onButtonStatisticsClicked()));
 
 // Keypress Sound
 //    for(int iTeam=0; iTeam <2; iTeam++) {
@@ -891,6 +902,23 @@ VolleyController::onButtonNewGameClicked() {
     pService[iServizio ? 0 : 1]->setChecked(false);
     sendAll();
     SaveStatus();
+}
+
+
+void
+VolleyController::onButtonStatisticsClicked() {
+    QPixmap* pPixmap= new QPixmap();
+    QSize iconSize = QSize(48,48);
+    if(pCharts->isVisible()) {
+        pCharts->hide();
+        pPixmap->load(":/buttonIcons/plot.png");
+    }
+    else {
+        pCharts->showFullScreen();
+        pPixmap->load(":/buttonIcons/sign_stop.png");
+    }
+    pStatisticButton  = new QPushButton(QIcon(*pPixmap), "");
+    pStatisticButton->setIconSize(iconSize);
 }
 
 

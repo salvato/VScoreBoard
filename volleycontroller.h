@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "scorecontroller.h"
 #include "panelorientation.h"
-#include "chartwindow.h"
 
 
 QT_FORWARD_DECLARE_CLASS(QSettings)
@@ -33,6 +32,7 @@ QT_FORWARD_DECLARE_CLASS(QGridLayout)
 QT_FORWARD_DECLARE_CLASS(VolleyPanel)
 QT_FORWARD_DECLARE_CLASS(ClientListDialog)
 QT_FORWARD_DECLARE_CLASS(QFile)
+QT_FORWARD_DECLARE_CLASS(ChartWindow)
 
 
 class VolleyController : public ScoreController
@@ -65,6 +65,7 @@ private slots:
     void onButtonChangeFieldClicked();
     void onButtonNewSetClicked();
     void onButtonNewGameClicked();
+    void onButtonStatisticsClicked();
     void onChangePanelOrientation(PanelOrientation orientation);
 
 private:
@@ -102,7 +103,9 @@ private:
     QPushButton*  pNewSetButton{};
     QPushButton*  pNewGameButton{};
     QPushButton*  pChangeFieldButton{};
-    bool          bFontBuilt;
+    QPushButton*  pStatisticButton{};
+
+    bool            bFontBuilt;
     QPalette        panelPalette;
     QLinearGradient panelGradient;
     QBrush          panelBrush;

@@ -35,11 +35,9 @@ ChartWindow::ChartWindow(QWidget *parent)
 
     QList<QScreen*> screens = QApplication::screens();
     QRect screenGeometry = screens.at(0)->geometry();
-    if(screens.count() > 1) {
-        // Move the Window on the Secondary Display
+    if(screens.count() > 1) { // Move the Window on the Secondary Display
         screenGeometry = screens.at(1)->geometry();
-        QPoint point = QPoint(screenGeometry.x(),
-                              screenGeometry.y());
+        QPoint point = QPoint(screenGeometry.x(), screenGeometry.y());
         move(point);
     }
 
@@ -68,7 +66,7 @@ ChartWindow::ChartWindow(QWidget *parent)
     }
 
     auto* pLayout = new QGridLayout();
-    for(int i=0; i<1; i++) {
+    for(int i=0; i<1; i++) { // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         QChart* pChart = createLineChart();
         pChart->setTitle(QString("Set %1").arg(i+1));
         chartVector.append(pChart);
@@ -83,7 +81,8 @@ QChart*
 ChartWindow::createLineChart() {
     QChart* pChart = new QChart();
     QFont font = pChart->titleFont();
-    font.setPointSize(5*font.pointSize());
+    font.setPointSize(3*font.pointSize());
+    font.setBold(true);
     pChart->setTitleFont(font);
     pChart->setFont(font);
     pChart->legend()->setFont(font);
@@ -91,6 +90,7 @@ ChartWindow::createLineChart() {
     QLineSeries* pScoreSequence;
     for(int i=0; i<2; i++) {
         pScoreSequence = new QLineSeries();
+        pScoreSequence->append(0,0);
         pChart->addSeries(pScoreSequence); // From now pChart is the owner
     }
     for(int i=0; i<2; i++) {
@@ -105,15 +105,13 @@ ChartWindow::createLineChart() {
 
     QValueAxis* pAxisX = new QValueAxis();
     pAxisX->setRange(0, maxScore);
-    pAxisX->setTickInterval(1.0);
-    pAxisX->setTickCount(maxScore+2);
+    pAxisX->setTickCount(2);
     pAxisX->setLabelFormat("%d");
 
     // Add space to label to add space between labels and vertical axis
     QValueAxis* pAxisY = new QValueAxis();
     pAxisY->setRange(0, maxScore);
-    pAxisY->setTickInterval(1.0);
-    pAxisY->setTickCount(maxScore+2);
+    pAxisY->setTickCount(2);
     pAxisY->setLabelFormat("%d  ");
 
     pChart->addAxis(pAxisX, Qt::AlignBottom);
@@ -132,7 +130,7 @@ ChartWindow::updateLabel(int iTeam, QString sLabel, int iSet) {
 //  Check that parameters are in range
     QChart* pChart = chartVector.at(iSet);
     QLineSeries* pScoreSequence;
-    pScoreSequence = static_cast<QLineSeries*>(pChart->series().at(iTeam));
+    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(iTeam));
     pScoreSequence->setName(sLabel);
 }
 
@@ -143,9 +141,9 @@ ChartWindow::updateScore(int team0Score, int team1Score, int iSet) {
     //  Check that parameters are in range
     int iMax = std::max(team0Score, team1Score);
     QChart* pChart = chartVector.at(iSet);
-    QLineSeries* pScoreSequence = static_cast<QLineSeries*>(pChart->series().at(0));
+    QLineSeries* pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
     pScoreSequence->append(QPointF(iMax, team0Score));
-    pScoreSequence = static_cast<QLineSeries*>(pChart->series().at(1));
+    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
     pScoreSequence->append(QPointF(iMax, team1Score));
     if(iMax > maxScore) {
         maxScore = iMax;
@@ -160,14 +158,18 @@ void
 ChartWindow::resetScore(int iSet) {
     //  TODO:
     //  Check that parameter is in range
+    maxScore = 25;
     QChart* pChart = chartVector.at(iSet);
     QLineSeries* pScoreSequence;
-    pScoreSequence = static_cast<QLineSeries*>(pChart->series().at(0));
+
+    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
     pScoreSequence->clear();
-    pScoreSequence->append(QPointF(0.0, 0.0));
-    pScoreSequence = static_cast<QLineSeries*>(pChart->series().at(1));
-    pScoreSequence->append(QPointF(0, 0));
-    maxScore = 25;
+    pScoreSequence->append(0, 0);
+
+    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
+    pScoreSequence->clear();
+    pScoreSequence->append(0, 0);
+
     pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxScore);
     pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxScore);
 }
@@ -179,11 +181,12 @@ ChartWindow::resetAll() {
     for(int i=0; i<chartVector.count(); i++) {
         QChart* pChart = chartVector.at(i);
         QLineSeries* pScoreSequence;
-        pScoreSequence = static_cast<QLineSeries*>(pChart->series().at(0));
+        pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
         pScoreSequence->clear();
-        pScoreSequence->append(QPointF(0, 0));
-        pScoreSequence = static_cast<QLineSeries*>(pChart->series().at(1));
-        pScoreSequence->append(QPointF(0, 0));
+        pScoreSequence->append(0, 0);
+        pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
+        pScoreSequence->clear();
+        pScoreSequence->append(0, 0);
         pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxScore);
         pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxScore);
     }

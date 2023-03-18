@@ -50,7 +50,8 @@ private:
     QLinearGradient panelGradient;
     QBrush          panelBrush;
 
-    int              maxScore;
+    int              maxX;
+    int              maxY;
     QVector<QChart*> chartVector;
     QVector<QChartView*> pChartViews;
 };

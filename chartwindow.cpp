@@ -29,7 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ChartWindow::ChartWindow(QWidget *parent)
     : QWidget{parent}
-    , maxScore(25)
+    , maxX(25)
+    , maxY(25)
 {
     Q_UNUSED(parent);
 
@@ -90,13 +91,13 @@ ChartWindow::createLineChart() {
     pChart->legend()->setFont(font);
 
     QValueAxis* pAxisX = new QValueAxis();
-    pAxisX->setRange(0, maxScore);
+    pAxisX->setRange(0, maxX);
     pAxisX->setTickCount(2);
     pAxisX->setLabelFormat("%d");
 
     // Add space to label to add space between labels and vertical axis
     QValueAxis* pAxisY = new QValueAxis();
-    pAxisY->setRange(0, maxScore);
+    pAxisY->setRange(0, maxY);
     pAxisY->setTickCount(2);
     pAxisY->setLabelFormat("%d  ");
 
@@ -108,7 +109,6 @@ ChartWindow::createLineChart() {
         pScoreSequence = new QLineSeries();
         pChart->addSeries(pScoreSequence); // From now pChart is the owner
         pScoreSequence->append(0,0);
-        pScoreSequence->append(25, (i+1)*5);
         pScoreSequence->attachAxis(pAxisX);
         pScoreSequence->attachAxis(pAxisY);
         font = pScoreSequence->pointLabelsFont();
@@ -141,27 +141,30 @@ ChartWindow::updateLabel(int iTeam, QString sLabel, int iSet) {
 void
 ChartWindow::updateScore(int team0Score, int team1Score, int iSet) {
     if((iSet < 0) || (iSet > 4)) return;
-    int iMax = std::max(team0Score, team1Score);
+    int yMax = std::max(team0Score, team1Score);
+    int xMax = team0Score+team1Score;//std::max(team0Score, team1Score);
     QLineSeries* pScoreSequence;
     QChart* pChart = pChartViews.at(iSet)->chart();
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
-    pScoreSequence->append(iMax, team0Score);
+    pScoreSequence->append(xMax, team0Score);
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
-    pScoreSequence->append(iMax, team1Score);
-    if(iMax > maxScore) {
-        maxScore = iMax;
-        pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxScore);
-        pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxScore);
+    pScoreSequence->append(xMax, team1Score);
+    if(yMax > maxY) {
+        maxY = yMax;
+        pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxY);
+    }
+    if(xMax > maxX) {
+        maxX = xMax;
+        pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxX);
     }
     update();
 }
 
 
-
 void
 ChartWindow::resetScore(int iSet) {
     if((iSet < 0) || (iSet > 4)) return;
-    maxScore = 25;
+    maxX = maxY = 25;
     QChart* pChart = chartVector.at(iSet);
     QLineSeries* pScoreSequence;
 
@@ -173,15 +176,15 @@ ChartWindow::resetScore(int iSet) {
     pScoreSequence->clear();
     pScoreSequence->append(0, 0);
 
-    pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxScore);
-    pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxScore);
+    pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxX);
+    pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxY);
     update();
 }
 
 
 void
 ChartWindow::resetAll() {
-    maxScore = 25;
+    maxX = maxY = 25;
     for(int i=0; i<chartVector.count(); i++) {
         QChart* pChart = chartVector.at(i);
         QLineSeries* pScoreSequence;
@@ -191,8 +194,8 @@ ChartWindow::resetAll() {
         pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
         pScoreSequence->clear();
         pScoreSequence->append(0, 0);
-        pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxScore);
-        pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxScore);
+        pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxX);
+        pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxY);
     }
     update();
 }

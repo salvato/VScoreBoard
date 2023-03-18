@@ -69,7 +69,7 @@ ChartWindow::ChartWindow(QWidget *parent)
         pChart->setTitle(tr("Andamento Set %1").arg(i+1));
         chartVector.append(pChart);
         // The ownership of the chart is passed to the QChartView()
-        QChartView* pChartView = new QChartView(chartVector.at(0));
+        QChartView* pChartView = new QChartView(chartVector.at(i));
         pChartViews.append(pChartView);
     }
     auto* pLayout = new QGridLayout();
@@ -248,6 +248,7 @@ void
 ChartWindow::showFullScreen() {
     iCurrentSet = 0;
     QChartView* pChartView = new QChartView(chartVector.at(iCurrentSet));
+    pChartView->chart()->legend()->setReverseMarkers(iCurrentSet % 2);
     QLineSeries* pScore0 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(0));
     QLineSeries* pScore1 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(1));
     if(!pScore0->points().isEmpty() || !pScore1->points().isEmpty()) {

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <QWidget>
+#include <QTimer>
 
 
 QT_FORWARD_DECLARE_CLASS(QChart)
@@ -39,8 +40,16 @@ public:
     void updateLabel(int iTeam, QString sLabel, int iSet);
     void resetScore(int iSet);
     void resetAll();
+    void show();
+    void showMaximized();
+    void showFullScreen();
+    void hide();
+
+public slots:
+    void onTimeToRotateChart();
 
 signals:
+    void done();
 
 private:
     QChart* createLineChart();
@@ -54,4 +63,6 @@ private:
     int              maxY;
     QVector<QChart*> chartVector;
     QVector<QChartView*> pChartViews;
+    QTimer timerRotate;
+    int iCurrentSet;
 };

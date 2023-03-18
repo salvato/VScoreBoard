@@ -67,8 +67,6 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     buildControls();
     setWindowLayout();
 
-    setEventHandlers();
-
     pService[iServizio ? 1 : 0]->setChecked(true);
     pService[iServizio ? 0 : 1]->setChecked(false);
     pService[iServizio ? 0 : 1]->setFocus();
@@ -79,6 +77,8 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     pCharts = new ChartWindow();
     pCharts->updateLabel(0, gsArgs.sTeam[0], iSet[0]+iSet[1]);
     pCharts->updateLabel(1, gsArgs.sTeam[1], iSet[0]+iSet[1]);
+
+    setEventHandlers();
 }
 
 
@@ -569,6 +569,9 @@ VolleyController::setEventHandlers() {
     // Show Statistics
     connect(pStatisticButton, SIGNAL(clicked(bool)),
             this, SLOT(onButtonStatisticsClicked()));
+    // Statistics Window Signal
+    connect(pCharts, SIGNAL(done()),
+            this, SLOT(onStatisticsDone()));
 
 // Keypress Sound
 //    for(int iTeam=0; iTeam <2; iTeam++) {
@@ -920,8 +923,23 @@ VolleyController::onButtonStatisticsClicked() {
     }
     else {
         pCharts->showFullScreen();
-        pPixmap->load(":/buttonIcons/sign_stop.png");
+        if(pCharts->isVisible()) {
+            pPixmap->load(":/buttonIcons/sign_stop.png");
+        }
+        else {
+            pPixmap->load(":/buttonIcons/plot.png");
+        }
     }
+    pStatisticButton->setIcon(QIcon(*pPixmap));
+    pStatisticButton->setIconSize(iconSize);
+}
+
+
+void
+VolleyController::onStatisticsDone() {
+    QPixmap* pPixmap= new QPixmap();
+    QSize iconSize = QSize(48,48);
+    pPixmap->load(":/buttonIcons/plot.png");
     pStatisticButton->setIcon(QIcon(*pPixmap));
     pStatisticButton->setIconSize(iconSize);
 }

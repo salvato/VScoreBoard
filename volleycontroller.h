@@ -67,6 +67,7 @@ private slots:
     void onButtonNewGameClicked();
     void onButtonStatisticsClicked();
     void onChangePanelOrientation(PanelOrientation orientation);
+    void onStatisticsDone();
 
 private:
     void          buildControls();

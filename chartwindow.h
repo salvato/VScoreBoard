@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 QT_FORWARD_DECLARE_CLASS(QChart)
+QT_FORWARD_DECLARE_CLASS(QChartView)
 QT_FORWARD_DECLARE_CLASS(QLineSeries)
 
 
@@ -51,4 +52,5 @@ private:
 
     int              maxScore;
     QVector<QChart*> chartVector;
+    QVector<QChartView*> pChartViews;
 };

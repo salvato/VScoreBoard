@@ -70,7 +70,9 @@ ChartWindow::ChartWindow(QWidget *parent)
         QChart* pChart = createLineChart();
         pChart->setTitle(QString("Set %1").arg(i+1));
         chartVector.append(pChart);
+        // The ownership of the chart is passed to the QChartView()
         QChartView* pChartView = new QChartView(chartVector.at(i));
+        pChartViews.append(pChartView);
         pLayout->addWidget(pChartView, i/2, i%2, 1, 1);
     }
     setLayout(pLayout);
@@ -87,22 +89,6 @@ ChartWindow::createLineChart() {
     pChart->setFont(font);
     pChart->legend()->setFont(font);
 
-    QLineSeries* pScoreSequence;
-    for(int i=0; i<2; i++) {
-        pScoreSequence = new QLineSeries();
-        pScoreSequence->append(0,0);
-        pChart->addSeries(pScoreSequence); // From now pChart is the owner
-    }
-    for(int i=0; i<2; i++) {
-        pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(i));
-        font = pScoreSequence->pointLabelsFont();
-        font.setPointSize(32);
-        pScoreSequence->setPointLabelsFont(font);
-        QPen pen = pScoreSequence->pen();
-        pen.setWidth(pen.width()*10);
-        pScoreSequence->setPen(pen);
-    }
-
     QValueAxis* pAxisX = new QValueAxis();
     pAxisX->setRange(0, maxScore);
     pAxisX->setTickCount(2);
@@ -117,6 +103,22 @@ ChartWindow::createLineChart() {
     pChart->addAxis(pAxisX, Qt::AlignBottom);
     pChart->addAxis(pAxisY, Qt::AlignLeft);
 
+    QLineSeries* pScoreSequence;
+    for(int i=0; i<2; i++) {
+        pScoreSequence = new QLineSeries();
+        pChart->addSeries(pScoreSequence); // From now pChart is the owner
+        pScoreSequence->append(0,0);
+        pScoreSequence->append(25, (i+1)*5);
+        pScoreSequence->attachAxis(pAxisX);
+        pScoreSequence->attachAxis(pAxisY);
+        font = pScoreSequence->pointLabelsFont();
+        font.setPointSize(32);
+        pScoreSequence->setPointLabelsFont(font);
+        QPen pen = pScoreSequence->pen();
+        pen.setWidth(pen.width()*10);
+        pScoreSequence->setPen(pen);
+    }
+
 //    pChart->setAnimationOptions(QChart::SeriesAnimations);
 //    pChart->setAnimationDuration(10000);
 
@@ -127,7 +129,7 @@ ChartWindow::createLineChart() {
 void
 ChartWindow::updateLabel(int iTeam, QString sLabel, int iSet) {
     if((iTeam < 0) || (iTeam > 1)) return;
-    if((iSet < 1) || (iSet > 5)) return;
+    if((iSet < 0) || (iSet > 4)) return;
     QChart* pChart = chartVector.at(iSet);
     QLineSeries* pScoreSequence;
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(iTeam));
@@ -138,10 +140,11 @@ ChartWindow::updateLabel(int iTeam, QString sLabel, int iSet) {
 
 void
 ChartWindow::updateScore(int team0Score, int team1Score, int iSet) {
-    if((iSet < 1) || (iSet > 5)) return;
+    if((iSet < 0) || (iSet > 4)) return;
     int iMax = std::max(team0Score, team1Score);
-    QChart* pChart = chartVector.at(iSet);
-    QLineSeries* pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
+    QLineSeries* pScoreSequence;
+    QChart* pChart = pChartViews.at(iSet)->chart();
+    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
     pScoreSequence->append(iMax, team0Score);
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
     pScoreSequence->append(iMax, team1Score);
@@ -157,7 +160,7 @@ ChartWindow::updateScore(int team0Score, int team1Score, int iSet) {
 
 void
 ChartWindow::resetScore(int iSet) {
-    if((iSet < 1) || (iSet > 5)) return;
+    if((iSet < 0) || (iSet > 4)) return;
     maxScore = 25;
     QChart* pChart = chartVector.at(iSet);
     QLineSeries* pScoreSequence;

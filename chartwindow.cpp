@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utility.h"
 
 
-#define SHOW_TIME 30000 // 30 Sec.
+#define SHOW_TIME 5000 // 30 Sec.
 
 
 ChartWindow::ChartWindow(QWidget *parent)
@@ -67,9 +67,8 @@ ChartWindow::ChartWindow(QWidget *parent)
     for(int i=0; i<5; i++) {
         QChart* pChart = createLineChart();
         pChart->setTitle(tr("Andamento Set %1").arg(i+1));
-        chartVector.append(pChart);
         // The ownership of the chart is passed to the QChartView()
-        QChartView* pChartView = new QChartView(chartVector.at(i));
+        QChartView* pChartView = new QChartView(pChart);
         pChartViews.append(pChartView);
     }
     auto* pLayout = new QGridLayout();
@@ -116,6 +115,7 @@ ChartWindow::createLineChart() {
     QLineSeries* pScoreSequence;
     for(int i=0; i<2; i++) {
         pScoreSequence = new QLineSeries();
+        pScoreSequence->append(0, 0);
         pChart->addSeries(pScoreSequence);
         pScoreSequence->attachAxis(pAxisX);
         pScoreSequence->attachAxis(pAxisY);
@@ -132,13 +132,13 @@ ChartWindow::createLineChart() {
 
 
 void
-ChartWindow::updateLabel(int iTeam, QString sLabel, int iSet) {
+ChartWindow::updateLabel(int iTeam, QString sLabel) {
     if((iTeam < 0) || (iTeam > 1)) return;
-    if((iSet < 0) || (iSet > 4)) return;
-    QChart* pChart = chartVector.at(iSet);
-    QLineSeries* pScoreSequence;
-    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(iTeam));
-    pScoreSequence->setName(sLabel);
+    for(int i=0; i<5; i++) {
+        QChart* pChart = pChartViews.at(i)->chart();
+        QLineSeries* pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(iTeam));
+        pScoreSequence->setName(sLabel);
+    }
     update();
 }
 
@@ -147,7 +147,7 @@ void
 ChartWindow::updateScore(int team0Score, int team1Score, int iSet) {
     if((iSet < 0) || (iSet > 4)) return;
     int yMax = std::max(team0Score, team1Score);
-    int xMax = team0Score+team1Score;//std::max(team0Score, team1Score);
+    int xMax = team0Score+team1Score;
     QLineSeries* pScoreSequence;
     QChart* pChart = pChartViews.at(iSet)->chart();
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
@@ -170,7 +170,7 @@ void
 ChartWindow::resetScore(int iSet) {
     if((iSet < 0) || (iSet > 4)) return;
     maxX = maxY = 25;
-    QChart* pChart = chartVector.at(iSet);
+    QChart* pChart = pChartViews.at(iSet)->chart();
     QLineSeries* pScoreSequence;
 
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
@@ -190,15 +190,8 @@ ChartWindow::resetScore(int iSet) {
 void
 ChartWindow::resetAll() {
     maxX = maxY = 25;
-    for(int i=0; i<chartVector.count(); i++) {
-        QChart* pChart = chartVector.at(i);
-        QLineSeries* pScoreSequence;
-        pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
-        pScoreSequence->clear();
-        pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
-        pScoreSequence->clear();
-        pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxX);
-        pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxY);
+    for(int i=0; i<pChartViews.count(); i++) {
+        resetScore(i);
     }
     update();
 }
@@ -207,7 +200,7 @@ ChartWindow::resetAll() {
 void
 ChartWindow::show() {
     iCurrentSet = 0;
-    QChartView* pChartView = new QChartView(chartVector.at(iCurrentSet));
+    QChartView* pChartView = pChartViews.at(iCurrentSet);
     QLineSeries* pScore0 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(0));
     QLineSeries* pScore1 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(1));
     if(!pScore0->points().isEmpty() || !pScore1->points().isEmpty()) {
@@ -215,7 +208,7 @@ ChartWindow::show() {
         pLayout->invalidate();
         pLayout->addWidget(pChartView, 0, 0, 1, 1);
         setLayout(pLayout);
-        timerRotate.start(30000);
+        timerRotate.start(SHOW_TIME);
         QWidget::show();
     }
     else {
@@ -227,7 +220,7 @@ ChartWindow::show() {
 void
 ChartWindow::showMaximized() {
     iCurrentSet = 0;
-    QChartView* pChartView = new QChartView(chartVector.at(iCurrentSet));
+    QChartView* pChartView = pChartViews.at(iCurrentSet);
     QLineSeries* pScore0 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(0));
     QLineSeries* pScore1 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(1));
     if(!pScore0->points().isEmpty() || !pScore1->points().isEmpty()) {
@@ -235,7 +228,7 @@ ChartWindow::showMaximized() {
         pLayout->invalidate();
         pLayout->addWidget(pChartView, 0, 0, 1, 1);
         setLayout(pLayout);
-        timerRotate.start(30000);
+        timerRotate.start(SHOW_TIME);
         QWidget::showMaximized();
     }
     else {
@@ -247,7 +240,7 @@ ChartWindow::showMaximized() {
 void
 ChartWindow::showFullScreen() {
     iCurrentSet = 0;
-    QChartView* pChartView = new QChartView(chartVector.at(iCurrentSet));
+    QChartView* pChartView = pChartViews.at(iCurrentSet);
     pChartView->chart()->legend()->setReverseMarkers(iCurrentSet % 2);
     QLineSeries* pScore0 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(0));
     QLineSeries* pScore1 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(1));
@@ -256,7 +249,7 @@ ChartWindow::showFullScreen() {
         pLayout->invalidate();
         pLayout->addWidget(pChartView, 0, 0, 1, 1);
         setLayout(pLayout);
-        timerRotate.start(30000);
+        timerRotate.start(SHOW_TIME);
         QWidget::showFullScreen();
     }
     else {
@@ -279,8 +272,9 @@ ChartWindow::onTimeToRotateChart() {
     if(iCurrentSet > 4) {
         emit done();
         hide();
+        return;
     }
-    QChartView* pChartView = new QChartView(chartVector.at(iCurrentSet));
+    QChartView* pChartView = pChartViews.at(iCurrentSet);
     QLineSeries* pScore0 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(0));
     QLineSeries* pScore1 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(1));
     if(!pScore0->points().isEmpty() || !pScore1->points().isEmpty()) {
@@ -288,7 +282,7 @@ ChartWindow::onTimeToRotateChart() {
         pLayout->invalidate();
         pLayout->addWidget(pChartView, 0, 0, 1, 1);
         setLayout(pLayout);
-        timerRotate.start(30000);
+        timerRotate.start(SHOW_TIME);
         update();
     }
     else {

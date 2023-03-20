@@ -34,6 +34,7 @@ SOURCES += \
     main.cpp \
     scorecontroller.cpp \
     scorepanel.cpp \
+    setselectiondialog.cpp \
     slidewidget.cpp \
     timeoutwindow.cpp \
     utility.cpp \
@@ -50,6 +51,7 @@ HEADERS += \
     panelorientation.h \
     scorecontroller.h \
     scorepanel.h \
+    setselectiondialog.h \
     slidewidget.h \
     timeoutwindow.h \
     utility.h \

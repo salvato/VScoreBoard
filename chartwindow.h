@@ -37,7 +37,7 @@ class ChartWindow : public QWidget
 public:
     explicit ChartWindow(QWidget *parent = nullptr);
     void updateScore(int team0Score, int team1Score, int iSet);
-    void updateLabel(int iTeam, QString sLabel, int iSet);
+    void updateLabel(int iTeam, QString sLabel);
     void resetScore(int iSet);
     void resetAll();
     void show();
@@ -61,7 +61,6 @@ private:
 
     int              maxX;
     int              maxY;
-    QVector<QChart*> chartVector;
     QVector<QChartView*> pChartViews;
     QTimer timerRotate;
     int iCurrentSet;

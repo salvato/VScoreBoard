@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "scorecontroller.h"
 #include "panelorientation.h"
+#include "setselectiondialog.h"
 
 
 QT_FORWARD_DECLARE_CLASS(QSettings)
@@ -112,5 +113,6 @@ private:
     QBrush          panelBrush;
     ChartWindow*    pCharts;
     QFile*          pScoreFile;
+    SetSelectionDialog setSelectionDialog;
 };
 

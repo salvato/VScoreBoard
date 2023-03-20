@@ -75,8 +75,8 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
 
     pVolleyPanel->showFullScreen();
     pCharts = new ChartWindow();
-    pCharts->updateLabel(0, gsArgs.sTeam[0], iSet[0]+iSet[1]);
-    pCharts->updateLabel(1, gsArgs.sTeam[1], iSet[0]+iSet[1]);
+    pCharts->updateLabel(0, gsArgs.sTeam[0]);
+    pCharts->updateLabel(1, gsArgs.sTeam[1]);
 
     setEventHandlers();
 }
@@ -266,6 +266,7 @@ VolleyController::setWindowLayout() {
 
     widget->setLayout(mainLayout);
     setCentralWidget(widget);
+    setTabOrder(pTeamName[0], pTeamName[1]);
 }
 
 
@@ -736,7 +737,7 @@ VolleyController::onTeamTextChanged(QString sText, int iTeam) {
     pVolleyPanel->setTeam(iTeam, gsArgs.sTeam[iTeam]);
     sText = QString("team%1/name").arg(iTeam+1, 1);
     pSettings->setValue(sText, gsArgs.sTeam[iTeam]);
-    pCharts->updateLabel(iTeam, gsArgs.sTeam[iTeam], iSet[0]+iSet[1]);
+    pCharts->updateLabel(iTeam, gsArgs.sTeam[iTeam]);
 }
 
 
@@ -915,16 +916,21 @@ VolleyController::onButtonNewGameClicked() {
 
 void
 VolleyController::onButtonStatisticsClicked() {
-    QPixmap* pPixmap= new QPixmap();
+    QPixmap* pPixmap = new QPixmap();
     QSize iconSize = QSize(48,48);
     if(pCharts->isVisible()) {
         pCharts->hide();
         pPixmap->load(":/buttonIcons/plot.png");
     }
     else {
-        pCharts->showFullScreen();
-        if(pCharts->isVisible()) {
-            pPixmap->load(":/buttonIcons/sign_stop.png");
+        if(setSelectionDialog.exec() == QDialog::Accepted) {
+            pCharts->showFullScreen();
+            if(pCharts->isVisible()) {
+                pPixmap->load(":/buttonIcons/sign_stop.png");
+            }
+            else {
+                pPixmap->load(":/buttonIcons/plot.png");
+            }
         }
         else {
             pPixmap->load(":/buttonIcons/plot.png");
@@ -933,7 +939,6 @@ VolleyController::onButtonStatisticsClicked() {
     pStatisticButton->setIcon(QIcon(*pPixmap));
     pStatisticButton->setIconSize(iconSize);
 }
-
 
 void
 VolleyController::onStatisticsDone() {

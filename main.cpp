@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTranslator>
 #include <QMessageBox>
 #include <QSurfaceFormat>
+#include "racewindow.h"
 
 int
 main(int argc, char *argv[]) {
@@ -45,6 +46,9 @@ main(int argc, char *argv[]) {
             break;
         }
     }
+
+    RaceWindow race;
+    race.showFullScreen();
 
     int iResult = a.exec();
     return iResult;

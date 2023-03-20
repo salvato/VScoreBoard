@@ -41,5 +41,11 @@
         <file>buttonIcons/sign_stop.png</file>
         <file>buttonIcons/video-display.png</file>
         <file>buttonIcons/plot.png</file>
+        <file>res/cubemap_negx.jpg</file>
+        <file>res/cubemap_negy.jpg</file>
+        <file>res/cubemap_negz.jpg</file>
+        <file>res/cubemap_posx.jpg</file>
+        <file>res/cubemap_posy.jpg</file>
+        <file>res/cubemap_posz.jpg</file>
     </qresource>
 </RCC>

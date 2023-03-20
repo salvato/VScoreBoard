@@ -32,6 +32,7 @@ SOURCES += \
     generalsetuparguments.cpp \
     generalsetupdialog.cpp \
     main.cpp \
+    racewindow.cpp \
     scorecontroller.cpp \
     scorepanel.cpp \
     setselectiondialog.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     generalsetuparguments.h \
     generalsetupdialog.h \
     panelorientation.h \
+    racewindow.h \
     scorecontroller.h \
     scorepanel.h \
     setselectiondialog.h \

@@ -28,9 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utility.h"
 
 
-#define SHOW_TIME 5000 // 30 Sec.
-
-
 ChartWindow::ChartWindow(QWidget *parent)
     : QWidget{parent}
     , maxX(25)
@@ -63,7 +60,7 @@ ChartWindow::ChartWindow(QWidget *parent)
     setPalette(panelPalette);
 
     // TODO:
-    // Create charts for each Game Set (should be parametrized !)
+    // Create charts for each Game Set (should be parametrized ?)
     for(int i=0; i<5; i++) {
         QChart* pChart = createLineChart();
         pChart->setTitle(tr("Andamento Set %1").arg(i+1));
@@ -74,8 +71,6 @@ ChartWindow::ChartWindow(QWidget *parent)
     auto* pLayout = new QGridLayout();
     pLayout->addWidget(pChartViews.at(0), 0, 0, 1, 1);
     setLayout(pLayout);
-    connect(&timerRotate, SIGNAL(timeout()),
-            this, SLOT(onTimeToRotateChart()));
 }
 
 
@@ -198,95 +193,40 @@ ChartWindow::resetAll() {
 
 
 void
-ChartWindow::show() {
-    iCurrentSet = 0;
-    QChartView* pChartView = pChartViews.at(iCurrentSet);
-    QLineSeries* pScore0 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(0));
-    QLineSeries* pScore1 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(1));
-    if(!pScore0->points().isEmpty() || !pScore1->points().isEmpty()) {
-        auto* pLayout = reinterpret_cast<QGridLayout*>(layout());
-        pLayout->invalidate();
-        pLayout->addWidget(pChartView, 0, 0, 1, 1);
-        setLayout(pLayout);
-        timerRotate.start(SHOW_TIME);
-        QWidget::show();
-    }
-    else {
-        emit done();
-    }
+ChartWindow::show(int iSet) {
+    QChartView* pChartView = pChartViews.at(iSet);
+    auto* pLayout = reinterpret_cast<QGridLayout*>(layout());
+    pLayout->invalidate();
+    pLayout->addWidget(pChartView, 0, 0, 1, 1);
+    setLayout(pLayout);
+    QWidget::show();
 }
 
 
 void
-ChartWindow::showMaximized() {
-    iCurrentSet = 0;
-    QChartView* pChartView = pChartViews.at(iCurrentSet);
-    QLineSeries* pScore0 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(0));
-    QLineSeries* pScore1 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(1));
-    if(!pScore0->points().isEmpty() || !pScore1->points().isEmpty()) {
-        auto* pLayout = reinterpret_cast<QGridLayout*>(layout());
-        pLayout->invalidate();
-        pLayout->addWidget(pChartView, 0, 0, 1, 1);
-        setLayout(pLayout);
-        timerRotate.start(SHOW_TIME);
-        QWidget::showMaximized();
-    }
-    else {
-        emit done();
-    }
+ChartWindow::showMaximized(int iSet) {
+    QChartView* pChartView = pChartViews.at(iSet);
+    auto* pLayout = reinterpret_cast<QGridLayout*>(layout());
+    pLayout->invalidate();
+    pLayout->addWidget(pChartView, 0, 0, 1, 1);
+    setLayout(pLayout);
+    QWidget::showMaximized();
 }
 
 
 void
-ChartWindow::showFullScreen() {
-    iCurrentSet = 0;
-    QChartView* pChartView = pChartViews.at(iCurrentSet);
-    pChartView->chart()->legend()->setReverseMarkers(iCurrentSet % 2);
-    QLineSeries* pScore0 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(0));
-    QLineSeries* pScore1 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(1));
-    if(!pScore0->points().isEmpty() || !pScore1->points().isEmpty()) {
-        auto* pLayout = reinterpret_cast<QGridLayout*>(layout());
-        pLayout->invalidate();
-        pLayout->addWidget(pChartView, 0, 0, 1, 1);
-        setLayout(pLayout);
-        timerRotate.start(SHOW_TIME);
-        QWidget::showFullScreen();
-    }
-    else {
-        emit done();
-    }
+ChartWindow::showFullScreen(int iSet) {
+    QChartView* pChartView = pChartViews.at(iSet);
+    pChartView->chart()->legend()->setReverseMarkers(iSet % 2);
+    auto* pLayout = reinterpret_cast<QGridLayout*>(layout());
+    pLayout->invalidate();
+    pLayout->addWidget(pChartView, 0, 0, 1, 1);
+    setLayout(pLayout);
+    QWidget::showFullScreen();
 }
 
 
 void
 ChartWindow::hide() {
-    timerRotate.stop();
     QWidget::hide();
-}
-
-
-void
-ChartWindow::onTimeToRotateChart() {
-    timerRotate.stop();
-    iCurrentSet++;
-    if(iCurrentSet > 4) {
-        emit done();
-        hide();
-        return;
-    }
-    QChartView* pChartView = pChartViews.at(iCurrentSet);
-    QLineSeries* pScore0 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(0));
-    QLineSeries* pScore1 = reinterpret_cast<QLineSeries*>(pChartView->chart()->series().at(1));
-    if(!pScore0->points().isEmpty() || !pScore1->points().isEmpty()) {
-        auto* pLayout = reinterpret_cast<QGridLayout*>(layout());
-        pLayout->invalidate();
-        pLayout->addWidget(pChartView, 0, 0, 1, 1);
-        setLayout(pLayout);
-        timerRotate.start(SHOW_TIME);
-        update();
-    }
-    else {
-        emit done();
-        hide();
-    }
 }

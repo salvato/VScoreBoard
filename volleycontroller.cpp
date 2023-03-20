@@ -924,7 +924,7 @@ VolleyController::onButtonStatisticsClicked() {
     }
     else {
         if(setSelectionDialog.exec() == QDialog::Accepted) {
-            pCharts->showFullScreen();
+            pCharts->showFullScreen(setSelectionDialog.iSelectedSet);
             if(pCharts->isVisible()) {
                 pPixmap->load(":/buttonIcons/sign_stop.png");
             }

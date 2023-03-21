@@ -47,5 +47,6 @@
         <file>res/cubemap_posx.jpg</file>
         <file>res/cubemap_posy.jpg</file>
         <file>res/cubemap_posz.jpg</file>
+        <file>cube.png</file>
     </qresource>
 </RCC>

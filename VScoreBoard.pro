@@ -37,6 +37,7 @@ SOURCES += \
     scorepanel.cpp \
     setselectiondialog.cpp \
     slidewidget.cpp \
+    teamavatar.cpp \
     timeoutwindow.cpp \
     utility.cpp \
     volleyapplication.cpp \
@@ -55,6 +56,7 @@ HEADERS += \
     scorepanel.h \
     setselectiondialog.h \
     slidewidget.h \
+    teamavatar.h \
     timeoutwindow.h \
     utility.h \
     volleyapplication.h \
@@ -75,6 +77,7 @@ RESOURCES += \
     shaders.qrc
 
 DISTFILES += \
+    cube.png \
     fAngular.glsl \
     fBookFlip.glsl \
     fshader.glsl \

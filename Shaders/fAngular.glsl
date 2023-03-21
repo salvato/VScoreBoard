@@ -3,7 +3,7 @@
 // License: MIT
 
 #ifdef GL_ES
-// Set default precision to medium
+// Set default precision to high
 precision highp int;
 precision highp float;
 #endif

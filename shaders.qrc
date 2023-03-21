@@ -29,5 +29,6 @@
         <file>Shaders/fWind.glsl</file>
         <file>Shaders/fSwap.glsl</file>
         <file>Shaders/fCrosswarp.glsl</file>
+        <file>Shaders/fAvatar.glsl</file>
     </qresource>
 </RCC>

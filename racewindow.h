@@ -22,7 +22,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QOpenGLFunctions>
 #include <QOpenGLTexture>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
 #include <QCloseEvent>
+#include <QMatrix4x4>
+#include <QQuaternion>
+#include <QVector2D>
+#include <QVector3D>
+#include <QBasicTimer>
+
+
+QT_FORWARD_DECLARE_CLASS(TeamAvatar)
+
 
 class RaceWindow : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -36,12 +46,57 @@ public slots:
     void closeEvent(QCloseEvent*) override;
 
 protected:
+    void mousePressEvent(QMouseEvent* pEvent) override;
+    void mouseReleaseEvent(QMouseEvent* pEvent) override;
+    void wheelEvent(QWheelEvent* pEvent) override;
+
+    void timerEvent(QTimerEvent *e) override;
     void initializeGL() override;
+    void resizeGL(int w, int h) override;
     void paintGL() override;
+
     void initEnvironment();
+    void initPlayField();
+    void drawField(QOpenGLShaderProgram* pProgram);
+
+    void initShaders();
+    void initTextures();
 
 private:
+    struct VertexData {
+        QVector3D position;
+        QVector2D texCoord;
+    };
+    QOpenGLBuffer fieldBuf;
+
+    QBasicTimer timer;
+
     QOpenGLTexture* pEnvironment = nullptr;
-    QOpenGLShaderProgram* pEnvironmentProgram;
+    QOpenGLTexture* pAvatar0Texture = nullptr;
+    QOpenGLTexture* pAvatar1Texture = nullptr;
+    QOpenGLTexture* pFieldTexture = nullptr;
+
+    QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
+    QOpenGLShaderProgram* pAvatarProgram = nullptr;
+    QOpenGLShaderProgram* pFieldProgram = nullptr;
+
+    QMatrix4x4 projectionMatrix;
+    QMatrix4x4 viewMatrix;
+
+    TeamAvatar* pTeam0;
+    TeamAvatar* pTeam1;
+
+    QVector2D mousePressPosition;
+    QVector3D rotationAxis;
+    qreal angularSpeed = 0;
+    QQuaternion rotation;
+    float xCamera =  0.0;
+    float yCamera = 15.0;
+    float zCamera =-25.0;
+    float z0Start =  3.0;
+    float z1Start = -3.0;
+    float xField  =  9.0;
+    float zField  =  4.5;
+    int nVertices;
 };
 

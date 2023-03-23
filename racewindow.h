@@ -88,6 +88,8 @@ private:
     QMatrix4x4 viewMatrix;
     QMatrix4x4 translateMatrix;
 
+    QVector4D lightPosition;
+
     TeamAvatar* pTeam0;
     TeamAvatar* pTeam1;
     TeamAvatar* pPlayField;

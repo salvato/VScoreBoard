@@ -55,6 +55,7 @@ RaceWindow::RaceWindow()
 //        move(point);
 //    }
 
+    lightPosition = QVector4D(0.0, 20.0, 4.0, 1.0);
 }
 
 
@@ -248,27 +249,24 @@ void
 RaceWindow::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-/**/
-
     pSphereProgram->bind();
     pSphereTexture->bind();
 
     modelMatrix.setToIdentity();
-    //modelMatrix.translate(xField, 1.0, z0Start);
-    modelMatrix.translate(0.0, 0.0, 0.0);
+    //modelMatrix.translate(xField, 1.0f, z0Start);
+    modelMatrix.translate(0.0f, 0.0f, 0.0f);
     modelMatrix.rotate(rotation);
 
     pSphereProgram->setUniformValue("camera",   cameraMatrix);
     pSphereProgram->setUniformValue("model",    modelMatrix);
     pSphereProgram->setUniformValue("view",     viewMatrix);
     pSphereProgram->setUniformValue("Tex0",     0);
-    pSphereProgram->setUniformValue("lightPos", QVector4D(0.0, 20.0, 4.0, 1.0));
+    pSphereProgram->setUniformValue("lightPos", lightPosition);
 
     QMatrix4x4 modelViewMatrix = cameraMatrix * modelMatrix;
     pSphereProgram->setUniformValue("modelView",    modelViewMatrix);
     pSphereProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
 
-//    pSphereProgram->setUniformValue("texture", 0);
     pSphere->draw(pSphereProgram);
 
 /*
@@ -283,6 +281,7 @@ RaceWindow::paintGL() {
     pAvatarProgram->setUniformValue("texture", 0);
     pTeam0->draw(pAvatarProgram);
 */
+
 /*
     pFieldProgram->bind();
     pFieldTexture->bind();
@@ -294,8 +293,8 @@ RaceWindow::paintGL() {
     pFieldProgram->setUniformValue("texture", 0);
 
     pPlayField->draw(pFieldProgram);
-
 */
+
 /*
     modelMatrix.setToIdentity();
     modelMatrix.translate(xField, 1.0, z1Start);
@@ -307,15 +306,17 @@ RaceWindow::paintGL() {
     pTeam1->drawAvatar(pAvatarProgram);
 */
 
-//    pEnvironment->bind();
-//    pEnvironmentProgram->bind();
-//    pEnvironmentProgram->setUniformValue("mvp_matrix", projection * matrix);
-//    pEnvironmentProgram->setUniformValue("tex", GLint(0));
-//    pEnvironmentProgram->setUniformValue("env", GLint(1));
-//    pEnvironmentProgram->setUniformValue("noise", GLint(2));
-//    // m_box->draw();
-//    pEnvironmentProgram->release();
-//    pEnvironment->release();
+/*
+    pEnvironment->bind();
+    pEnvironmentProgram->bind();
+    pEnvironmentProgram->setUniformValue("mvp_matrix", projection * matrix);
+    pEnvironmentProgram->setUniformValue("tex", GLint(0));
+    pEnvironmentProgram->setUniformValue("env", GLint(1));
+    pEnvironmentProgram->setUniformValue("noise", GLint(2));
+    // m_box->draw();
+    pEnvironmentProgram->release();
+    pEnvironment->release();
+*/
 
 //    glDisable(GL_DEPTH_TEST);
 }
@@ -493,22 +494,3 @@ RaceWindow::timerEvent(QTimerEvent *) {
     }
 }
 
-
-/*
-glGenTextures(1, &textureID);
-glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
-glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
-//Define all 6 faces
-glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels_face0);
-glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels_face1);
-glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels_face2);
-glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels_face3);
-glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels_face4);
-glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels_face5);
-*/

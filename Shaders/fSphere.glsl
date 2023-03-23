@@ -8,7 +8,7 @@ in vec3 N;
 in vec3 L;
 in vec3 E;
 
-//texture
+// texture
 in vec2 texCoord;
 out vec4 fragColor;
 
@@ -20,7 +20,7 @@ void main() {
     vec3 NN = normalize(N);
     vec3 EE = normalize(E);
     vec3 LL = normalize(L);
-    vec3 H = normalize(LL + EE);
+    vec3 H  = normalize(LL + EE);
 
     float Kd = max(dot(LL, NN), 0.0);
     float Ks = pow(max(dot(NN, H), 0.0), 80);

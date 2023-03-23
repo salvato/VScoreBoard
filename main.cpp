@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QLocale>
 #include <QTranslator>
 #include <QMessageBox>
-#include <QSurfaceFormat>
 #include "racewindow.h"
 
 int
@@ -30,7 +29,7 @@ main(int argc, char *argv[]) {
     qputenv("QT_LOGGING_RULES","*.debug=false;qt.qpa.*=false"); // supress anoying messages
 
     QSurfaceFormat format;
-    format.setDepthBufferSize(24);
+    format.setDepthBufferSize(16);
     QSurfaceFormat::setDefaultFormat(format);
 
     VolleyApplication a(argc, argv);
@@ -48,7 +47,7 @@ main(int argc, char *argv[]) {
     }
 
     RaceWindow race;
-    race.showFullScreen();
+    race.show();
 
     int iResult = a.exec();
     return iResult;

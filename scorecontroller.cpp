@@ -43,14 +43,15 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
     #endif
 {
     qApp->installEventFilter(this);
-    QList<QScreen*> screens = QApplication::screens();
-    if(screens.count() < 2) {
-        QMessageBox::critical(nullptr,
-                              QObject::tr("Secondo Monitor non connesso"),
-                              QObject::tr("Connettilo e Riesegui il Programma"),
-                              QMessageBox::Abort);
-        exit(EXIT_FAILURE);
-    }
+// TODO: Remove
+//    QList<QScreen*> screens = QApplication::screens();
+//    if(screens.count() < 2) {
+//        QMessageBox::critical(nullptr,
+//                              QObject::tr("Secondo Monitor non connesso"),
+//                              QObject::tr("Connettilo e Riesegui il Programma"),
+//                              QMessageBox::Abort);
+//        exit(EXIT_FAILURE);
+//    }
 
     setWindowTitle("Score Controller - ©Gabriele Salvato (2023)");
     setWindowIcon(QIcon(":/Logo.ico"));

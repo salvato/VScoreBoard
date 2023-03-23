@@ -17,22 +17,22 @@ TeamAvatar::TeamAvatar()
     initializeOpenGLFunctions();
 
     // Generate 2 VBOs
-    arrayBuf.create();
+    vertexBuf.create();
     indexBuf.create();
 
     // Initializes Avatar geometry and transfers it to VBOs
-    initAvatar();
+    init();
 }
 
 
 TeamAvatar::~TeamAvatar() {
-    arrayBuf.destroy();
+    vertexBuf.destroy();
     indexBuf.destroy();
 }
 
 
 void
-TeamAvatar::initAvatar() { // A simple cube at present !
+TeamAvatar::init() { // A simple cube at present !
     VertexData vertices[] = {
         // Vertex data for face 0
         {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(0.0f, 0.0f)},  // v0
@@ -81,8 +81,8 @@ TeamAvatar::initAvatar() { // A simple cube at present !
     };
 
     // Transfer vertex data to VBO 0
-    arrayBuf.bind();
-    arrayBuf.allocate(vertices, 24 * sizeof(VertexData));
+    vertexBuf.bind();
+    vertexBuf.allocate(vertices, 24 * sizeof(VertexData));
 
     // Transfer index data to VBO 1
     indexBuf.bind();
@@ -91,9 +91,9 @@ TeamAvatar::initAvatar() { // A simple cube at present !
 
 
 void
-TeamAvatar::drawAvatar(QOpenGLShaderProgram* pProgram) {
+TeamAvatar::draw(QOpenGLShaderProgram* pProgram) {
     // Tell OpenGL which VBOs to use
-    arrayBuf.bind();
+    vertexBuf.bind();
     indexBuf.bind();
 
     // Offset for position

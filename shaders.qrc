@@ -30,5 +30,7 @@
         <file>Shaders/fSwap.glsl</file>
         <file>Shaders/fCrosswarp.glsl</file>
         <file>Shaders/fAvatar.glsl</file>
+        <file>Shaders/vSphere.glsl</file>
+        <file>Shaders/fSphere.glsl</file>
     </qresource>
 </RCC>

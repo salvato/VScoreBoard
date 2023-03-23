@@ -11,12 +11,13 @@ public:
     TeamAvatar();
     virtual ~TeamAvatar();
 
-    void drawAvatar(QOpenGLShaderProgram* pProgram);
+public:
+    void draw(QOpenGLShaderProgram* pProgram);
 
 private:
-    void initAvatar();
+    void init();
 
 private:
-    QOpenGLBuffer arrayBuf;
+    QOpenGLBuffer vertexBuf;
     QOpenGLBuffer indexBuf;
 };

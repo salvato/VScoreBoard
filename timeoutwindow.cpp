@@ -36,17 +36,18 @@ TimeoutWindow::TimeoutWindow(QWidget *parent)
 {
     Q_UNUSED(parent);
     setMinimumSize(QSize(320, 240));
-
+// TODO: Remove
     QList<QScreen*> screens = QApplication::screens();
-    if(screens.count() < 2) {
-        QMessageBox::critical(nullptr,
-                              tr("Secondo Monitor non connesso"),
-                              tr("Connettilo e ritenta"),
-                              QMessageBox::Abort);
-        exit(0);
-    }
+//    if(screens.count() < 2) {
+//        QMessageBox::critical(nullptr,
+//                              tr("Secondo Monitor non connesso"),
+//                              tr("Connettilo e ritenta"),
+//                              QMessageBox::Abort);
+//        exit(0);
+//    }
     // Move the Panel on the Secondary Display
-    QRect  screenGeometry = screens.at(1)->geometry();
+//    QRect  screenGeometry = screens.at(1)->geometry();
+    QRect  screenGeometry = screens.at(0)->geometry();
     QPoint point = QPoint(screenGeometry.x(),
                           screenGeometry.y());
     move(point);

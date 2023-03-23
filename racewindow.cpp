@@ -1,7 +1,9 @@
 #include "racewindow.h"
 #include "TeamAvatar.h"
+#include "sphere.h"
 
 #include <QApplication>
+#include <QSurfaceFormat>
 #include <QScreen>
 
 
@@ -44,13 +46,14 @@ RaceWindow::RaceWindow()
     : QOpenGLWidget()
     , fieldBuf(QOpenGLBuffer::VertexBuffer)
 {
-    QList<QScreen*> screens = QApplication::screens();
-    QRect screenres = screens.at(0)->geometry();
-    if(screens.count() > 1) {
-        screenres = screens.at(1)->geometry();
-        QPoint point = QPoint(screenres.x(), screenres.y());
-        move(point);
-    }
+// TODO: Remove
+//    QList<QScreen*> screens = QApplication::screens();
+//    QRect screenres = screens.at(0)->geometry();
+//    if(screens.count() > 1) {
+//        screenres = screens.at(1)->geometry();
+//        QPoint point = QPoint(screenres.x(), screenres.y());
+//        move(point);
+//    }
 
 }
 
@@ -72,19 +75,23 @@ RaceWindow::closeEvent(QCloseEvent* event) {
 void
 RaceWindow::initializeGL() {
     initializeOpenGLFunctions();
-    glClearColor(1, 1, 1, 1);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
 
-    pTeam0 = new TeamAvatar();
-    pTeam1 = new TeamAvatar();
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    pTeam0     = new TeamAvatar();
+    pTeam1     = new TeamAvatar();
+    pPlayField = new TeamAvatar();
+    pSphere    = new Sphere(1.0f, 40, 40);
+
+    cameraMatrix.lookAt(QVector3D(0.0f, 0.0f, 3.0f),  // Eye
+                        QVector3D(0.0f, 0.0f, 0.0f),  // Center
+                        QVector3D(0.0f, 1.0f, 0.0f)); // Up
 
     initEnvironment();
-    initPlayField();
+//    initPlayField();
 
     initShaders();
     initTextures();
-
 
 /*
     if((currentAnimation >= pPrograms.count()) ||
@@ -98,6 +105,10 @@ RaceWindow::initializeGL() {
     }
     getLocations();
 */
+
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
 }
@@ -106,7 +117,6 @@ RaceWindow::initializeGL() {
 void
 RaceWindow::initShaders() {
     pFieldProgram = new QOpenGLShaderProgram();
-    // Compile Avatar vertex shader
     if (!pFieldProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/vShader.glsl")) {
         qWarning("Failed to compile vertex shader program");
         qWarning("Shader program log:");
@@ -114,7 +124,6 @@ RaceWindow::initShaders() {
         delete pFieldProgram;
         exit(EXIT_FAILURE);
     }
-    // Compile Avatar fragment shader
     if (!pFieldProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fAvatar.glsl")) {
         qWarning("Failed to compile fragment shader program");
         qWarning("Shader program log:");
@@ -122,7 +131,6 @@ RaceWindow::initShaders() {
         delete pFieldProgram;
         exit(EXIT_FAILURE);
     }
-    // Link Avatat shader pipeline
     if (!pFieldProgram->link()) {
         qWarning("Failed to compile and link shader program");
         qWarning("Shader program log:");
@@ -132,7 +140,6 @@ RaceWindow::initShaders() {
     }
 
     pAvatarProgram = new QOpenGLShaderProgram();
-    // Compile Avatar vertex shader
     if (!pAvatarProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/vShader.glsl")) {
         qWarning("Failed to compile vertex shader program");
         qWarning("Shader program log:");
@@ -140,7 +147,6 @@ RaceWindow::initShaders() {
         delete pAvatarProgram;
         exit(EXIT_FAILURE);
     }
-    // Compile Avatar fragment shader
     if (!pAvatarProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fAvatar.glsl")) {
         qWarning("Failed to compile fragment shader program");
         qWarning("Shader program log:");
@@ -148,7 +154,6 @@ RaceWindow::initShaders() {
         delete pAvatarProgram;
         exit(EXIT_FAILURE);
     }
-    // Link Avatat shader pipeline
     if (!pAvatarProgram->link()) {
         qWarning("Failed to compile and link shader program");
         qWarning("Shader program log:");
@@ -179,6 +184,29 @@ RaceWindow::initShaders() {
         delete pEnvironmentProgram;
         exit(EXIT_FAILURE);
     }
+
+    pSphereProgram = new QOpenGLShaderProgram();
+    if(!pSphereProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/vSphere.glsl")) {
+        qWarning("Failed to compile vertex shader program");
+        qWarning("Shader program log:");
+        qWarning() << pSphereProgram->log();
+        delete pSphereProgram;
+        exit(EXIT_FAILURE);
+    }
+    if(!pSphereProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fSphere.glsl")) {
+        qWarning("Failed to compile fragment shader program");
+        qWarning("Shader program log:");
+        qWarning() << pSphereProgram->log();
+        delete pSphereProgram;
+        exit(EXIT_FAILURE);
+    }
+    if (!pSphereProgram->link()) {
+        qWarning("Failed to compile and link shader program");
+        qWarning("Shader program log:");
+        qWarning() << pSphereProgram->log();
+        delete pSphereProgram;
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -198,39 +226,77 @@ RaceWindow::initTextures() {
     pFieldTexture->setMinificationFilter(QOpenGLTexture::Nearest);
     pFieldTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     pFieldTexture->setWrapMode(QOpenGLTexture::Repeat);
+
+    pSphereTexture = new QOpenGLTexture(QImage(":/earth.png").mirrored());
+    pSphereTexture->setMinificationFilter(QOpenGLTexture::Nearest);
+    pSphereTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    pSphereTexture->setWrapMode(QOpenGLTexture::Repeat);
+}
+
+
+void
+RaceWindow::resizeGL(int w, int h) {
+    viewMatrix.setToIdentity();
+    // Calculate aspect ratio
+    qreal aspect = qreal(w) / qreal(h ? h : 1);
+    const qreal zNear = 0.01f, zFar = 18.0f, fov = 65.0f;
+    viewMatrix.perspective(fov, aspect, zNear, zFar);
 }
 
 
 void
 RaceWindow::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glClearDepthf(5.0f);
 
+/**/
+
+    pSphereProgram->bind();
+    pSphereTexture->bind();
+
+    modelMatrix.setToIdentity();
+    //modelMatrix.translate(xField, 1.0, z0Start);
+    modelMatrix.translate(0.0, 0.0, 0.0);
+    modelMatrix.rotate(rotation);
+
+    pSphereProgram->setUniformValue("camera",   cameraMatrix);
+    pSphereProgram->setUniformValue("model",    modelMatrix);
+    pSphereProgram->setUniformValue("view",     viewMatrix);
+    pSphereProgram->setUniformValue("Tex0",     0);
+    pSphereProgram->setUniformValue("lightPos", QVector4D(0.0, 20.0, 4.0, 1.0));
+
+    QMatrix4x4 modelViewMatrix = cameraMatrix * modelMatrix;
+    pSphereProgram->setUniformValue("modelView",    modelViewMatrix);
+    pSphereProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
+
+//    pSphereProgram->setUniformValue("texture", 0);
+    pSphere->draw(pSphereProgram);
+
+/*
     pAvatarProgram->bind();
-
-    QMatrix4x4 modelMatrix;
-
+    pAvatar0Texture->bind();
     modelMatrix.setToIdentity();
-    modelMatrix.translate(0.0, 1.0, 0.0);
-    modelMatrix.scale(9.0, 1.0, 4.5);
-    //modelMatrix.rotate(rotation);
-
-    pFieldProgram->setUniformValue("mvp_matrix", projectionMatrix * viewMatrix * modelMatrix);
-    pFieldTexture->bind();
-    pFieldProgram->setUniformValue("texture", 0);
-    drawField(pAvatarProgram);
-
-    modelMatrix.setToIdentity();
-    modelMatrix.translate(xField, 1.0, z0Start);
-    //modelMatrix.rotate(rotation);
+    //modelMatrix.translate(xField, 1.0, z0Start);
+    modelMatrix.translate(0.0, 0.0, -5.0);
+    modelMatrix.rotate(rotation);
 
     pAvatarProgram->setUniformValue("mvp_matrix", projectionMatrix * viewMatrix * modelMatrix);
-    pAvatar0Texture->bind();
     pAvatarProgram->setUniformValue("texture", 0);
-    pTeam0->drawAvatar(pAvatarProgram);
+    pTeam0->draw(pAvatarProgram);
+*/
+/*
+    pFieldProgram->bind();
+    pFieldTexture->bind();
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(0.0f, 0.0f, -5.0f);
+    modelMatrix.scale(xField, 0.1f, zField);
 
+    pFieldProgram->setUniformValue("mvp_matrix", viewMatrix * modelMatrix);
+    pFieldProgram->setUniformValue("texture", 0);
+
+    pPlayField->draw(pFieldProgram);
+
+*/
+/*
     modelMatrix.setToIdentity();
     modelMatrix.translate(xField, 1.0, z1Start);
     //modelMatrix.rotate(rotation);
@@ -239,6 +305,7 @@ RaceWindow::paintGL() {
     pAvatar1Texture->bind();
     pAvatarProgram->setUniformValue("texture", 0);
     pTeam1->drawAvatar(pAvatarProgram);
+*/
 
 //    pEnvironment->bind();
 //    pEnvironmentProgram->bind();
@@ -250,20 +317,7 @@ RaceWindow::paintGL() {
 //    pEnvironmentProgram->release();
 //    pEnvironment->release();
 
-    glDisable(GL_DEPTH_TEST);
-}
-
-
-void
-RaceWindow::resizeGL(int w, int h) {
-    // Calculate aspect ratio
-    qreal aspect = qreal(w) / qreal(h ? h : 1);
-    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 0.0, zFar = 7.0, fov = 25.0;
-    projectionMatrix.setToIdentity();
-    projectionMatrix.perspective(fov, aspect, zNear, zFar);
-    viewMatrix.setToIdentity();
-    viewMatrix.lookAt(QVector3D(xCamera, yCamera, zCamera), QVector3D(0.0, 0.0, 0.0), QVector3D(0.0, 1.0, 0.0));
+//    glDisable(GL_DEPTH_TEST);
 }
 
 

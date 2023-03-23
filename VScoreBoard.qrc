@@ -48,5 +48,6 @@
         <file>res/cubemap_posy.jpg</file>
         <file>res/cubemap_posz.jpg</file>
         <file>cube.png</file>
+        <file>earth.png</file>
     </qresource>
 </RCC>

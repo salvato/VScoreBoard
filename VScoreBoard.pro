@@ -37,6 +37,7 @@ SOURCES += \
     scorepanel.cpp \
     setselectiondialog.cpp \
     slidewidget.cpp \
+    sphere.cpp \
     teamavatar.cpp \
     timeoutwindow.cpp \
     utility.cpp \
@@ -56,6 +57,7 @@ HEADERS += \
     scorepanel.h \
     setselectiondialog.h \
     slidewidget.h \
+    sphere.h \
     teamavatar.h \
     timeoutwindow.h \
     utility.h \

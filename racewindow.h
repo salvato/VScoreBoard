@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 QT_FORWARD_DECLARE_CLASS(TeamAvatar)
+QT_FORWARD_DECLARE_CLASS(Sphere)
 
 
 class RaceWindow : public QOpenGLWidget, protected QOpenGLFunctions
@@ -74,17 +75,23 @@ private:
     QOpenGLTexture* pEnvironment = nullptr;
     QOpenGLTexture* pAvatar0Texture = nullptr;
     QOpenGLTexture* pAvatar1Texture = nullptr;
-    QOpenGLTexture* pFieldTexture = nullptr;
+    QOpenGLTexture* pFieldTexture   = nullptr;
+    QOpenGLTexture* pSphereTexture  = nullptr;
 
     QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
     QOpenGLShaderProgram* pAvatarProgram = nullptr;
     QOpenGLShaderProgram* pFieldProgram = nullptr;
+    QOpenGLShaderProgram* pSphereProgram = nullptr;
 
-    QMatrix4x4 projectionMatrix;
+    QMatrix4x4 modelMatrix;
+    QMatrix4x4 cameraMatrix;
     QMatrix4x4 viewMatrix;
+    QMatrix4x4 translateMatrix;
 
     TeamAvatar* pTeam0;
     TeamAvatar* pTeam1;
+    TeamAvatar* pPlayField;
+    Sphere*     pSphere;
 
     QVector2D mousePressPosition;
     QVector3D rotationAxis;
@@ -92,9 +99,9 @@ private:
     QQuaternion rotation;
     float xCamera =  0.0;
     float yCamera = 15.0;
-    float zCamera =-25.0;
-    float z0Start =  3.0;
-    float z1Start = -3.0;
+    float zCamera =-20.0;
+    float z0Start =  1.0;
+    float z1Start = -1.0;
     float xField  =  9.0;
     float zField  =  4.5;
     int nVertices;

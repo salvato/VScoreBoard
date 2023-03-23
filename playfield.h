@@ -30,6 +30,7 @@ private:
 
 private:
     QOpenGLBuffer*            pVbo; // vertexBuf;
+    QOpenGLBuffer             indexBuf;
     QOpenGLVertexArrayObject* pVao;
 
     QVector4D m_color;

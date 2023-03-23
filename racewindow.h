@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 QT_FORWARD_DECLARE_CLASS(TeamAvatar)
+QT_FORWARD_DECLARE_CLASS(PlayField)
 QT_FORWARD_DECLARE_CLASS(Sphere)
 
 
@@ -92,7 +93,7 @@ private:
 
     TeamAvatar* pTeam0;
     TeamAvatar* pTeam1;
-    TeamAvatar* pPlayField;
+    PlayField*  pPlayField;
     Sphere*     pSphere;
 
     QVector2D mousePressPosition;

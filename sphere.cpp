@@ -170,19 +170,19 @@ Sphere::~Sphere() {
 
 
 void
-Sphere::setupVAO(QOpenGLShaderProgram *prog) {
+Sphere::setupVAO(QOpenGLShaderProgram* pProgram) {
     m_vao->bind();
     m_vbo->bind();
-    prog->enableAttributeArray("vPosition");
-    prog->setAttributeBuffer("vPosition", GL_FLOAT, 0, 3, 0);
-    prog->enableAttributeArray("vTexture");
+    pProgram->enableAttributeArray("vPosition");
+    pProgram->setAttributeBuffer("vPosition", GL_FLOAT, 0, 3, 0);
+    pProgram->enableAttributeArray("vTexture");
     int nverts = (m_stacks - 2) * m_stripsize + 2 * (m_slices + 2);
-    prog->setAttributeBuffer("vTexture", GL_FLOAT, nverts * sizeof(QVector3D), 2, 0);
-    prog->enableAttributeArray("vNormal");
-    prog->setAttributeBuffer("vNormal", GL_FLOAT,
+    pProgram->setAttributeBuffer("vTexture", GL_FLOAT, nverts * sizeof(QVector3D), 2, 0);
+    pProgram->enableAttributeArray("vNormal");
+    pProgram->setAttributeBuffer("vNormal", GL_FLOAT,
                              nverts * (sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
-    prog->enableAttributeArray("vTangent");
-    prog->setAttributeBuffer("vTangent", GL_FLOAT,
+    pProgram->enableAttributeArray("vTangent");
+    pProgram->setAttributeBuffer("vTangent", GL_FLOAT,
                              nverts * (2 * sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
     m_vao->release();
     m_vbo->release();
@@ -190,19 +190,19 @@ Sphere::setupVAO(QOpenGLShaderProgram *prog) {
 
 
 void
-Sphere::draw(QOpenGLShaderProgram *prog) {
-    if (!prog) {
+Sphere::draw(QOpenGLShaderProgram* pProgram) {
+    if (!pProgram) {
         return;
     }
     if (m_firstDraw) {
-        setupVAO(prog);
+        setupVAO(pProgram);
         m_firstDraw = false;
     }
     m_vao->bind();
 
     QVector4D clr =  m_color;
-    prog->setUniformValue("vColor", clr);
-    prog->setUniformValue("vSColor", m_spec_color);
+    pProgram->setUniformValue("vColor", clr);
+    pProgram->setUniformValue("vSColor", m_spec_color);
     for(int i=0; i<m_stacks-2; i++) {
         glDrawArrays(GL_TRIANGLE_STRIP, i*m_stripsize, m_stripsize);
     }

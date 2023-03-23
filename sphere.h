@@ -14,7 +14,7 @@ public:
     Sphere(float radius, int slices, int stacks);
     ~Sphere();
     // draw the sphere using provided shader program
-    void draw(QOpenGLShaderProgram* prog);
+    void draw(QOpenGLShaderProgram* pProgram);
     // Set Ambient and Diffuse color of Sphere
     inline void setColor(const QVector3D &color) {
       m_color = QVector4D(color, 1.);
@@ -31,7 +31,7 @@ public:
     // Return true if generate was a success, false otherwise
     bool initVBO();
     // setUp VAO once on firstDraw
-    void setupVAO(QOpenGLShaderProgram* prog);
+    void setupVAO(QOpenGLShaderProgram* pProgram);
 
   protected:
     QOpenGLBuffer*            m_vbo;

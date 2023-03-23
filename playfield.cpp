@@ -6,6 +6,7 @@
 
 PlayField::PlayField()
     : pVbo(nullptr)
+    , indexBuf(QOpenGLBuffer::IndexBuffer)
     , m_color(0.0f, 0.0f, 1.0f, 1.0f)
     , m_spec_color(1.0f, 1.0f, 1.0f, 1.0f)
 {
@@ -180,6 +181,7 @@ PlayField::init() { // A simple cube at present !
     tangents.clear();
 
     // Transfer index data to VBO 1
+    indexBuf.create();
     indexBuf.bind();
     indexBuf.allocate(indices, 34 * sizeof(GLushort));
 }
@@ -209,26 +211,15 @@ PlayField::setupVAO(QOpenGLShaderProgram *prog) {
 
 void
 PlayField::draw(QOpenGLShaderProgram* pProgram) {
-    // Tell OpenGL which VBOs to use
-    vertexBuf.bind();
+    if (m_firstDraw) {
+        setupVAO(pProgram);
+        m_firstDraw = false;
+    }
+    pVao->bind();
     indexBuf.bind();
-
-    // Offset for position
-    quintptr offset = 0;
-
-    // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = pProgram->attributeLocation("a_position");
-    pProgram->enableAttributeArray(vertexLocation);
-    pProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-    // Offset for texture coordinate
-    offset += sizeof(QVector3D);
-
-    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    int texcoordLocation = pProgram->attributeLocation("a_texcoord");
-    pProgram->enableAttributeArray(texcoordLocation);
-    pProgram->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-
-    // Draw Avatar using indices from VBO 1
-    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, nullptr);
+    QVector4D clr =  m_color;
+    pProgram->setUniformValue("vColor", clr);
+    pProgram->setUniformValue("vSColor", m_spec_color);
+    glDrawElements(GL_TRIANGLE_STRIP, nverts, GL_UNSIGNED_SHORT, nullptr);
+    pVao->release();
 }

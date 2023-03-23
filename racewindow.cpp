@@ -1,6 +1,7 @@
 #include "racewindow.h"
 #include "TeamAvatar.h"
 #include "sphere.h"
+#include "playfield.h"
 
 #include <QApplication>
 #include <QSurfaceFormat>
@@ -81,7 +82,7 @@ RaceWindow::initializeGL() {
 
     pTeam0     = new TeamAvatar();
     pTeam1     = new TeamAvatar();
-    pPlayField = new TeamAvatar();
+    pPlayField = new PlayField();
     pSphere    = new Sphere(1.0f, 40, 40);
 
     cameraMatrix.lookAt(QVector3D(0.0f, 0.0f, 3.0f),  // Eye
@@ -269,6 +270,14 @@ RaceWindow::paintGL() {
 
     pSphere->draw(pSphereProgram);
 
+    pFieldTexture->bind();
+
+//    modelMatrix.setToIdentity();
+//    modelMatrix.translate(0.0f, 0.0f, 0.0f);
+//    modelMatrix.scale(xField, 0.1f, zField);
+
+    pPlayField->draw(pSphereProgram);
+
 /*
     pAvatarProgram->bind();
     pAvatar0Texture->bind();
@@ -282,18 +291,6 @@ RaceWindow::paintGL() {
     pTeam0->draw(pAvatarProgram);
 */
 
-/*
-    pFieldProgram->bind();
-    pFieldTexture->bind();
-    modelMatrix.setToIdentity();
-    modelMatrix.translate(0.0f, 0.0f, -5.0f);
-    modelMatrix.scale(xField, 0.1f, zField);
-
-    pFieldProgram->setUniformValue("mvp_matrix", viewMatrix * modelMatrix);
-    pFieldProgram->setUniformValue("texture", 0);
-
-    pPlayField->draw(pFieldProgram);
-*/
 
 /*
     modelMatrix.setToIdentity();

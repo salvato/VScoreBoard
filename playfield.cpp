@@ -37,128 +37,94 @@ PlayField::init() { // A simple cube at present !
     QVector<QVector3D> normals;
     QVector<QVector3D> tangents;
     QVector<QVector2D> texCoords;
-    QVector3D normal;
 
     // Vertex data for face 0
     vertices.append(QVector3D(-1.0f, -1.0f,  1.0f));
-    normal = QVector3D::crossProduct(QVector3D(-1.0f, -1.0f,  1.0f),
-                                     QVector3D( 1.0f, -1.0f,  1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(0.0f, 0.0f, 1.0f));
+    tangents.append(QVector3D(1.0, 0.0, 0.0));
     texCoords.append(QVector2D(0.0f, 0.0f));         // v0
-
     vertices.append(QVector3D( 1.0f, -1.0f,  1.0f));
-    normal = QVector3D::crossProduct(QVector3D( 1.0f, -1.0f,  1.0f),
-                                     QVector3D(-1.0f,  1.0f,  1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(0.0f, 0.0f, 1.0f));
+    tangents.append(QVector3D(1.0, 0.0, 0.0));
     texCoords.append(QVector2D(0.33f, 0.0f));        // v1
-
     vertices.append(QVector3D(-1.0f,  1.0f,  1.0f));
-    normal = QVector3D::crossProduct(QVector3D(-1.0f,  1.0f,  1.0f),
-                                     QVector3D( 1.0f,  1.0f,  1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(0.0f, 0.0f, 1.0f));
+    tangents.append(QVector3D(1.0, 0.0, 0.0));
     texCoords.append(QVector2D(0.0f, 0.5f));         // v2
-
     vertices.append(QVector3D( 1.0f,  1.0f,  1.0f));
-    normal = QVector3D::crossProduct(QVector3D( 1.0f,  1.0f,  1.0f),
-                                     QVector3D(-1.0f, -1.0f,  1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(0.0f, 0.0f, 1.0f));
+    tangents.append(QVector3D(1.0, 0.0, 0.0));
     texCoords.append(QVector2D(0.33f, 0.5f));        // v3
 
     // Vertex data for face 1
     vertices.append(QVector3D( 1.0f, -1.0f,  1.0f));
-    normal = QVector3D::crossProduct(QVector3D( 1.0f, -1.0f,  1.0f),
-                                     QVector3D( 1.0f, -1.0f, -1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(1.0f, 0.0f, 0.0f));
     texCoords.append(QVector2D( 0.0f, 0.5f));        // v4
-
     vertices.append(QVector3D( 1.0f, -1.0f, -1.0f));
-    normal = QVector3D::crossProduct(QVector3D( 1.0f, -1.0f, -1.0f),
-                                     QVector3D( 1.0f,  1.0f,  1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(1.0f, 0.0f, 0.0f));
     texCoords.append(QVector2D(0.33f, 0.5f));        // v5
-
     vertices.append(QVector3D( 1.0f,  1.0f,  1.0f));
-    normal = QVector3D::crossProduct(QVector3D( 1.0f,  1.0f,  1.0f),
-                                     QVector3D( 1.0f,  1.0f, -1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(1.0f, 0.0f, 0.0f));
     texCoords.append(QVector2D(0.0f, 1.0f));         // v6
-
     vertices.append(QVector3D( 1.0f,  1.0f, -1.0f));
-    normal = QVector3D::crossProduct(QVector3D( 1.0f,  1.0f, -1.0f),
-                                     QVector3D( 1.0f, -1.0f,  1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(1.0f, 0.0f, 0.0f));
     texCoords.append(QVector2D(0.33f, 1.0f));        // v7
 
     // Vertex data for face 2
     vertices.append(QVector3D( 1.0f, -1.0f, -1.0f));
-    normal = QVector3D::crossProduct(QVector3D( 1.0f, -1.0f, -1.0f),
-                                     QVector3D(-1.0f, -1.0f, -1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(0.0f, 0.0f, -1.0f));
     texCoords.append(QVector2D(0.66f, 0.5f));        // v8
-
     vertices.append(QVector3D(-1.0f, -1.0f, -1.0f));
-    normal = QVector3D::crossProduct(QVector3D(-1.0f, -1.0f, -1.0f),
-                                     QVector3D( 1.0f,  1.0f, -1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(0.0f, 0.0f, -1.0f));
     texCoords.append(QVector2D(1.0f, 0.5f));         // v9
-
     vertices.append(QVector3D( 1.0f,  1.0f, -1.0f));
-    normal = QVector3D::crossProduct(QVector3D( 1.0f,  1.0f, -1.0f),
-                                     QVector3D(-1.0f,  1.0f, -1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(0.0f, 0.0f, -1.0f));
     texCoords.append(QVector2D(0.66f, 1.0f));        // v10
-
     vertices.append(QVector3D(-1.0f,  1.0f, -1.0f));
-    normal = QVector3D::crossProduct(QVector3D(-1.0f,  1.0f, -1.0f),
-                                     QVector3D( 1.0f, -1.0f, -1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(0.0f, 0.0f, -1.0f));
     texCoords.append(QVector2D(1.0f, 1.0f));         // v11
 
 
     // Vertex data for face 3
     vertices.append(QVector3D(-1.0f, -1.0f, -1.0f));
-    normal = QVector3D::crossProduct(QVector3D(-1.0f, -1.0f, -1.0f),
-                                     QVector3D(-1.0f, -1.0f,  1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(-1.0f, 0.0f, 0.0f));
     texCoords.append(QVector2D(0.66f, 0.0f));        // v12
-
     vertices.append(QVector3D(-1.0f, -1.0f,  1.0f));
-    normal = QVector3D::crossProduct(QVector3D(-1.0f, -1.0f,  1.0f),
-                                     QVector3D(-1.0f,  1.0f, -1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(-1.0f, 0.0f, 0.0f));
     texCoords.append(QVector2D(1.0f, 0.0f));         // v13
-
     vertices.append(QVector3D(-1.0f,  1.0f, -1.0f));
-    normal = QVector3D::crossProduct(QVector3D(-1.0f,  1.0f, -1.0f),
-                                     QVector3D(-1.0f,  1.0f,  1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(-1.0f, 0.0f, 0.0f));
     texCoords.append(QVector2D(0.66f, 0.5f));        // v14
-
     vertices.append(QVector3D(-1.0f,  1.0f,  1.0f));
-    normal = QVector3D::crossProduct(QVector3D(-1.0f,  1.0f,  1.0f),
-                                     QVector3D(-1.0f, -1.0f, -1.0f));
-    normals.append(normal.normalized());
+    normals.append(QVector3D(-1.0f, 0.0f, 0.0f));
     texCoords.append(QVector2D(1.0f, 0.5f));         // v15
-
 
     // Vertex data for face 4
     vertices.append(QVector3D(-1.0f, -1.0f, -1.0f));
+    normals.append(QVector3D(0.0f, -1.0f, 0.0f));
     texCoords.append(QVector2D(0.33f, 0.0f));        // v16
     vertices.append(QVector3D( 1.0f, -1.0f, -1.0f));
+    normals.append(QVector3D(0.0f, -1.0f, 0.0f));
     texCoords.append(QVector2D(0.66f, 0.0f));        // v17
     vertices.append(QVector3D(-1.0f, -1.0f,  1.0f));
+    normals.append(QVector3D(0.0f, -1.0f, 0.0f));
     texCoords.append(QVector2D(0.33f, 0.5f));        // v18
     vertices.append(QVector3D( 1.0f, -1.0f,  1.0f));
+    normals.append(QVector3D(0.0f, -1.0f, 0.0f));
     texCoords.append(QVector2D(0.66f, 0.5f));        // v19
 
     // Vertex data for face 5
     vertices.append(QVector3D(-1.0f,  1.0f,  1.0f));
+    normals.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.33f, 0.5f));        // v20
     vertices.append(QVector3D( 1.0f,  1.0f,  1.0f));
+    normals.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.66f, 0.5f));        // v21
     vertices.append(QVector3D(-1.0f,  1.0f, -1.0f));
+    normals.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.33f, 1.0f));        // v22
     vertices.append(QVector3D( 1.0f,  1.0f, -1.0f));
+    normals.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.66f, 1.0f));        // v23
 
     GLushort indices[] = {

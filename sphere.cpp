@@ -146,14 +146,10 @@ bool
 Sphere::initVBO() {
     m_vao = new QOpenGLVertexArrayObject();
     bool ok = m_vao->create();
-    if(!ok) {
-        return false;
-    }
+    if(!ok) return false;
     m_vbo = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     ok = m_vbo->create();
-    if(!ok) {
-        return false;
-    }
+    if(!ok) return false;
     m_vbo->setUsagePattern(QOpenGLBuffer::StaticDraw);
     return ok;
 }
@@ -207,8 +203,8 @@ Sphere::draw(QOpenGLShaderProgram *prog) {
     QVector4D clr =  m_color;
     prog->setUniformValue("vColor", clr);
     prog->setUniformValue("vSColor", m_spec_color);
-    for (int i=0; i<m_stacks-2; i++) {
-        glDrawArrays(GL_TRIANGLE_STRIP, i * m_stripsize, m_stripsize);
+    for(int i=0; i<m_stacks-2; i++) {
+        glDrawArrays(GL_TRIANGLE_STRIP, i*m_stripsize, m_stripsize);
     }
     int offset = (m_stacks - 2) * m_stripsize;
     int fansize = m_slices + 2;

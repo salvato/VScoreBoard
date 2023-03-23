@@ -32,6 +32,7 @@ SOURCES += \
     generalsetuparguments.cpp \
     generalsetupdialog.cpp \
     main.cpp \
+    playfield.cpp \
     racewindow.cpp \
     scorecontroller.cpp \
     scorepanel.cpp \
@@ -52,6 +53,7 @@ HEADERS += \
     generalsetuparguments.h \
     generalsetupdialog.h \
     panelorientation.h \
+    playfield.h \
     racewindow.h \
     scorecontroller.h \
     scorepanel.h \

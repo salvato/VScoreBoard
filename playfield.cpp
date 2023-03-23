@@ -11,8 +11,7 @@ PlayField::PlayField()
 {
     initializeOpenGLFunctions();
     m_firstDraw = true;
-
-    // Initializes Avatar geometry and transfers it to VBOs
+    // Initializes Avatar Play Field and transfers it to VBO
     init();
 }
 
@@ -59,73 +58,100 @@ PlayField::init() { // A simple cube at present !
     // Vertex data for face 1
     vertices.append(QVector3D( 1.0f, -1.0f,  1.0f));
     normals.append(QVector3D(1.0f, 0.0f, 0.0f));
+    tangents.append(QVector3D(0.0, 1.0, 0.0));
     texCoords.append(QVector2D( 0.0f, 0.5f));        // v4
     vertices.append(QVector3D( 1.0f, -1.0f, -1.0f));
     normals.append(QVector3D(1.0f, 0.0f, 0.0f));
+    tangents.append(QVector3D(0.0, 1.0, 0.0));
     texCoords.append(QVector2D(0.33f, 0.5f));        // v5
     vertices.append(QVector3D( 1.0f,  1.0f,  1.0f));
     normals.append(QVector3D(1.0f, 0.0f, 0.0f));
+    tangents.append(QVector3D(0.0, 1.0, 0.0));
     texCoords.append(QVector2D(0.0f, 1.0f));         // v6
     vertices.append(QVector3D( 1.0f,  1.0f, -1.0f));
     normals.append(QVector3D(1.0f, 0.0f, 0.0f));
+    tangents.append(QVector3D(0.0, 1.0, 0.0));
     texCoords.append(QVector2D(0.33f, 1.0f));        // v7
 
     // Vertex data for face 2
     vertices.append(QVector3D( 1.0f, -1.0f, -1.0f));
     normals.append(QVector3D(0.0f, 0.0f, -1.0f));
+    tangents.append(QVector3D(0.0f, 0.0f, 1.0f));
     texCoords.append(QVector2D(0.66f, 0.5f));        // v8
     vertices.append(QVector3D(-1.0f, -1.0f, -1.0f));
     normals.append(QVector3D(0.0f, 0.0f, -1.0f));
+    tangents.append(QVector3D(0.0f, 0.0f, 1.0f));
     texCoords.append(QVector2D(1.0f, 0.5f));         // v9
     vertices.append(QVector3D( 1.0f,  1.0f, -1.0f));
     normals.append(QVector3D(0.0f, 0.0f, -1.0f));
+    tangents.append(QVector3D(0.0f, 0.0f, 1.0f));
     texCoords.append(QVector2D(0.66f, 1.0f));        // v10
     vertices.append(QVector3D(-1.0f,  1.0f, -1.0f));
     normals.append(QVector3D(0.0f, 0.0f, -1.0f));
+    tangents.append(QVector3D(0.0f, 0.0f, 1.0f));
     texCoords.append(QVector2D(1.0f, 1.0f));         // v11
 
 
     // Vertex data for face 3
     vertices.append(QVector3D(-1.0f, -1.0f, -1.0f));
     normals.append(QVector3D(-1.0f, 0.0f, 0.0f));
+    tangents.append(QVector3D(1.0f, 0.0f, 1.0f));
     texCoords.append(QVector2D(0.66f, 0.0f));        // v12
     vertices.append(QVector3D(-1.0f, -1.0f,  1.0f));
     normals.append(QVector3D(-1.0f, 0.0f, 0.0f));
+    tangents.append(QVector3D(1.0f, 0.0f, 1.0f));
     texCoords.append(QVector2D(1.0f, 0.0f));         // v13
     vertices.append(QVector3D(-1.0f,  1.0f, -1.0f));
     normals.append(QVector3D(-1.0f, 0.0f, 0.0f));
+    tangents.append(QVector3D(1.0f, 0.0f, 1.0f));
     texCoords.append(QVector2D(0.66f, 0.5f));        // v14
     vertices.append(QVector3D(-1.0f,  1.0f,  1.0f));
     normals.append(QVector3D(-1.0f, 0.0f, 0.0f));
+    tangents.append(QVector3D(1.0f, 0.0f, 1.0f));
     texCoords.append(QVector2D(1.0f, 0.5f));         // v15
 
     // Vertex data for face 4
     vertices.append(QVector3D(-1.0f, -1.0f, -1.0f));
     normals.append(QVector3D(0.0f, -1.0f, 0.0f));
+    tangents.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.33f, 0.0f));        // v16
     vertices.append(QVector3D( 1.0f, -1.0f, -1.0f));
     normals.append(QVector3D(0.0f, -1.0f, 0.0f));
+    tangents.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.66f, 0.0f));        // v17
     vertices.append(QVector3D(-1.0f, -1.0f,  1.0f));
     normals.append(QVector3D(0.0f, -1.0f, 0.0f));
+    tangents.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.33f, 0.5f));        // v18
     vertices.append(QVector3D( 1.0f, -1.0f,  1.0f));
     normals.append(QVector3D(0.0f, -1.0f, 0.0f));
+    tangents.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.66f, 0.5f));        // v19
 
     // Vertex data for face 5
     vertices.append(QVector3D(-1.0f,  1.0f,  1.0f));
     normals.append(QVector3D(0.0f, 1.0f, 0.0f));
+    tangents.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.33f, 0.5f));        // v20
     vertices.append(QVector3D( 1.0f,  1.0f,  1.0f));
     normals.append(QVector3D(0.0f, 1.0f, 0.0f));
+    tangents.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.66f, 0.5f));        // v21
     vertices.append(QVector3D(-1.0f,  1.0f, -1.0f));
     normals.append(QVector3D(0.0f, 1.0f, 0.0f));
+    tangents.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.33f, 1.0f));        // v22
     vertices.append(QVector3D( 1.0f,  1.0f, -1.0f));
     normals.append(QVector3D(0.0f, 1.0f, 0.0f));
+    tangents.append(QVector3D(0.0f, 1.0f, 0.0f));
     texCoords.append(QVector2D(0.66f, 1.0f));        // v23
+
+    nverts = vertices.count();
+
+    int VertexSize = nverts*sizeof(QVector3D);
+    int TexSize    = nverts*sizeof(QVector2D);
+    int NormalSize = VertexSize;
+    int TangentSize= VertexSize;
 
     GLushort indices[] = {
          0,  1,  2,  3,  3,     // Face 0 - triangle strip ( v0,  v1,  v2,  v3)
@@ -141,13 +167,44 @@ PlayField::init() { // A simple cube at present !
     if(!pVbo->create()) exit(EXIT_FAILURE);
     pVbo->setUsagePattern(QOpenGLBuffer::StaticDraw);
     pVbo->bind();
-    pVbo->allocate(vertices.count() * sizeof(QVector3D));
-    pVbo->write(0, vertices.constData(), vertices.count() * sizeof(QVector3D));
+    pVbo->allocate(VertexSize+TexSize+NormalSize+TangentSize);
+    pVbo->write(0, vertices.constData(), VertexSize);
+    pVbo->write(VertexSize, texCoords.constData(), TexSize);
+    pVbo->write(VertexSize + TexSize, normals.constData(), NormalSize);
+    pVbo->write(VertexSize + TexSize + NormalSize, tangents.constData(), TangentSize);
+    pVbo->release();
+
+    vertices.clear();
+    texCoords.clear();
+    normals.clear();
+    tangents.clear();
 
     // Transfer index data to VBO 1
     indexBuf.bind();
     indexBuf.allocate(indices, 34 * sizeof(GLushort));
 }
+
+
+void
+PlayField::setupVAO(QOpenGLShaderProgram *prog) {
+    pVao = new QOpenGLVertexArrayObject();
+    if(!pVao->create()) exit(EXIT_FAILURE);
+    pVao->bind();
+    pVbo->bind();
+    prog->enableAttributeArray("vPosition");
+    prog->setAttributeBuffer("vPosition", GL_FLOAT, 0, 3, 0);
+    prog->enableAttributeArray("vTexture");
+    prog->setAttributeBuffer("vTexture", GL_FLOAT, nverts * sizeof(QVector3D), 2, 0);
+    prog->enableAttributeArray("vNormal");
+    prog->setAttributeBuffer("vNormal", GL_FLOAT,
+                             nverts * (sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
+    prog->enableAttributeArray("vTangent");
+    prog->setAttributeBuffer("vTangent", GL_FLOAT,
+                             nverts * (2 * sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
+    pVao->release();
+    pVbo->release();
+}
+
 
 
 void

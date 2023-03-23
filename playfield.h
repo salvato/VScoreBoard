@@ -35,4 +35,5 @@ private:
     QVector4D m_color;
     QVector4D m_spec_color;
     bool m_firstDraw;
+    int nverts;
 };

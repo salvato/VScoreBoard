@@ -83,9 +83,9 @@ RaceWindow::RaceWindow()
     specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
     lightPosition = QVector4D(0.0, 20.0, 4.0, 1.0);
 
-    xCamera =  0.0;
-    yCamera = 10.0;
-    zCamera = 10.0;
+    xCamera =  0.0f;
+    yCamera = 10.0f;
+    zCamera = 10.0f;
     cameraMatrix.lookAt(QVector3D(xCamera, yCamera, zCamera), // Eye
                         QVector3D(0.0f,    0.0f,    0.0f),    // Center
                         QVector3D(0.0f,    1.0f,    0.0f));   // Up
@@ -292,8 +292,8 @@ RaceWindow::paintGL() {
     pGameProgram->setUniformValue("vSColor",  specularColor);
 
     modelMatrix.setToIdentity();
-    modelMatrix.translate(0.0f, 0.0f, 0.0f);
     modelMatrix.scale(xField, 0.1f, zField);
+    modelMatrix.translate(0.0f, -1.0f, 0.0f);
     modelViewMatrix = cameraMatrix * modelMatrix;
     pGameProgram->setUniformValue("model",        modelMatrix);
     pGameProgram->setUniformValue("modelView",    modelViewMatrix);

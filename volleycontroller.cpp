@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "volleypanel.h"
 #include "utility.h"
 #include "chartwindow.h"
+#include "racewindow.h"
 
 
 VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
@@ -40,6 +41,7 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     , bFontBuilt(false)
     , pCharts(nullptr)
     , pScoreFile(nullptr)
+    , pRaceWindow(nullptr)
 {
     setWindowTitle("Score Controller - © Gabriele Salvato (2023)");
     setWindowIcon(QIcon(":/Logo.ico"));
@@ -78,6 +80,8 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     pCharts->updateLabel(0, gsArgs.sTeam[0]);
     pCharts->updateLabel(1, gsArgs.sTeam[1]);
 
+    pRaceWindow = new RaceWindow();
+
     setEventHandlers();
 }
 
@@ -92,6 +96,7 @@ VolleyController::closeEvent(QCloseEvent *event) {
     SaveSettings();
     if(pVolleyPanel) delete pVolleyPanel;
     if(pCharts) delete pCharts;
+    if(pRaceWindow) delete pRaceWindow;
     ScoreController::closeEvent(event);
     event->accept();
 }
@@ -573,10 +578,11 @@ VolleyController::setEventHandlers() {
     // Statistics Window Signal
     connect(pCharts, SIGNAL(done()),
             this, SLOT(onStatisticsDone()));
+    connect(pRaceWindow, SIGNAL(raceDone()),
+            this, SLOT(onRaceDone()));
 
 // Keypress Sound
-//    for(int iTeam=0; iTeam <2; iTeam++) {
-//        connect(pTimeoutIncrement[iTeam], SIGNAL(clicked()),
+//    for(int iTeam=0; iTeam <2; iTeam++) {//        connect(pTimeoutIncrement[iTeam], SIGNAL(clicked()),
 //                pButtonClick, SLOT(play()));
 //        connect(pTimeoutDecrement[iTeam], SIGNAL(clicked()),
 //                pButtonClick, SLOT(play()));
@@ -916,17 +922,29 @@ VolleyController::onButtonNewGameClicked() {
 
 void
 VolleyController::onButtonStatisticsClicked() {
+    int iScore0 = 0;
+    int iScore1 = 0;
+    bool bEnd   = false;
     QPixmap* pPixmap = new QPixmap();
     QSize iconSize = QSize(48,48);
     if(pCharts->isVisible()) {
-        pCharts->hide();
+        pRaceWindow->hide();
         pPixmap->load(":/buttonIcons/plot.png");
     }
     else {
         if(setSelectionDialog.exec() == QDialog::Accepted) {
-            pCharts->showFullScreen(setSelectionDialog.iSelectedSet);
-            if(pCharts->isVisible()) {
+//            pRaceWindow->showFullScreen();
+            pRaceWindow->show();
+            if(pRaceWindow->isVisible()) {
                 pPixmap->load(":/buttonIcons/sign_stop.png");
+                while(!bEnd) {
+                    if(rand() & 1) iScore0++;
+                    else iScore1++;
+                    pRaceWindow->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
+                    bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
+                           std::abs(iScore0-iScore1) > 1;
+                }
+                pRaceWindow->startRace(setSelectionDialog.iSelectedSet);
             }
             else {
                 pPixmap->load(":/buttonIcons/plot.png");
@@ -940,8 +958,20 @@ VolleyController::onButtonStatisticsClicked() {
     pStatisticButton->setIconSize(iconSize);
 }
 
+
 void
 VolleyController::onStatisticsDone() {
+    QPixmap* pPixmap= new QPixmap();
+    QSize iconSize = QSize(48,48);
+    pPixmap->load(":/buttonIcons/plot.png");
+    pStatisticButton->setIcon(QIcon(*pPixmap));
+    pStatisticButton->setIconSize(iconSize);
+}
+
+
+void
+VolleyController::onRaceDone() {
+    pRaceWindow->hide();
     QPixmap* pPixmap= new QPixmap();
     QSize iconSize = QSize(48,48);
     pPixmap->load(":/buttonIcons/plot.png");

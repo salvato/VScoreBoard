@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QVector2D>
 #include <QVector3D>
 #include <QBasicTimer>
+#include <QTime>
 
 
 QT_FORWARD_DECLARE_CLASS(PlayField)
@@ -43,8 +44,18 @@ public:
     RaceWindow();
     ~RaceWindow();
 
+public:
+    void updateScore(int team0Score, int team1Score, int iSet);
+    void updateLabel(int iTeam, QString sLabel);
+    void resetScore(int iSet);
+    void resetAll();
+    void startRace(int iSet);
+
 public slots:
     void closeEvent(QCloseEvent*) override;
+
+signals:
+    void raceDone();
 
 protected:
     void mousePressEvent(QMouseEvent* pEvent) override;
@@ -87,6 +98,8 @@ private:
     QMatrix4x4 modelViewMatrix;
 
     QVector4D lightPosition;
+    QVector4D diffuseColor;
+    QVector4D specularColor;
 
     Sphere*    pTeam0;
     Sphere*    pTeam1;
@@ -95,7 +108,8 @@ private:
     QVector2D mousePressPosition;
     QVector3D rotationAxis;
     qreal angularSpeed = 0;
-    QQuaternion rotation;
+    QQuaternion rotation1;
+    QQuaternion rotation0;
     float xCamera =  0.0;
     float yCamera = 15.0;
     float zCamera = 20.0;
@@ -103,11 +117,22 @@ private:
     float z1Start = -2.0;
     float xField  =  9.0;
     float zField  =  4.5;
-    int nVertices;
+    int   nVertices;
     float ballRadius;
-    QVector4D diffuseColor;
-    QVector4D specularColor;
     double dx;
+    double dx0;
+    double dx1;
     double x0;
+    double x1;
+    QString sTeamName[2];
+    QVector<QVector2D> score[5];
+    int maxScore[5];
+    int indexScore;
+    float scanTime;
+    float pointTime;
+    float pointSpace;
+    double t0;
+    int refreshTime;
+    int iCurrentSet;
 };
 

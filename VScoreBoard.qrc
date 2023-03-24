@@ -49,5 +49,7 @@
         <file>res/cubemap_posz.jpg</file>
         <file>cube.png</file>
         <file>earth.png</file>
+        <file>VolleyBall_0.png</file>
+        <file>VolleyBall_1.png</file>
     </qresource>
 </RCC>

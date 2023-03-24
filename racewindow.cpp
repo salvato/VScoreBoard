@@ -1,3 +1,22 @@
+/*
+ *
+Copyright (C) 2023  Gabriele Salvato
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
 #include "racewindow.h"
 #include "sphere.h"
 #include "playfield.h"
@@ -5,7 +24,8 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 #include <QScreen>
-
+#include <QIcon>
+#include <QTime>
 
 /*
 const static char
@@ -55,7 +75,25 @@ RaceWindow::RaceWindow()
 //        move(point);
 //    }
 
+    setWindowIcon(QIcon(":/buttonIcons/plot.png"));
+
+    ballRadius = 0.1066f*5.0f; // Five times bigger than real
+
+    diffuseColor  = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
+    specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
     lightPosition = QVector4D(0.0, 20.0, 4.0, 1.0);
+
+    xCamera =  0.0;
+    yCamera = 10.0;
+    zCamera = 10.0;
+    cameraMatrix.lookAt(QVector3D(xCamera, yCamera, zCamera), // Eye
+                        QVector3D(0.0f,    0.0f,    0.0f),    // Center
+                        QVector3D(0.0f,    1.0f,    0.0f));   // Up
+
+    resetAll();
+    scanTime = 10.0; // Tempo in secondi per l'intera "Corsa"
+    x0  = x1  =-xField;
+    dx0 = dx1 = 0;
 }
 
 
@@ -74,11 +112,48 @@ RaceWindow::closeEvent(QCloseEvent* event) {
 
 
 void
+RaceWindow::updateLabel(int iTeam, QString sLabel) {
+    if((iTeam < 0) || (iTeam > 1)) return;
+    sTeamName[iTeam] = sLabel;
+    update();
+}
+
+
+void
+RaceWindow::updateScore(int team0Score, int team1Score, int iSet) {
+    if((iSet < 0) || (iSet > 4)) return;
+    score[iSet].append(QVector2D(team0Score, team1Score));
+    maxScore[iSet] = std::max(team0Score, team1Score);
+}
+
+
+void
+RaceWindow::resetScore(int iSet) {
+    if((iSet < 0) || (iSet > 4)) return;
+    score[iSet].clear();
+    score[iSet].append(QVector2D(0, 0));
+    maxScore[iSet] = 0;
+}
+
+
+void
+RaceWindow::resetAll() {
+    for(int i=0; i<5; i++) {
+        score[i].clear();
+        score[i].append(QVector2D(0, 0));
+        maxScore[i] = 0;
+    }
+}
+
+
+void
 RaceWindow::resizeGL(int w, int h) {
     viewMatrix.setToIdentity();
     // Calculate aspect ratio
     qreal aspect = qreal(w) / qreal(h ? h : 1);
-    const qreal zNear = 0.01f, zFar = 18.0f, fov = 65.0f;
+    const qreal zNear = 0.01f, zFar = 18.0f;
+    const qreal fov = 50.0;//abs(qRadiansToDegrees(atan2((xCamera-xField), (zCamera-zField))));
+//    qCritical() << "fov" << fov;
     viewMatrix.perspective(fov, aspect, zNear, zFar);
 }
 
@@ -89,22 +164,10 @@ RaceWindow::initializeGL() {
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    diffuseColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
-    specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
-
-    ballRadius = 0.1066f*5.0f; // Five times bigger than real
-
     pTeam0     = new Sphere(ballRadius, 40, 40);
     pTeam1     = new Sphere(ballRadius, 40, 40);
     pPlayField = new PlayField();
 
-    xCamera =  0.0;
-    yCamera = 10.0;
-    zCamera = 10.0;
-
-    cameraMatrix.lookAt(QVector3D(xCamera, yCamera, zCamera),  // Eye
-                        QVector3D(0.0f, 0.0f, 0.0f),  // Center
-                        QVector3D(0.0f, 1.0f, 0.0f)); // Up
 
     initEnvironment();
     initShaders();
@@ -112,11 +175,6 @@ RaceWindow::initializeGL() {
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-
-    // Use QBasicTimer because its faster than QTimer
-    dx = 0.0;
-    x0 = -xField;
-    timer.start(12, this);
 }
 
 
@@ -173,12 +231,12 @@ RaceWindow::initShaders() {
 
 void
 RaceWindow::initTextures() {
-    pTeam0Texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    pTeam0Texture = new QOpenGLTexture(QImage(":/VolleyBall_0.png").mirrored());
     pTeam0Texture->setMinificationFilter(QOpenGLTexture::Nearest);
     pTeam0Texture->setMagnificationFilter(QOpenGLTexture::Linear);
     pTeam0Texture->setWrapMode(QOpenGLTexture::Repeat);
 
-    pTeam1Texture = new QOpenGLTexture(QImage(":/earth.png").mirrored());
+    pTeam1Texture = new QOpenGLTexture(QImage(":/VolleyBall_1.png").mirrored());
     pTeam1Texture->setMinificationFilter(QOpenGLTexture::Nearest);
     pTeam1Texture->setMagnificationFilter(QOpenGLTexture::Linear);
     pTeam1Texture->setWrapMode(QOpenGLTexture::Repeat);
@@ -187,6 +245,35 @@ RaceWindow::initTextures() {
     pFieldTexture->setMinificationFilter(QOpenGLTexture::Nearest);
     pFieldTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     pFieldTexture->setWrapMode(QOpenGLTexture::Repeat);
+}
+
+
+void
+RaceWindow::startRace(int iSet) {
+    if(maxScore[iSet] == 0) {
+        return;
+    }
+    iCurrentSet = iSet;
+    int totalPoints = score[iSet].count();
+    pointTime  = (scanTime/totalPoints)*1000.0; // Tempo in ms per passare da un punto al successivo
+    pointSpace = 2.0*xField/maxScore[iSet];     // Spazio da percorrere per ciascun punto.
+    refreshTime = 12; // in ms
+    float nTicks = pointTime/refreshTime;
+    dx = pointSpace/nTicks;
+    indexScore = 0;
+    if(score[iCurrentSet].at(indexScore+1).x() > score[iCurrentSet].at(indexScore).x()) {
+        dx0 = dx;
+        dx1 = 0.0;
+    }
+    else {
+        dx0 = 0.0;
+        dx1 = dx;
+    }
+    x0  = x1  =-xField;
+    t0 = 0.0;
+    qCritical() << score[iSet].at(indexScore+1);
+    // Use QBasicTimer because its faster than QTimer
+    timer.start(refreshTime, this);
 }
 
 
@@ -212,29 +299,49 @@ RaceWindow::paintGL() {
     pFieldTexture->bind();
     pPlayField->draw(pGameProgram);
 
-    float angle = (dx/ballRadius)*180.0/M_PI;
-    x0 += dx;
-    rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0,-1.0), angle) * rotation;
+    float angle = qRadiansToDegrees(dx0/ballRadius);
+    x0 += dx0;
+    if(x0 > xField) {
+        timer.stop();
+        emit raceDone();
+        return;
+    }
+    if(x0 < -xField) {
+        timer.stop();
+        emit raceDone();
+        return;
+    }
+    rotation0 = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0,-1.0), angle) * rotation0;
     modelMatrix.setToIdentity();
     modelMatrix.translate(x0, ballRadius, z0Start);
-    modelMatrix.rotate(rotation);
+    modelMatrix.rotate(rotation0);
     modelViewMatrix = cameraMatrix * modelMatrix;
     pGameProgram->setUniformValue("model",        modelMatrix);
     pGameProgram->setUniformValue("modelView",    modelViewMatrix);
     pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
-
     pTeam0Texture->bind();
     pTeam0->draw(pGameProgram);
 
+    angle = qRadiansToDegrees(dx1/ballRadius);
+    x1 += dx1;
+    if(x1 > xField) {
+        timer.stop();
+        emit raceDone();
+        return;
+    }
+    if(x1 <-xField) {
+        timer.stop();
+        emit raceDone();
+        return;
+    }
+    rotation1 = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0,-1.0), angle) * rotation1;
     modelMatrix.setToIdentity();
-    modelMatrix.translate(-xField, ballRadius, z1Start);
-    modelMatrix.translate(0.0f, 0.0f, 0.0f);
-    modelMatrix.rotate(rotation);
+    modelMatrix.translate(x1, ballRadius, z1Start);
+    modelMatrix.rotate(rotation1);
     modelViewMatrix = cameraMatrix * modelMatrix;
     pGameProgram->setUniformValue("model",        modelMatrix);
     pGameProgram->setUniformValue("modelView",    modelViewMatrix);
     pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
-
     pTeam1Texture->bind();
     pTeam1->draw(pGameProgram);
 
@@ -411,8 +518,26 @@ RaceWindow::wheelEvent(QWheelEvent* pEvent) {
 
 
 void
-RaceWindow::timerEvent(QTimerEvent *) {
-    dx = 0.012;
+RaceWindow::timerEvent(QTimerEvent*) {
+    t0 += refreshTime;
+    if(t0 > pointTime) {
+        t0 = 0.0;
+        indexScore++;
+        if(indexScore >= score[iCurrentSet].count()-1) {
+            timer.stop();
+            emit raceDone();
+            return;
+        }
+        if(score[iCurrentSet].at(indexScore+1).x() > score[iCurrentSet].at(indexScore).x()) {
+            dx0 = dx;
+            dx1 = 0.0;
+        }
+        else {
+            dx0 = 0.0;
+            dx1 = dx;
+        }
+        qCritical() << score[iCurrentSet].at(indexScore+1);
+    }
     update();
 }
 

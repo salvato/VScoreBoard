@@ -12,7 +12,7 @@ PlayField::PlayField()
 {
     initializeOpenGLFunctions();
     m_firstDraw = true;
-    // Initializes Avatar Play Field and transfers it to VBO
+    // Initializes Play Field and transfers it to VBOs
     init();
 }
 
@@ -28,6 +28,7 @@ PlayField::~PlayField() {
         delete pVao;
         pVao = nullptr;
     }
+    indexBuf.release();
 }
 
 

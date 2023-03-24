@@ -26,11 +26,9 @@ void main() {
     float Ks = pow(max(dot(NN, H), 0.0), 80);
 
     ambient = baseColor * 0.6;
-    diffuse = baseColor * Kd * 0.0;
-    specular = vec4(0, 0, 0, 1);
+    diffuse = baseColor * Kd * 0.5;
     if (dot(LL, NN) > 0) {
-        specular = vSColor * Ks * 0.6;
+        specular = vSColor * Ks * 0.5;
     }
     fragColor = vec4((ambient + diffuse + specular).xyz, 1);
-    // fragColor = texture(Tex0, texCoord);
 }

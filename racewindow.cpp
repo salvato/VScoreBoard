@@ -1,5 +1,4 @@
 #include "racewindow.h"
-#include "TeamAvatar.h"
 #include "sphere.h"
 #include "playfield.h"
 
@@ -8,7 +7,7 @@
 #include <QScreen>
 
 
-
+/*
 const static char
 environmentVShaderText[] =
 "varying vec3 position, normal;"
@@ -41,7 +40,7 @@ environmentFShaderText[] =
         "gl_FragColor = textureCube(env, gl_TexCoord[1].xyz);"
     "}";
 
-
+*/
 
 RaceWindow::RaceWindow()
     : QOpenGLWidget()
@@ -75,95 +74,55 @@ RaceWindow::closeEvent(QCloseEvent* event) {
 
 
 void
+RaceWindow::resizeGL(int w, int h) {
+    viewMatrix.setToIdentity();
+    // Calculate aspect ratio
+    qreal aspect = qreal(w) / qreal(h ? h : 1);
+    const qreal zNear = 0.01f, zFar = 18.0f, fov = 65.0f;
+    viewMatrix.perspective(fov, aspect, zNear, zFar);
+}
+
+
+void
 RaceWindow::initializeGL() {
     initializeOpenGLFunctions();
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    pTeam0     = new TeamAvatar();
-    pTeam1     = new TeamAvatar();
-    pPlayField = new PlayField();
-    pSphere    = new Sphere(1.0f, 40, 40);
+    diffuseColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
+    specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
 
-    cameraMatrix.lookAt(QVector3D(0.0f, 0.0f, 3.0f),  // Eye
+    ballRadius = 0.1066f*5.0f; // Five times bigger than real
+
+    pTeam0     = new Sphere(ballRadius, 40, 40);
+    pTeam1     = new Sphere(ballRadius, 40, 40);
+    pPlayField = new PlayField();
+
+    xCamera =  0.0;
+    yCamera = 10.0;
+    zCamera = 10.0;
+
+    cameraMatrix.lookAt(QVector3D(xCamera, yCamera, zCamera),  // Eye
                         QVector3D(0.0f, 0.0f, 0.0f),  // Center
                         QVector3D(0.0f, 1.0f, 0.0f)); // Up
 
     initEnvironment();
-//    initPlayField();
-
     initShaders();
     initTextures();
-
-/*
-    if((currentAnimation >= pPrograms.count()) ||
-       (currentAnimation < 0))
-        currentAnimation = 0;
-    pCurrentProgram = pPrograms.at(currentAnimation);
-    if(!pCurrentProgram->bind()) {
-        qCritical() << __FUNCTION__ << __LINE__;
-        close();
-        return;
-    }
-    getLocations();
-*/
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
     // Use QBasicTimer because its faster than QTimer
+    dx = 0.0;
+    x0 = -xField;
     timer.start(12, this);
 }
 
 
 void
 RaceWindow::initShaders() {
-    pFieldProgram = new QOpenGLShaderProgram();
-    if (!pFieldProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/vShader.glsl")) {
-        qWarning("Failed to compile vertex shader program");
-        qWarning("Shader program log:");
-        qWarning() << pFieldProgram->log();
-        delete pFieldProgram;
-        exit(EXIT_FAILURE);
-    }
-    if (!pFieldProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fAvatar.glsl")) {
-        qWarning("Failed to compile fragment shader program");
-        qWarning("Shader program log:");
-        qWarning() << pFieldProgram->log();
-        delete pFieldProgram;
-        exit(EXIT_FAILURE);
-    }
-    if (!pFieldProgram->link()) {
-        qWarning("Failed to compile and link shader program");
-        qWarning("Shader program log:");
-        qWarning() << pFieldProgram->log();
-        delete pFieldProgram;
-        exit(EXIT_FAILURE);
-    }
-
-    pAvatarProgram = new QOpenGLShaderProgram();
-    if (!pAvatarProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/vShader.glsl")) {
-        qWarning("Failed to compile vertex shader program");
-        qWarning("Shader program log:");
-        qWarning() << pAvatarProgram->log();
-        delete pAvatarProgram;
-        exit(EXIT_FAILURE);
-    }
-    if (!pAvatarProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fAvatar.glsl")) {
-        qWarning("Failed to compile fragment shader program");
-        qWarning("Shader program log:");
-        qWarning() << pAvatarProgram->log();
-        delete pAvatarProgram;
-        exit(EXIT_FAILURE);
-    }
-    if (!pAvatarProgram->link()) {
-        qWarning("Failed to compile and link shader program");
-        qWarning("Shader program log:");
-        qWarning() << pAvatarProgram->log();
-        delete pAvatarProgram;
-        exit(EXIT_FAILURE);
-    }
-
+/*
     pEnvironmentProgram = new QOpenGLShaderProgram();
     if(!pEnvironmentProgram->addShaderFromSourceCode(QOpenGLShader::Vertex, environmentVShaderText)) {
         qWarning("Failed to compile vertex shader program");
@@ -186,27 +145,27 @@ RaceWindow::initShaders() {
         delete pEnvironmentProgram;
         exit(EXIT_FAILURE);
     }
-
-    pSphereProgram = new QOpenGLShaderProgram();
-    if(!pSphereProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/vSphere.glsl")) {
+*/
+    pGameProgram = new QOpenGLShaderProgram();
+    if(!pGameProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/vSphere.glsl")) {
         qWarning("Failed to compile vertex shader program");
         qWarning("Shader program log:");
-        qWarning() << pSphereProgram->log();
-        delete pSphereProgram;
+        qWarning() << pGameProgram->log();
+        delete pGameProgram;
         exit(EXIT_FAILURE);
     }
-    if(!pSphereProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fSphere.glsl")) {
+    if(!pGameProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fSphere.glsl")) {
         qWarning("Failed to compile fragment shader program");
         qWarning("Shader program log:");
-        qWarning() << pSphereProgram->log();
-        delete pSphereProgram;
+        qWarning() << pGameProgram->log();
+        delete pGameProgram;
         exit(EXIT_FAILURE);
     }
-    if (!pSphereProgram->link()) {
+    if (!pGameProgram->link()) {
         qWarning("Failed to compile and link shader program");
         qWarning("Shader program log:");
-        qWarning() << pSphereProgram->log();
-        delete pSphereProgram;
+        qWarning() << pGameProgram->log();
+        delete pGameProgram;
         exit(EXIT_FAILURE);
     }
 }
@@ -214,35 +173,20 @@ RaceWindow::initShaders() {
 
 void
 RaceWindow::initTextures() {
-    pAvatar0Texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
-    pAvatar0Texture->setMinificationFilter(QOpenGLTexture::Nearest);
-    pAvatar0Texture->setMagnificationFilter(QOpenGLTexture::Linear);
-    pAvatar0Texture->setWrapMode(QOpenGLTexture::Repeat);
+    pTeam0Texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    pTeam0Texture->setMinificationFilter(QOpenGLTexture::Nearest);
+    pTeam0Texture->setMagnificationFilter(QOpenGLTexture::Linear);
+    pTeam0Texture->setWrapMode(QOpenGLTexture::Repeat);
 
-    pAvatar1Texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
-    pAvatar1Texture->setMinificationFilter(QOpenGLTexture::Nearest);
-    pAvatar1Texture->setMagnificationFilter(QOpenGLTexture::Linear);
-    pAvatar1Texture->setWrapMode(QOpenGLTexture::Repeat);
+    pTeam1Texture = new QOpenGLTexture(QImage(":/earth.png").mirrored());
+    pTeam1Texture->setMinificationFilter(QOpenGLTexture::Nearest);
+    pTeam1Texture->setMagnificationFilter(QOpenGLTexture::Linear);
+    pTeam1Texture->setWrapMode(QOpenGLTexture::Repeat);
 
     pFieldTexture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
     pFieldTexture->setMinificationFilter(QOpenGLTexture::Nearest);
     pFieldTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     pFieldTexture->setWrapMode(QOpenGLTexture::Repeat);
-
-    pSphereTexture = new QOpenGLTexture(QImage(":/earth.png").mirrored());
-    pSphereTexture->setMinificationFilter(QOpenGLTexture::Nearest);
-    pSphereTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-    pSphereTexture->setWrapMode(QOpenGLTexture::Repeat);
-}
-
-
-void
-RaceWindow::resizeGL(int w, int h) {
-    viewMatrix.setToIdentity();
-    // Calculate aspect ratio
-    qreal aspect = qreal(w) / qreal(h ? h : 1);
-    const qreal zNear = 0.01f, zFar = 18.0f, fov = 65.0f;
-    viewMatrix.perspective(fov, aspect, zNear, zFar);
 }
 
 
@@ -250,58 +194,49 @@ void
 RaceWindow::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    pSphereProgram->bind();
-    pSphereTexture->bind();
+    pGameProgram->bind();
+    pGameProgram->setUniformValue("camera",   cameraMatrix);
+    pGameProgram->setUniformValue("view",     viewMatrix);
+    pGameProgram->setUniformValue("Tex0",     0);
+    pGameProgram->setUniformValue("lightPos", lightPosition);
+    pGameProgram->setUniformValue("vColor",   diffuseColor);
+    pGameProgram->setUniformValue("vSColor",  specularColor);
 
     modelMatrix.setToIdentity();
-    //modelMatrix.translate(xField, 1.0f, z0Start);
+    modelMatrix.translate(0.0f, 0.0f, 0.0f);
+    modelMatrix.scale(xField, 0.1f, zField);
+    modelViewMatrix = cameraMatrix * modelMatrix;
+    pGameProgram->setUniformValue("model",        modelMatrix);
+    pGameProgram->setUniformValue("modelView",    modelViewMatrix);
+    pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
+    pFieldTexture->bind();
+    pPlayField->draw(pGameProgram);
+
+    float angle = (dx/ballRadius)*180.0/M_PI;
+    x0 += dx;
+    rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0,-1.0), angle) * rotation;
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(x0, ballRadius, z0Start);
+    modelMatrix.rotate(rotation);
+    modelViewMatrix = cameraMatrix * modelMatrix;
+    pGameProgram->setUniformValue("model",        modelMatrix);
+    pGameProgram->setUniformValue("modelView",    modelViewMatrix);
+    pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
+
+    pTeam0Texture->bind();
+    pTeam0->draw(pGameProgram);
+
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(-xField, ballRadius, z1Start);
     modelMatrix.translate(0.0f, 0.0f, 0.0f);
     modelMatrix.rotate(rotation);
+    modelViewMatrix = cameraMatrix * modelMatrix;
+    pGameProgram->setUniformValue("model",        modelMatrix);
+    pGameProgram->setUniformValue("modelView",    modelViewMatrix);
+    pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
 
-    pSphereProgram->setUniformValue("camera",   cameraMatrix);
-    pSphereProgram->setUniformValue("model",    modelMatrix);
-    pSphereProgram->setUniformValue("view",     viewMatrix);
-    pSphereProgram->setUniformValue("Tex0",     0);
-    pSphereProgram->setUniformValue("lightPos", lightPosition);
-
-    QMatrix4x4 modelViewMatrix = cameraMatrix * modelMatrix;
-    pSphereProgram->setUniformValue("modelView",    modelViewMatrix);
-    pSphereProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
-
-    pSphere->draw(pSphereProgram);
-
-    pFieldTexture->bind();
-
-//    modelMatrix.setToIdentity();
-//    modelMatrix.translate(0.0f, 0.0f, 0.0f);
-//    modelMatrix.scale(xField, 0.1f, zField);
-
-    pPlayField->draw(pSphereProgram);
-
-/*
-    pAvatarProgram->bind();
-    pAvatar0Texture->bind();
-    modelMatrix.setToIdentity();
-    //modelMatrix.translate(xField, 1.0, z0Start);
-    modelMatrix.translate(0.0, 0.0, -5.0);
-    modelMatrix.rotate(rotation);
-
-    pAvatarProgram->setUniformValue("mvp_matrix", projectionMatrix * viewMatrix * modelMatrix);
-    pAvatarProgram->setUniformValue("texture", 0);
-    pTeam0->draw(pAvatarProgram);
-*/
-
-
-/*
-    modelMatrix.setToIdentity();
-    modelMatrix.translate(xField, 1.0, z1Start);
-    //modelMatrix.rotate(rotation);
-
-    pAvatarProgram->setUniformValue("mvp_matrix", projectionMatrix * viewMatrix * modelMatrix);
-    pAvatar1Texture->bind();
-    pAvatarProgram->setUniformValue("texture", 0);
-    pTeam1->drawAvatar(pAvatarProgram);
-*/
+    pTeam1Texture->bind();
+    pTeam1->draw(pGameProgram);
 
 /*
     pEnvironment->bind();
@@ -477,17 +412,7 @@ RaceWindow::wheelEvent(QWheelEvent* pEvent) {
 
 void
 RaceWindow::timerEvent(QTimerEvent *) {
-    // Decrease angular speed (friction)
-    angularSpeed *= 0.99;
-
-    // Stop rotation when speed goes below threshold
-    if (angularSpeed < 0.01) {
-        angularSpeed = 0.0;
-    }
-    else {// Update rotation
-        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
-        // Request an update
-        update();
-    }
+    dx = 0.012;
+    update();
 }
 

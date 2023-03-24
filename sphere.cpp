@@ -3,8 +3,6 @@
 
 Sphere::Sphere(float radius, int slices, int stacks)
     : m_vbo(nullptr)
-    , m_color(0.0f, 0.0f, 1.0f, 1.0f)
-    , m_spec_color(1.0f, 1.0f, 1.0f, 1.0f)
     , m_radius(radius)
     , m_slices(slices)
     , m_stacks(stacks)
@@ -200,9 +198,6 @@ Sphere::draw(QOpenGLShaderProgram* pProgram) {
     }
     m_vao->bind();
 
-    QVector4D clr =  m_color;
-    pProgram->setUniformValue("vColor", clr);
-    pProgram->setUniformValue("vSColor", m_spec_color);
     for(int i=0; i<m_stacks-2; i++) {
         glDrawArrays(GL_TRIANGLE_STRIP, i*m_stripsize, m_stripsize);
     }

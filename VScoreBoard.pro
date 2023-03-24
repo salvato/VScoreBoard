@@ -39,7 +39,6 @@ SOURCES += \
     setselectiondialog.cpp \
     slidewidget.cpp \
     sphere.cpp \
-    teamavatar.cpp \
     timeoutwindow.cpp \
     utility.cpp \
     volleyapplication.cpp \
@@ -60,7 +59,6 @@ HEADERS += \
     setselectiondialog.h \
     slidewidget.h \
     sphere.h \
-    teamavatar.h \
     timeoutwindow.h \
     utility.h \
     volleyapplication.h \

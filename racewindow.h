@@ -31,7 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QBasicTimer>
 
 
-QT_FORWARD_DECLARE_CLASS(TeamAvatar)
 QT_FORWARD_DECLARE_CLASS(PlayField)
 QT_FORWARD_DECLARE_CLASS(Sphere)
 
@@ -73,28 +72,25 @@ private:
 
     QBasicTimer timer;
 
-    QOpenGLTexture* pEnvironment = nullptr;
-    QOpenGLTexture* pAvatar0Texture = nullptr;
-    QOpenGLTexture* pAvatar1Texture = nullptr;
-    QOpenGLTexture* pFieldTexture   = nullptr;
-    QOpenGLTexture* pSphereTexture  = nullptr;
+    QOpenGLTexture* pEnvironment   = nullptr;
+    QOpenGLTexture* pTeam0Texture  = nullptr;
+    QOpenGLTexture* pTeam1Texture  = nullptr;
+    QOpenGLTexture* pFieldTexture  = nullptr;
 
     QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
-    QOpenGLShaderProgram* pAvatarProgram = nullptr;
-    QOpenGLShaderProgram* pFieldProgram = nullptr;
-    QOpenGLShaderProgram* pSphereProgram = nullptr;
+    QOpenGLShaderProgram* pGameProgram = nullptr;
 
     QMatrix4x4 modelMatrix;
     QMatrix4x4 cameraMatrix;
     QMatrix4x4 viewMatrix;
     QMatrix4x4 translateMatrix;
+    QMatrix4x4 modelViewMatrix;
 
     QVector4D lightPosition;
 
-    TeamAvatar* pTeam0;
-    TeamAvatar* pTeam1;
-    PlayField*  pPlayField;
-    Sphere*     pSphere;
+    Sphere*    pTeam0;
+    Sphere*    pTeam1;
+    PlayField* pPlayField;
 
     QVector2D mousePressPosition;
     QVector3D rotationAxis;
@@ -102,11 +98,16 @@ private:
     QQuaternion rotation;
     float xCamera =  0.0;
     float yCamera = 15.0;
-    float zCamera =-20.0;
-    float z0Start =  1.0;
-    float z1Start = -1.0;
+    float zCamera = 20.0;
+    float z0Start =  2.0;
+    float z1Start = -2.0;
     float xField  =  9.0;
     float zField  =  4.5;
     int nVertices;
+    float ballRadius;
+    QVector4D diffuseColor;
+    QVector4D specularColor;
+    double dx;
+    double x0;
 };
 

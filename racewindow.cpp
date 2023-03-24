@@ -94,6 +94,8 @@ RaceWindow::RaceWindow()
     scanTime = 10.0; // Tempo in secondi per l'intera "Corsa"
     x0  = x1  =-xField;
     dx0 = dx1 = 0;
+    connect(&closeTimer, SIGNAL(timeout()),
+            this, SLOT(onTimeToClose()));
 }
 
 
@@ -271,7 +273,7 @@ RaceWindow::startRace(int iSet) {
     }
     x0  = x1  =-xField;
     t0 = 0.0;
-    qCritical() << score[iSet].at(indexScore+1);
+//    qCritical() << score[iSet].at(indexScore+1);
     // Use QBasicTimer because its faster than QTimer
     timer.start(refreshTime, this);
 }
@@ -303,13 +305,11 @@ RaceWindow::paintGL() {
     x0 += dx0;
     if(x0 > xField) {
         timer.stop();
-        emit raceDone();
-        return;
+        closeTimer.start(3000);
     }
     if(x0 < -xField) {
         timer.stop();
-        emit raceDone();
-        return;
+        closeTimer.start(3000);
     }
     rotation0 = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0,-1.0), angle) * rotation0;
     modelMatrix.setToIdentity();
@@ -326,13 +326,11 @@ RaceWindow::paintGL() {
     x1 += dx1;
     if(x1 > xField) {
         timer.stop();
-        emit raceDone();
-        return;
+        closeTimer.start(3000);
     }
     if(x1 <-xField) {
         timer.stop();
-        emit raceDone();
-        return;
+        closeTimer.start(3000);
     }
     rotation1 = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0,-1.0), angle) * rotation1;
     modelMatrix.setToIdentity();
@@ -482,42 +480,6 @@ RaceWindow::initEnvironment() {
 
 
 void
-RaceWindow::mousePressEvent(QMouseEvent* pEvent) {
-    // Save mouse press position
-    mousePressPosition = QVector2D(pEvent->position());
-}
-
-void
-RaceWindow::mouseReleaseEvent(QMouseEvent* pEvent) {
-    // Mouse release position - mouse press position
-    QVector2D diff = QVector2D(pEvent->position()) - mousePressPosition;
-    // Rotation axis perpendicular to the mouse position difference vector
-    QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
-    // Accelerate angular speed relative to the length of the mouse sweep
-    qreal acc = diff.length() / 100.0;
-    // Calculate new rotation axis as weighted sum
-    rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
-    // Increase angular speed
-    angularSpeed += acc;
-}
-
-
-void
-RaceWindow::wheelEvent(QWheelEvent* pEvent) {
-    QOpenGLWidget::wheelEvent(pEvent);
-    if(!pEvent->isAccepted()) {
-        zCamera += pEvent->angleDelta().y()/(8.0*360.0);
-//        if(zCamera < -8 * 120)
-//            zCamera = -8 * 120;
-//        if(zCamera > 10 * 120)
-//            zCamera = 10 * 120;
-        update();
-        pEvent->accept();
-    }
-}
-
-
-void
 RaceWindow::timerEvent(QTimerEvent*) {
     t0 += refreshTime;
     if(t0 > pointTime) {
@@ -525,7 +487,8 @@ RaceWindow::timerEvent(QTimerEvent*) {
         indexScore++;
         if(indexScore >= score[iCurrentSet].count()-1) {
             timer.stop();
-            emit raceDone();
+            closeTimer.start(3000);
+            update();
             return;
         }
         if(score[iCurrentSet].at(indexScore+1).x() > score[iCurrentSet].at(indexScore).x()) {
@@ -536,8 +499,13 @@ RaceWindow::timerEvent(QTimerEvent*) {
             dx0 = 0.0;
             dx1 = dx;
         }
-        qCritical() << score[iCurrentSet].at(indexScore+1);
     }
     update();
 }
 
+
+void
+RaceWindow::onTimeToClose() {
+    closeTimer.stop();
+    emit raceDone();
+}

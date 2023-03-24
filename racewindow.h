@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QVector2D>
 #include <QVector3D>
 #include <QBasicTimer>
+#include <QTimer>
 #include <QTime>
 
 
@@ -53,15 +54,12 @@ public:
 
 public slots:
     void closeEvent(QCloseEvent*) override;
+    void onTimeToClose();
 
 signals:
     void raceDone();
 
 protected:
-    void mousePressEvent(QMouseEvent* pEvent) override;
-    void mouseReleaseEvent(QMouseEvent* pEvent) override;
-    void wheelEvent(QWheelEvent* pEvent) override;
-
     void timerEvent(QTimerEvent *e) override;
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -82,6 +80,7 @@ private:
     QOpenGLBuffer fieldBuf;
 
     QBasicTimer timer;
+    QTimer closeTimer;
 
     QOpenGLTexture* pEnvironment   = nullptr;
     QOpenGLTexture* pTeam0Texture  = nullptr;

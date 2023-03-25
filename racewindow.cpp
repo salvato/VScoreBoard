@@ -247,6 +247,12 @@ RaceWindow::initTextures() {
     pFieldTexture->setMinificationFilter(QOpenGLTexture::Nearest);
     pFieldTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     pFieldTexture->setWrapMode(QOpenGLTexture::Repeat);
+
+    // Texture for shadows...
+    pDepthMap = new QOpenGLFramebufferObject(SHADOW_WIDTH, SHADOW_HEIGHT, QOpenGLTexture::Target2D);
+    pDepthMap->setAttachment(QOpenGLFramebufferObject::Depth);
+
+    depthMapFBO.create();
 }
 
 
@@ -283,6 +289,34 @@ void
 RaceWindow::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    depthMapFBO.bind();
+//    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+//    glDrawBuffer(GL_NONE);
+//    glReadBuffer(GL_NONE);
+//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    pDepthMap->bind();
+/*
+    // 1. first render to depth map
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    ConfigureShaderAndMatrices();
+    RenderScene();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // 2. then render scene as normal with shadow mapping (using depth map)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ConfigureShaderAndMatrices();
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    RenderScene();
+*/
+    depthMapFBO.release();
+    pDepthMap->release();
+
+    glViewport(0, 0, width(), height());
     pGameProgram->bind();
     pGameProgram->setUniformValue("camera",   cameraMatrix);
     pGameProgram->setUniformValue("view",     viewMatrix);

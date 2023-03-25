@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QOpenGLTexture>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
+#include <QOpenGLFramebufferObject>
 #include <QCloseEvent>
 #include <QMatrix4x4>
 #include <QQuaternion>
@@ -36,6 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QT_FORWARD_DECLARE_CLASS(PlayField)
 QT_FORWARD_DECLARE_CLASS(Sphere)
 
+// QOpenGLFunctions class provides cross-platform
+// access to the OpenGL ES 2.0 API.
 
 class RaceWindow : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -87,6 +90,10 @@ private:
     QOpenGLTexture* pTeam1Texture  = nullptr;
     QOpenGLTexture* pFieldTexture  = nullptr;
 
+    QOpenGLFramebufferObject* pDepthMap = nullptr;
+
+    QOpenGLBuffer depthMapFBO;
+
     QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
     QOpenGLShaderProgram* pGameProgram = nullptr;
 
@@ -104,9 +111,7 @@ private:
     Sphere*    pTeam1;
     PlayField* pPlayField;
 
-    QVector2D mousePressPosition;
     QVector3D rotationAxis;
-    qreal angularSpeed = 0;
     QQuaternion rotation1;
     QQuaternion rotation0;
     float xCamera =  0.0;
@@ -133,5 +138,7 @@ private:
     double t0;
     int refreshTime;
     int iCurrentSet;
+    const unsigned int SHADOW_WIDTH  = 1024;
+    const unsigned int SHADOW_HEIGHT = 1024;
 };
 

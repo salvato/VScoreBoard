@@ -67,6 +67,8 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
+    void renderScene();
+    void ConfigureModelsMatrices();
 
     void initEnvironment();
     void initPlayField();
@@ -96,12 +98,18 @@ private:
 
     QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
     QOpenGLShaderProgram* pGameProgram = nullptr;
+    QOpenGLShaderProgram* pDepthProgram = nullptr;
 
-    QMatrix4x4 modelMatrix;
+    QMatrix4x4 fieldModelMatrix;
+    QMatrix4x4 team0ModelMatrix;
+    QMatrix4x4 team1ModelMatrix;
     QMatrix4x4 cameraMatrix;
     QMatrix4x4 viewMatrix;
     QMatrix4x4 translateMatrix;
     QMatrix4x4 modelViewMatrix;
+    QMatrix4x4 lightProjectionMatrix;
+    QMatrix4x4 lightViewMatrix;
+    QMatrix4x4 lightSpaceMatrix;
 
     QVector4D lightPosition;
     QVector4D diffuseColor;

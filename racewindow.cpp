@@ -81,7 +81,7 @@ RaceWindow::RaceWindow()
 
     diffuseColor  = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
     specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
-    lightPosition = QVector4D(0.0, 20.0, 4.0, 1.0);
+    lightPosition = QVector4D(-5.0, 10.0, 3.0, 1.0);
 
     xCamera =  0.0f;
     yCamera = 10.0f;
@@ -89,6 +89,10 @@ RaceWindow::RaceWindow()
     cameraMatrix.lookAt(QVector3D(xCamera, yCamera, zCamera), // Eye
                         QVector3D(0.0f,    0.0f,    0.0f),    // Center
                         QVector3D(0.0f,    1.0f,    0.0f));   // Up
+
+    lightViewMatrix.lookAt(lightPosition.toVector3D(),
+                           QVector3D( 0.0f, 0.0f,  0.0f),
+                           QVector3D( 0.0f, 1.0f,  0.0f));
 
     resetAll();
     scanTime = 10.0; // Tempo in secondi per l'intera "Corsa"
@@ -159,9 +163,6 @@ RaceWindow::resizeGL(int w, int h) {
 //    qCritical() << "fov" << fov;
     viewMatrix.perspective(fov, aspect, zNear, zFar);
     lightProjectionMatrix.ortho(-10.0f, 10.0f, -10.0f, 10.0f, zNear, zFar);
-    lightViewMatrix.lookAt(lightPosition.toVector3D(),
-                           QVector3D( 0.0f, 0.0f,  0.0f),
-                           QVector3D( 0.0f, 1.0f,  0.0f));
     lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
 }
 
@@ -234,6 +235,7 @@ RaceWindow::initShaders() {
         delete pGameProgram;
         exit(EXIT_FAILURE);
     }
+
     pDepthProgram = new QOpenGLShaderProgram();
     if(!pDepthProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/vDepth.glsl")) {
         qWarning("Failed to compile vertex shader program");
@@ -277,10 +279,12 @@ RaceWindow::initTextures() {
     pFieldTexture->setWrapMode(QOpenGLTexture::Repeat);
 
     // Texture for shadows...
+    // Create a framebuffer object for rendering the depth map
+    // The QOpenGLFramebufferObject class encapsulates an OpenGL framebuffer object.
+    // It provides a rendering surface that can be rendered to using native OpenGL calls.
+    // This surface can be bound and used as a regular texture in your own OpenGL drawing code.
     pDepthMap = new QOpenGLFramebufferObject(SHADOW_WIDTH, SHADOW_HEIGHT, QOpenGLTexture::Target2D);
     pDepthMap->setAttachment(QOpenGLFramebufferObject::Depth);
-
-    depthMapFBO.create();
 }
 
 
@@ -314,49 +318,48 @@ RaceWindow::startRace(int iSet) {
 
 
 void
-RaceWindow::ConfigureModelsMatrices() {
-    fieldModelMatrix.setToIdentity();
-    fieldModelMatrix.scale(xField, 0.1f, zField);
-    fieldModelMatrix.translate(0.0f, -1.0f, 0.0f);
-
-    float angle = qRadiansToDegrees(dx0/ballRadius);
+RaceWindow::ConfigureModelMatrices() {
     x0 += dx0;
-    if(std::abs(x0) > xField) {
+    x1 += dx1;
+    if((std::abs(x0) > xField) || (std::abs(x1) > xField)) {
         timer.stop();
         closeTimer.start(3000);
     }
+    float angle = qRadiansToDegrees(dx0/ballRadius);
     rotation0 = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0,-1.0), angle) * rotation0;
     team0ModelMatrix.setToIdentity();
     team0ModelMatrix.translate(x0, ballRadius, z0Start);
     team0ModelMatrix.rotate(rotation0);
 
     angle = qRadiansToDegrees(dx1/ballRadius);
-    x1 += dx1;
-    if(std::abs(x1) > xField) {
-        timer.stop();
-        closeTimer.start(3000);
-    }
     rotation1 = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0,-1.0), angle) * rotation1;
     team1ModelMatrix.setToIdentity();
     team1ModelMatrix.translate(x1, ballRadius, z1Start);
     team1ModelMatrix.rotate(rotation1);
+
+    fieldModelMatrix.setToIdentity();
+    fieldModelMatrix.scale(xField, 0.1f, zField);
+    fieldModelMatrix.translate(0.0f, -1.0f, 0.0f);
 }
 
-
+bool first = true;
 void
 RaceWindow::paintGL() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    depthMapFBO.bind();
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     pDepthMap->bind();
     glClear(GL_DEPTH_BUFFER_BIT);
     pDepthProgram->bind();
     pDepthProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
-    ConfigureModelsMatrices();
-    renderScene();
+    ConfigureModelMatrices();
+    renderScene(pDepthProgram);
 
-    depthMapFBO.release();
+    if(first) {
+        first = false;
+        QImage fboImage(pDepthMap->toImage());
+        QImage image(fboImage.constBits(), fboImage.width(), fboImage.height(), QImage::Format_ARGB32);
+        image.save("./depth.png", "PNG");
+    }
+
     pDepthMap->release();
     glViewport(0, 0, width(), height());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -364,14 +367,15 @@ RaceWindow::paintGL() {
     pGameProgram->bind();
     pGameProgram->setUniformValue("camera",   cameraMatrix);
     pGameProgram->setUniformValue("view",     viewMatrix);
+
     pGameProgram->setUniformValue("Tex0",     0);
     pGameProgram->setUniformValue("lightPos", lightPosition);
     pGameProgram->setUniformValue("vColor",   diffuseColor);
     pGameProgram->setUniformValue("vSColor",  specularColor);
 
-    ConfigureModelsMatrices();
+    ConfigureModelMatrices();
     glBindTexture(GL_TEXTURE_2D, pDepthMap->texture());
-    renderScene();
+    renderScene(pGameProgram);
 
 /*
     pEnvironment->bind();
@@ -390,27 +394,27 @@ RaceWindow::paintGL() {
 
 
 void
-RaceWindow::renderScene() {
+RaceWindow::renderScene(QOpenGLShaderProgram *pProgram) {
     modelViewMatrix = cameraMatrix * fieldModelMatrix;
-    pGameProgram->setUniformValue("model",        fieldModelMatrix);
-    pGameProgram->setUniformValue("modelView",    modelViewMatrix);
-    pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
+    pProgram->setUniformValue("model",        fieldModelMatrix);
+    pProgram->setUniformValue("modelView",    modelViewMatrix);
+    pProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
     pFieldTexture->bind();
-    pPlayField->draw(pGameProgram);
+    pPlayField->draw(pProgram);
 
     modelViewMatrix = cameraMatrix * team0ModelMatrix;
-    pGameProgram->setUniformValue("model",        team0ModelMatrix);
-    pGameProgram->setUniformValue("modelView",    modelViewMatrix);
-    pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
+    pProgram->setUniformValue("model",        team0ModelMatrix);
+    pProgram->setUniformValue("modelView",    modelViewMatrix);
+    pProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
     pTeam0Texture->bind();
-    pTeam0->draw(pGameProgram);
+    pTeam0->draw(pProgram);
 
     modelViewMatrix = cameraMatrix * team1ModelMatrix;
-    pGameProgram->setUniformValue("model",        team1ModelMatrix);
-    pGameProgram->setUniformValue("modelView",    modelViewMatrix);
-    pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
+    pProgram->setUniformValue("model",        team1ModelMatrix);
+    pProgram->setUniformValue("modelView",    modelViewMatrix);
+    pProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
     pTeam1Texture->bind();
-    pTeam1->draw(pGameProgram);
+    pTeam1->draw(pProgram);
 }
 
 

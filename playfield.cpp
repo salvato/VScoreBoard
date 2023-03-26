@@ -202,21 +202,31 @@ PlayField::init() { // A simple cube at present !
 
 
 void
-PlayField::setupVAO(QOpenGLShaderProgram *prog) {
+PlayField::setupVAO(QOpenGLShaderProgram* pProgram) {
     pVao = new QOpenGLVertexArrayObject();
-    if(!pVao->create()) exit(EXIT_FAILURE);
+    if(!pVao->create()) {
+        qCritical() << __FUNCTION__ << "unable to create VAO ! exiting...";
+        exit(EXIT_FAILURE);
+    }
     pVao->bind();
     pVbo->bind();
-    prog->enableAttributeArray("vPosition");
-    prog->setAttributeBuffer("vPosition", GL_FLOAT, 0, 3, 0);
-    prog->enableAttributeArray("vTexture");
-    prog->setAttributeBuffer("vTexture", GL_FLOAT, nverts * sizeof(QVector3D), 2, 0);
-    prog->enableAttributeArray("vNormal");
-    prog->setAttributeBuffer("vNormal", GL_FLOAT,
-                             nverts * (sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
-    prog->enableAttributeArray("vTangent");
-    prog->setAttributeBuffer("vTangent", GL_FLOAT,
-                             nverts * (2 * sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
+    if(pProgram->attributeLocation("vPosition") == -1) {
+        qCritical() << "vPosition attribute not found! exiting...";
+        exit(EXIT_FAILURE);
+    }
+    pProgram->enableAttributeArray("vPosition");
+    pProgram->setAttributeBuffer("vPosition", GL_FLOAT, 0, 3, 0);
+
+    if(pProgram->attributeLocation("vTexture") != -1) {
+        pProgram->enableAttributeArray("vTexture");
+        pProgram->setAttributeBuffer("vTexture", GL_FLOAT, nverts * sizeof(QVector3D), 2, 0);
+        pProgram->enableAttributeArray("vNormal");
+        pProgram->setAttributeBuffer("vNormal", GL_FLOAT,
+                                     nverts * (sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
+        pProgram->enableAttributeArray("vTangent");
+        pProgram->setAttributeBuffer("vTangent", GL_FLOAT,
+                                     nverts * (2 * sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
+    }
     pVao->release();
     pVbo->release();
 }
@@ -225,10 +235,10 @@ PlayField::setupVAO(QOpenGLShaderProgram *prog) {
 
 void
 PlayField::draw(QOpenGLShaderProgram* pProgram) {
-    if (m_firstDraw) {
+//    if (m_firstDraw) {
         setupVAO(pProgram);
         m_firstDraw = false;
-    }
+//    }
     pVao->bind();
     indexBuf.bind();
     QVector4D clr =  m_color;

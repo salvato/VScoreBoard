@@ -68,7 +68,8 @@ protected:
     void resizeGL(int w, int h) override;
     void paintGL() override;
     void renderScene();
-    void ConfigureModelsMatrices();
+    void renderDepth();
+    void ConfigureModelMatrices();
 
     void initEnvironment();
     void initPlayField();
@@ -94,8 +95,6 @@ private:
 
     QOpenGLFramebufferObject* pDepthMap = nullptr;
 
-    QOpenGLBuffer depthMapFBO;
-
     QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
     QOpenGLShaderProgram* pGameProgram = nullptr;
     QOpenGLShaderProgram* pDepthProgram = nullptr;
@@ -103,8 +102,8 @@ private:
     QMatrix4x4 fieldModelMatrix;
     QMatrix4x4 team0ModelMatrix;
     QMatrix4x4 team1ModelMatrix;
-    QMatrix4x4 cameraMatrix;
-    QMatrix4x4 viewMatrix;
+    QMatrix4x4 cameraViewMatrix;
+    QMatrix4x4 cameraProjectionMatrix;
     QMatrix4x4 translateMatrix;
     QMatrix4x4 modelViewMatrix;
     QMatrix4x4 lightProjectionMatrix;
@@ -114,6 +113,7 @@ private:
     QVector4D lightPosition;
     QVector4D diffuseColor;
     QVector4D specularColor;
+    QVector4D cameraPosition;
 
     Sphere*    pTeam0;
     Sphere*    pTeam1;

@@ -171,17 +171,23 @@ void
 Sphere::setupVAO(QOpenGLShaderProgram* pProgram) {
     m_vao->bind();
     m_vbo->bind();
+    if(pProgram->attributeLocation("vPosition") == -1) {
+        qCritical() << "vPosition attribute not found! exiting...";
+        exit(EXIT_FAILURE);
+    }
     pProgram->enableAttributeArray("vPosition");
     pProgram->setAttributeBuffer("vPosition", GL_FLOAT, 0, 3, 0);
-    pProgram->enableAttributeArray("vTexture");
-    int nverts = (m_stacks - 2) * m_stripsize + 2 * (m_slices + 2);
-    pProgram->setAttributeBuffer("vTexture", GL_FLOAT, nverts * sizeof(QVector3D), 2, 0);
-    pProgram->enableAttributeArray("vNormal");
-    pProgram->setAttributeBuffer("vNormal", GL_FLOAT,
-                             nverts * (sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
-    pProgram->enableAttributeArray("vTangent");
-    pProgram->setAttributeBuffer("vTangent", GL_FLOAT,
-                             nverts * (2 * sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
+    if(pProgram->attributeLocation("vTexture") != -1) {
+        pProgram->enableAttributeArray("vTexture");
+        int nverts = (m_stacks - 2) * m_stripsize + 2 * (m_slices + 2);
+        pProgram->setAttributeBuffer("vTexture", GL_FLOAT, nverts * sizeof(QVector3D), 2, 0);
+        pProgram->enableAttributeArray("vNormal");
+        pProgram->setAttributeBuffer("vNormal", GL_FLOAT,
+                                 nverts * (sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
+        pProgram->enableAttributeArray("vTangent");
+        pProgram->setAttributeBuffer("vTangent", GL_FLOAT,
+                                 nverts * (2 * sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
+    }
     m_vao->release();
     m_vbo->release();
 }
@@ -189,13 +195,13 @@ Sphere::setupVAO(QOpenGLShaderProgram* pProgram) {
 
 void
 Sphere::draw(QOpenGLShaderProgram* pProgram) {
-    if (!pProgram) {
-        return;
-    }
-    if (m_firstDraw) {
+//    if (!pProgram) {
+//        return;
+//    }
+//    if (m_firstDraw) {
         setupVAO(pProgram);
-        m_firstDraw = false;
-    }
+//        m_firstDraw = false;
+//    }
     m_vao->bind();
 
     for(int i=0; i<m_stacks-2; i++) {

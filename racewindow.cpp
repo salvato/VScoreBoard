@@ -81,14 +81,16 @@ RaceWindow::RaceWindow()
 
     diffuseColor  = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
     specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
-    lightPosition = QVector4D(0.0, 20.0, 4.0, 1.0);
 
-    xCamera =  0.0f;
-    yCamera = 10.0f;
-    zCamera = 10.0f;
-    cameraMatrix.lookAt(QVector3D(xCamera, yCamera, zCamera), // Eye
-                        QVector3D(0.0f,    0.0f,    0.0f),    // Center
-                        QVector3D(0.0f,    1.0f,    0.0f));   // Up
+    cameraPosition = QVector4D(0.0f, 10.0f, 10.0f, 1.0f);
+    cameraViewMatrix.lookAt(cameraPosition.toVector3D(),        // Eye
+                            QVector3D(0.0f,    0.0f,    0.0f),  // Center
+                            QVector3D(0.0f,    1.0f,    0.0f)); // Up
+
+    lightPosition = QVector4D(0.0, 20.0, 4.0, 1.0);
+    lightViewMatrix.lookAt(lightPosition.toVector3D(),     // Eye
+                           QVector3D( 0.0f, 0.0f,  0.0f),  // Center
+                           QVector3D( 0.0f, 1.0f,  0.0f)); // Up
 
     resetAll();
     scanTime = 10.0; // Tempo in secondi per l'intera "Corsa"
@@ -151,17 +153,16 @@ RaceWindow::resetAll() {
 
 void
 RaceWindow::resizeGL(int w, int h) {
-    viewMatrix.setToIdentity();
+    cameraProjectionMatrix.setToIdentity();
     // Calculate aspect ratio
     qreal aspect = qreal(w) / qreal(h ? h : 1);
     const qreal zNear = 0.01f, zFar = 18.0f;
     const qreal fov = 50.0;//abs(qRadiansToDegrees(atan2((xCamera-xField), (zCamera-zField))));
-//    qCritical() << "fov" << fov;
-    viewMatrix.perspective(fov, aspect, zNear, zFar);
-    lightProjectionMatrix.ortho(-10.0f, 10.0f, -10.0f, 10.0f, zNear, zFar);
-    lightViewMatrix.lookAt(lightPosition.toVector3D(),
-                           QVector3D( 0.0f, 0.0f,  0.0f),
-                           QVector3D( 0.0f, 1.0f,  0.0f));
+    cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
+
+    float extension = std::max(xField, zField)*1.25;
+    lightProjectionMatrix.setToIdentity();
+    lightProjectionMatrix.ortho(-extension, extension, -extension, extension, 0.0f, lightPosition.y()*1.25);
     lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
 }
 
@@ -176,12 +177,12 @@ RaceWindow::initializeGL() {
     pTeam1     = new Sphere(ballRadius, 40, 40);
     pPlayField = new PlayField();
 
-
     initEnvironment();
     initShaders();
     initTextures();
 
     glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -277,10 +278,10 @@ RaceWindow::initTextures() {
     pFieldTexture->setWrapMode(QOpenGLTexture::Repeat);
 
     // Texture for shadows...
-    pDepthMap = new QOpenGLFramebufferObject(SHADOW_WIDTH, SHADOW_HEIGHT, QOpenGLTexture::Target2D);
-    pDepthMap->setAttachment(QOpenGLFramebufferObject::Depth);
-
-    depthMapFBO.create();
+    pDepthMap = new QOpenGLFramebufferObject(SHADOW_WIDTH, SHADOW_HEIGHT,
+                                             QOpenGLFramebufferObject::Attachment::Depth,
+                                             GL_TEXTURE_2D,
+                                             GL_RGBA32F);
 }
 
 
@@ -312,9 +313,70 @@ RaceWindow::startRace(int iSet) {
     timer.start(refreshTime, this);
 }
 
+bool first = true;
+void
+RaceWindow::paintGL() {
+/**/
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+//    pDepthMap->bind();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    pDepthProgram->bind();
+    pDepthProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
+    ConfigureModelMatrices();
+    renderDepth();
+/*
+    if(first) {
+        first = false;
+        QImage fboImage(pDepthMap->toImage());
+        QImage image(fboImage.constBits(), fboImage.width(), fboImage.height(), QImage::Format_ARGB32);
+        float min, max;
+        const float* p = reinterpret_cast<const float*>(image.constBits());
+        min = max = p[0];
+        for(int i=0; i<image.width(); i++) {
+            for(int j=0; j<image.height(); j++) {
+                min = std::min(p[i*image.width()+j], min);
+                max = std::max(p[i*image.width()+j], max);
+            }
+        }
+        qCritical() << "min=" << min << "max=" << max;
+//        image.save("./depth.png", "PNG");
+    }
+    pDepthProgram->release();
+    pDepthMap->release();
+    glViewport(0, 0, width(), height());
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    pGameProgram->bind();
+    pGameProgram->setUniformValue("camera",   cameraViewMatrix);
+    pGameProgram->setUniformValue("view",     cameraProjectionMatrix);
+    pGameProgram->setUniformValue("Tex0",     0);
+    pGameProgram->setUniformValue("lightPos", lightPosition);
+    pGameProgram->setUniformValue("vColor",   diffuseColor);
+    pGameProgram->setUniformValue("vSColor",  specularColor);
+
+    ConfigureModelMatrices();
+    glBindTexture(GL_TEXTURE_2D, pDepthMap->texture());
+    renderScene();
+*/
+/*
+    pEnvironment->bind();
+    pEnvironmentProgram->bind();
+    pEnvironmentProgram->setUniformValue("mvp_matrix", projection * matrix);
+    pEnvironmentProgram->setUniformValue("tex", GLint(0));
+    pEnvironmentProgram->setUniformValue("env", GLint(1));
+    pEnvironmentProgram->setUniformValue("noise", GLint(2));
+    // m_box->draw();
+    pEnvironmentProgram->release();
+    pEnvironment->release();
+*/
+
+//    glDisable(GL_DEPTH_TEST);
+}
+
 
 void
-RaceWindow::ConfigureModelsMatrices() {
+RaceWindow::ConfigureModelMatrices() {
     fieldModelMatrix.setToIdentity();
     fieldModelMatrix.scale(xField, 0.1f, zField);
     fieldModelMatrix.translate(0.0f, -1.0f, 0.0f);
@@ -344,68 +406,42 @@ RaceWindow::ConfigureModelsMatrices() {
 
 
 void
-RaceWindow::paintGL() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+RaceWindow::renderDepth() {
+    pDepthProgram->setUniformValue("model",        fieldModelMatrix);
+    pFieldTexture->bind();
+    pPlayField->draw(pDepthProgram);
+    pFieldTexture->release();
 
-    depthMapFBO.bind();
-    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-    pDepthMap->bind();
-    glClear(GL_DEPTH_BUFFER_BIT);
-    pDepthProgram->bind();
-    pDepthProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
-    ConfigureModelsMatrices();
-    renderScene();
+    pDepthProgram->setUniformValue("model",        team0ModelMatrix);
+    pTeam0Texture->bind();
+    pTeam0->draw(pDepthProgram);
+    pTeam0Texture->release();
 
-    depthMapFBO.release();
-    pDepthMap->release();
-    glViewport(0, 0, width(), height());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    pGameProgram->bind();
-    pGameProgram->setUniformValue("camera",   cameraMatrix);
-    pGameProgram->setUniformValue("view",     viewMatrix);
-    pGameProgram->setUniformValue("Tex0",     0);
-    pGameProgram->setUniformValue("lightPos", lightPosition);
-    pGameProgram->setUniformValue("vColor",   diffuseColor);
-    pGameProgram->setUniformValue("vSColor",  specularColor);
-
-    ConfigureModelsMatrices();
-    glBindTexture(GL_TEXTURE_2D, pDepthMap->texture());
-    renderScene();
-
-/*
-    pEnvironment->bind();
-    pEnvironmentProgram->bind();
-    pEnvironmentProgram->setUniformValue("mvp_matrix", projection * matrix);
-    pEnvironmentProgram->setUniformValue("tex", GLint(0));
-    pEnvironmentProgram->setUniformValue("env", GLint(1));
-    pEnvironmentProgram->setUniformValue("noise", GLint(2));
-    // m_box->draw();
-    pEnvironmentProgram->release();
-    pEnvironment->release();
-*/
-
-//    glDisable(GL_DEPTH_TEST);
+    pDepthProgram->setUniformValue("model",        team1ModelMatrix);
+    pTeam1Texture->bind();
+    pTeam1->draw(pDepthProgram);
+    pTeam1Texture->release();
 }
+
 
 
 void
 RaceWindow::renderScene() {
-    modelViewMatrix = cameraMatrix * fieldModelMatrix;
+    modelViewMatrix = cameraViewMatrix * fieldModelMatrix;
     pGameProgram->setUniformValue("model",        fieldModelMatrix);
     pGameProgram->setUniformValue("modelView",    modelViewMatrix);
     pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
     pFieldTexture->bind();
     pPlayField->draw(pGameProgram);
 
-    modelViewMatrix = cameraMatrix * team0ModelMatrix;
+    modelViewMatrix = cameraViewMatrix * team0ModelMatrix;
     pGameProgram->setUniformValue("model",        team0ModelMatrix);
     pGameProgram->setUniformValue("modelView",    modelViewMatrix);
     pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());
     pTeam0Texture->bind();
     pTeam0->draw(pGameProgram);
 
-    modelViewMatrix = cameraMatrix * team1ModelMatrix;
+    modelViewMatrix = cameraViewMatrix * team1ModelMatrix;
     pGameProgram->setUniformValue("model",        team1ModelMatrix);
     pGameProgram->setUniformValue("modelView",    modelViewMatrix);
     pGameProgram->setUniformValue("normalMatrix", modelViewMatrix.normalMatrix());

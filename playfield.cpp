@@ -202,20 +202,20 @@ PlayField::init() { // A simple cube at present !
 
 
 void
-PlayField::setupVAO(QOpenGLShaderProgram* pProg) {
+PlayField::setupVAO(QOpenGLShaderProgram *prog) {
     pVao = new QOpenGLVertexArrayObject();
     if(!pVao->create()) exit(EXIT_FAILURE);
     pVao->bind();
     pVbo->bind();
-    pProg->enableAttributeArray("vPosition");
-    pProg->setAttributeBuffer("vPosition", GL_FLOAT, 0, 3, 0);
-    pProg->enableAttributeArray("vTexture");
-    pProg->setAttributeBuffer("vTexture", GL_FLOAT, nverts * sizeof(QVector3D), 2, 0);
-    pProg->enableAttributeArray("vNormal");
-    pProg->setAttributeBuffer("vNormal", GL_FLOAT,
+    prog->enableAttributeArray("vPosition");
+    prog->setAttributeBuffer("vPosition", GL_FLOAT, 0, 3, 0);
+    prog->enableAttributeArray("vTexture");
+    prog->setAttributeBuffer("vTexture", GL_FLOAT, nverts * sizeof(QVector3D), 2, 0);
+    prog->enableAttributeArray("vNormal");
+    prog->setAttributeBuffer("vNormal", GL_FLOAT,
                              nverts * (sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
-    pProg->enableAttributeArray("vTangent");
-    pProg->setAttributeBuffer("vTangent", GL_FLOAT,
+    prog->enableAttributeArray("vTangent");
+    prog->setAttributeBuffer("vTangent", GL_FLOAT,
                              nverts * (2 * sizeof(QVector3D) + sizeof(QVector2D)), 3, 0);
     pVao->release();
     pVbo->release();
@@ -225,10 +225,10 @@ PlayField::setupVAO(QOpenGLShaderProgram* pProg) {
 
 void
 PlayField::draw(QOpenGLShaderProgram* pProgram) {
-//    if (m_firstDraw) {
+    if (m_firstDraw) {
         setupVAO(pProgram);
         m_firstDraw = false;
-//    }
+    }
     pVao->bind();
     indexBuf.bind();
     QVector4D clr =  m_color;

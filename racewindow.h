@@ -67,8 +67,8 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
-    void renderScene(QOpenGLShaderProgram* pProgram);
-    void ConfigureModelMatrices();
+    void renderScene();
+    void ConfigureModelsMatrices();
 
     void initEnvironment();
     void initPlayField();
@@ -93,6 +93,8 @@ private:
     QOpenGLTexture* pFieldTexture  = nullptr;
 
     QOpenGLFramebufferObject* pDepthMap = nullptr;
+
+    QOpenGLBuffer depthMapFBO;
 
     QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
     QOpenGLShaderProgram* pGameProgram = nullptr;

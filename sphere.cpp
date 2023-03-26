@@ -189,10 +189,13 @@ Sphere::setupVAO(QOpenGLShaderProgram* pProgram) {
 
 void
 Sphere::draw(QOpenGLShaderProgram* pProgram) {
-//    if (m_firstDraw) {
+    if (!pProgram) {
+        return;
+    }
+    if (m_firstDraw) {
         setupVAO(pProgram);
         m_firstDraw = false;
-//    }
+    }
     m_vao->bind();
 
     for(int i=0; i<m_stacks-2; i++) {

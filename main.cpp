@@ -26,10 +26,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 int
 main(int argc, char *argv[]) {
-    qputenv("QT_LOGGING_RULES","*.debug=false;qt.qpa.*=false"); // supress anoying messages
-
+//    qputenv("QT_LOGGING_RULES","*.debug=false;qt.qpa.*=true");
+//    qputenv("QT_LOGGING_RULES","*.debug=false;qt.qpa.*=false"); // supress anoying messages
+//    qputenv("QSG_INFO", "1");
     QSurfaceFormat format;
-    format.setDepthBufferSize(16);
+    format.setVersion(3, 3);
+    format.setDepthBufferSize(32);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setOption(QSurfaceFormat::DeprecatedFunctions, false);
     QSurfaceFormat::setDefaultFormat(format);
 
     VolleyApplication a(argc, argv);

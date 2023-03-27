@@ -66,6 +66,7 @@ RaceWindow::RaceWindow()
     : QOpenGLWidget()
     , fieldBuf(QOpenGLBuffer::VertexBuffer)
 {
+
 // TODO: Remove
 //    QList<QScreen*> screens = QApplication::screens();
 //    QRect screenres = screens.at(0)->geometry();
@@ -87,13 +88,13 @@ RaceWindow::RaceWindow()
                             QVector3D(0.0f,    0.0f,    0.0f),  // Center
                             QVector3D(0.0f,    1.0f,    0.0f)); // Up
 
-    lightPosition = QVector4D(0.0, 20.0, 4.0, 1.0);
+    lightPosition = QVector4D(-2.0f, 4.0f, -1.0f, 1.0f);
     lightViewMatrix.lookAt(lightPosition.toVector3D(),     // Eye
                            QVector3D( 0.0f, 0.0f,  0.0f),  // Center
                            QVector3D( 0.0f, 1.0f,  0.0f)); // Up
 
     resetAll();
-    scanTime = 10.0; // Tempo in secondi per l'intera "Corsa"
+    scanTime = 3.0; // Tempo in secondi per l'intera "Corsa"
     x0  = x1  =-xField;
     dx0 = dx1 = 0;
     connect(&closeTimer, SIGNAL(timeout()),
@@ -160,9 +161,9 @@ RaceWindow::resizeGL(int w, int h) {
     const qreal fov = 50.0;//abs(qRadiansToDegrees(atan2((xCamera-xField), (zCamera-zField))));
     cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
 
-    float extension = std::max(xField, zField)*1.25;
+    float extension = std::max(xField, zField)*1.5;
     lightProjectionMatrix.setToIdentity();
-    lightProjectionMatrix.ortho(-extension, extension, -extension, extension, 0.0f, lightPosition.y()*1.25);
+    lightProjectionMatrix.ortho(-extension, extension, -extension, extension, -lightPosition.y()*2.5, lightPosition.y()*2.5);
     lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
 }
 
@@ -184,6 +185,7 @@ RaceWindow::initializeGL() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc (GL_LESS); // depth-testing interprets a smaller value as "closer"
 }
 
 
@@ -277,11 +279,11 @@ RaceWindow::initTextures() {
     pFieldTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     pFieldTexture->setWrapMode(QOpenGLTexture::Repeat);
 
-    // Texture for shadows...
+    // Framebuffer with texture for shadows...
     pDepthMap = new QOpenGLFramebufferObject(SHADOW_WIDTH, SHADOW_HEIGHT,
-                                             QOpenGLFramebufferObject::Attachment::Depth,
+                                             QOpenGLFramebufferObject::Depth,
                                              GL_TEXTURE_2D,
-                                             GL_RGBA32F);
+                                             GL_RGBA8);
 }
 
 
@@ -316,15 +318,14 @@ RaceWindow::startRace(int iSet) {
 bool first = true;
 void
 RaceWindow::paintGL() {
-/**/
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-//    pDepthMap->bind();
+    pDepthMap->bind();
     glClear(GL_DEPTH_BUFFER_BIT);
     pDepthProgram->bind();
     pDepthProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
     ConfigureModelMatrices();
     renderDepth();
-/*
+/**/
     if(first) {
         first = false;
         QImage fboImage(pDepthMap->toImage());
@@ -339,10 +340,11 @@ RaceWindow::paintGL() {
             }
         }
         qCritical() << "min=" << min << "max=" << max;
-//        image.save("./depth.png", "PNG");
+        image.save("C:/Users/gabriele/Documents/qtprojects/depth.png", "PNG");
     }
     pDepthProgram->release();
     pDepthMap->release();
+
     glViewport(0, 0, width(), height());
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -358,7 +360,6 @@ RaceWindow::paintGL() {
     ConfigureModelMatrices();
     glBindTexture(GL_TEXTURE_2D, pDepthMap->texture());
     renderScene();
-*/
 /*
     pEnvironment->bind();
     pEnvironmentProgram->bind();

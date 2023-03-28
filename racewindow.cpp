@@ -325,26 +325,25 @@ RaceWindow::paintGL() {
     pDepthProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
     ConfigureModelMatrices();
     renderDepth();
-/**/
+/*
     if(first) {
         first = false;
         QImage fboImage(pDepthMap->toImage());
         QImage image(fboImage.constBits(), fboImage.width(), fboImage.height(), QImage::Format_ARGB32);
         float min, max;
-        const float* p = reinterpret_cast<const float*>(image.constBits());
-        min = max = p[0];
-        for(int i=0; i<image.width(); i++) {
-            for(int j=0; j<image.height(); j++) {
-                min = std::min(p[i*image.width()+j], min);
-                max = std::max(p[i*image.width()+j], max);
-            }
+        const uchar* p = image.constBits();
+        min = max = float(p[0]);
+        for(int i=0; i<image.width()*image.height(); i+=4) {
+            float color = float(p[i]);
+            min = std::min(color, min);
+            max = std::max(color, max);
         }
         qCritical() << "min=" << min << "max=" << max;
         image.save("C:/Users/gabriele/Documents/qtprojects/depth.png", "PNG");
     }
+*/
     pDepthProgram->release();
     pDepthMap->release();
-
     glViewport(0, 0, width(), height());
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

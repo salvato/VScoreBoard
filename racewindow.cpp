@@ -94,7 +94,7 @@ RaceWindow::RaceWindow()
                            QVector3D( 0.0f, 1.0f,  0.0f)); // Up
 
     resetAll();
-    scanTime = 3.0; // Tempo in secondi per l'intera "Corsa"
+    scanTime = 30.0; // Tempo in secondi per l'intera "Corsa"
     x0  = x1  =-xField;
     dx0 = dx1 = 0;
     connect(&closeTimer, SIGNAL(timeout()),
@@ -284,6 +284,11 @@ RaceWindow::initTextures() {
                                              QOpenGLFramebufferObject::Depth,
                                              GL_TEXTURE_2D,
                                              GL_RGBA8);
+    glBindTexture(GL_TEXTURE_2D, pDepthMap->texture());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 }
 
 
@@ -320,10 +325,12 @@ void
 RaceWindow::paintGL() {
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     pDepthMap->bind();
+    glBindTexture(GL_TEXTURE_2D, pDepthMap->texture());
     glClear(GL_DEPTH_BUFFER_BIT);
     pDepthProgram->bind();
     pDepthProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
     ConfigureModelMatrices();
+    glCullFace(GL_FRONT); // To fix peter panning
     renderDepth();
 /*
     if(first) {
@@ -346,18 +353,25 @@ RaceWindow::paintGL() {
     pDepthMap->release();
     glViewport(0, 0, width(), height());
 
+    glCullFace(GL_BACK); // Reset original culling face
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     pGameProgram->bind();
+    glActiveTexture(GL_TEXTURE1);
+//    pDepthMap->bind();
+    glBindTexture(GL_TEXTURE_2D, pDepthMap->texture());
+
     pGameProgram->setUniformValue("camera",   cameraViewMatrix);
     pGameProgram->setUniformValue("view",     cameraProjectionMatrix);
-    pGameProgram->setUniformValue("Tex0",     0);
+    pGameProgram->setUniformValue("diffuseTexture",     0);
+    pGameProgram->setUniformValue("shadowMap",          1);
     pGameProgram->setUniformValue("lightPos", lightPosition);
     pGameProgram->setUniformValue("vColor",   diffuseColor);
     pGameProgram->setUniformValue("vSColor",  specularColor);
+    pGameProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
 
     ConfigureModelMatrices();
-    glBindTexture(GL_TEXTURE_2D, pDepthMap->texture());
     renderScene();
 /*
     pEnvironment->bind();
@@ -427,6 +441,7 @@ RaceWindow::renderDepth() {
 
 void
 RaceWindow::renderScene() {
+    glActiveTexture(GL_TEXTURE0);
     modelViewMatrix = cameraViewMatrix * fieldModelMatrix;
     pGameProgram->setUniformValue("model",        fieldModelMatrix);
     pGameProgram->setUniformValue("modelView",    modelViewMatrix);

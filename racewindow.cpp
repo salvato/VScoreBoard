@@ -92,12 +92,19 @@ RaceWindow::RaceWindow()
                             QVector3D(0.0f,    1.0f,    0.0f)); // Up
 
     lightPosition = QVector4D(-2.0f, 4.0f, -1.0f, 1.0f);
+
+    float extension = std::max(xField, zField)*1.5;
+    near_plane = -1.0f;
+    far_plane  = extension;
+    lightProjectionMatrix.setToIdentity();
+    lightProjectionMatrix.ortho(-extension, extension, -extension, extension, near_plane, far_plane);
     lightViewMatrix.lookAt(lightPosition.toVector3D(),     // Eye
                            QVector3D( 0.0f, 0.0f,  0.0f),  // Center
                            QVector3D( 0.0f, 1.0f,  0.0f)); // Up
+    lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
 
     resetAll();
-    scanTime = 10.0; // Tempo in secondi per l'intera "Corsa"
+    scanTime = 5.0; // Tempo in secondi per l'intera "Corsa"
     x0  = x1  =-xField;
     dx0 = dx1 = 0;
     connect(&closeTimer, SIGNAL(timeout()),
@@ -163,11 +170,6 @@ RaceWindow::resizeGL(int w, int h) {
     const qreal zNear = 0.01f, zFar = 18.0f;
     const qreal fov = 50.0;//abs(qRadiansToDegrees(atan2((xCamera-xField), (zCamera-zField))));
     cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
-
-    float extension = std::max(xField, zField)*1.5;
-    lightProjectionMatrix.setToIdentity();
-    lightProjectionMatrix.ortho(-extension, extension, -extension, extension, near_plane, far_plane);
-    lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
 }
 
 

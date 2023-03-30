@@ -225,8 +225,8 @@ RaceWindow::initShaders() {
     }
 */
     pGameProgram = new QOpenGLShaderProgram();
-    pGameProgram->addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/Shaders/vSphere.glsl");
-    pGameProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fSphere.glsl");
+    pGameProgram->addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/Shaders/vRace.glsl");
+    pGameProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fRace.glsl");
     pGameProgram->link();
 
     pComputeDepthProgram = new QOpenGLShaderProgram();
@@ -329,7 +329,7 @@ RaceWindow::paintGL() {
     glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 
     glViewport(0, 0, width(), height());
-    glCullFace(GL_BACK); // Reset original culling face
+    glCullFace(GL_BACK); // Reset right culling face
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     pGameProgram->bind();

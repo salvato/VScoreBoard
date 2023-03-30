@@ -30,8 +30,8 @@
         <file>Shaders/fSwap.glsl</file>
         <file>Shaders/fCrosswarp.glsl</file>
         <file>Shaders/fAvatar.glsl</file>
-        <file>Shaders/vSphere.glsl</file>
-        <file>Shaders/fSphere.glsl</file>
+        <file>Shaders/vRace.glsl</file>
+        <file>Shaders/fRace.glsl</file>
         <file>Shaders/vDepth.glsl</file>
         <file>Shaders/fDepth.glsl</file>
         <file>Shaders/fDebug_quad_depth.glsl</file>

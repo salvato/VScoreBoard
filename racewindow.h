@@ -19,11 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLTexture>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
-#include <QOpenGLFramebufferObject>
 #include <QCloseEvent>
 #include <QMatrix4x4>
 #include <QQuaternion>
@@ -40,7 +39,7 @@ QT_FORWARD_DECLARE_CLASS(Sphere)
 // QOpenGLFunctions class provides cross-platform
 // access to the OpenGL ES 2.0 API.
 
-class RaceWindow : public QOpenGLWidget, protected QOpenGLFunctions
+class RaceWindow : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
     Q_OBJECT
 
@@ -68,7 +67,8 @@ protected:
     void resizeGL(int w, int h) override;
     void paintGL() override;
     void renderScene();
-    void renderDepth();
+    void computeDepth();
+    void renderQuad();
     void ConfigureModelMatrices();
 
     void initEnvironment();
@@ -93,11 +93,10 @@ private:
     QOpenGLTexture* pTeam1Texture  = nullptr;
     QOpenGLTexture* pFieldTexture  = nullptr;
 
-    QOpenGLFramebufferObject* pDepthMap = nullptr;
-
     QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
     QOpenGLShaderProgram* pGameProgram = nullptr;
-    QOpenGLShaderProgram* pDepthProgram = nullptr;
+    QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
+    QOpenGLShaderProgram* pDebugDepthQuad;
 
     QMatrix4x4 fieldModelMatrix;
     QMatrix4x4 team0ModelMatrix;
@@ -148,5 +147,11 @@ private:
     int iCurrentSet;
     const unsigned int SHADOW_WIDTH  = 1024;
     const unsigned int SHADOW_HEIGHT = 1024;
+    unsigned int depthMapFBO;
+    unsigned int depthMap;
+    unsigned int quadVAO = 0;
+    unsigned int quadVBO;
+    float near_plane = 0.0f;
+    float far_plane  = 7.5f;
 };
 

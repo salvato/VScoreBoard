@@ -34,5 +34,7 @@
         <file>Shaders/fSphere.glsl</file>
         <file>Shaders/vDepth.glsl</file>
         <file>Shaders/fDepth.glsl</file>
+        <file>Shaders/fDebug_quad_depth.glsl</file>
+        <file>Shaders/vDebug_quad.glsl</file>
     </qresource>
 </RCC>

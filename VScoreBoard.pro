@@ -29,6 +29,7 @@ SOURCES += \
     button.cpp \
     chartwindow.cpp \
     edit.cpp \
+    floor.cpp \
     generalsetuparguments.cpp \
     generalsetupdialog.cpp \
     main.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     button.h \
     chartwindow.h \
     edit.h \
+    floor.h \
     generalsetuparguments.h \
     generalsetupdialog.h \
     panelorientation.h \

@@ -35,6 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 QT_FORWARD_DECLARE_CLASS(PlayField)
 QT_FORWARD_DECLARE_CLASS(Sphere)
+QT_FORWARD_DECLARE_CLASS(Floor)
+
 
 // QOpenGLFunctions class provides cross-platform
 // access to the OpenGL ES 2.0 API.
@@ -66,14 +68,11 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
-    void renderScene();
-    void computeDepth();
+    void renderScene(QOpenGLShaderProgram *pProgram);
     void renderQuad();
     void ConfigureModelMatrices();
 
     void initEnvironment();
-    void initPlayField();
-    void drawField(QOpenGLShaderProgram* pProgram);
 
     void initShaders();
     void initTextures();
@@ -92,19 +91,20 @@ private:
     QOpenGLTexture* pTeam0Texture  = nullptr;
     QOpenGLTexture* pTeam1Texture  = nullptr;
     QOpenGLTexture* pFieldTexture  = nullptr;
+    QOpenGLTexture* pWoodTexture   = nullptr;
 
     QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
     QOpenGLShaderProgram* pGameProgram = nullptr;
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
     QOpenGLShaderProgram* pDebugDepthQuad;
 
+    QMatrix4x4 floorModelMatrix;
     QMatrix4x4 fieldModelMatrix;
     QMatrix4x4 team0ModelMatrix;
     QMatrix4x4 team1ModelMatrix;
     QMatrix4x4 cameraViewMatrix;
     QMatrix4x4 cameraProjectionMatrix;
     QMatrix4x4 translateMatrix;
-    QMatrix4x4 modelViewMatrix;
     QMatrix4x4 lightProjectionMatrix;
     QMatrix4x4 lightViewMatrix;
     QMatrix4x4 lightSpaceMatrix;
@@ -114,9 +114,10 @@ private:
     QVector4D specularColor;
     QVector4D cameraPosition;
 
+    Floor*     pFloor;
+    PlayField* pPlayField;
     Sphere*    pTeam0;
     Sphere*    pTeam1;
-    PlayField* pPlayField;
 
     QVector3D rotationAxis;
     QQuaternion rotation1;
@@ -153,5 +154,7 @@ private:
     unsigned int quadVBO;
     float near_plane = 0.0f;
     float far_plane  = 7.5f;
+    QVector<float> floorVertices;
+    unsigned int floorVAO;
 };
 

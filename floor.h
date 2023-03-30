@@ -6,15 +6,15 @@
 #include <QOpenGLBuffer>
 
 
-class PlayField : protected QOpenGLFunctions_3_3_Core
+class Floor : protected QOpenGLFunctions_3_3_Core
 {
 public:
-    PlayField(int xField, int zField);
-    ~PlayField();
+    Floor(int xFloor, int zFloor);
+    ~Floor();
 
 public:
     void draw(QOpenGLShaderProgram* pProgram);
 
 protected:
-    QOpenGLBuffer fieldBuf;
+    QOpenGLBuffer floorBuf;
 };

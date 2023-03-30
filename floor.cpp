@@ -1,38 +1,39 @@
-#include "playfield.h"
+#include "floor.h"
 #include <QVector>
 
 
-PlayField::PlayField(int xField, int zField) {
+Floor::Floor(int xFloor, int zFloor) {
     initializeOpenGLFunctions();
 
-    QVector<float> vertices;
+    QVector<float>  vertices;
     vertices <<
-    // positions                   // normals              // texcoords
-    -xField << 0.0f <<  zField <<  0.0f << 1.0f << 0.0f <<   0.0f << zField <<
-     xField << 0.0f <<  zField <<  0.0f << 1.0f << 0.0f << xField << zField <<
-    -xField << 0.0f << -zField <<  0.0f << 1.0f << 0.0f <<   0.0f <<   0.0f <<
+        // positions                 // normals               // texcoords
+        -xFloor << 0.0f <<  zFloor <<  0.0f << 1.0f << 0.0f <<   0.0f <<   0.0f <<
+         xFloor << 0.0f <<  zFloor <<  0.0f << 1.0f << 0.0f << xFloor <<   0.0f <<
+        -xFloor << 0.0f << -zFloor <<  0.0f << 1.0f << 0.0f <<   0.0f << zFloor <<
 
-     xField << 0.0f << -zField <<  0.0f << 1.0f << 0.0f << xField <<   0.0f <<
-    -xField << 0.0f << -zField <<  0.0f << 1.0f << 0.0f <<   0.0f <<   0.0f <<
-     xField << 0.0f <<  zField <<  0.0f << 1.0f << 0.0f << xField << zField ;
+         xFloor << 0.0f << -zFloor <<  0.0f << 1.0f << 0.0f << xFloor << zFloor <<
+        -xFloor << 0.0f << -zFloor <<  0.0f << 1.0f << 0.0f <<   0.0f << zFloor <<
+         xFloor << 0.0f <<  zFloor <<  0.0f << 1.0f << 0.0f << xFloor << 0.0f;
 
     // Transfer vertex data to VBO
-    fieldBuf.create();
-    fieldBuf.bind();
-    fieldBuf.allocate(vertices.data(), int(vertices.count()*sizeof(float)));
-    fieldBuf.release();
+    floorBuf.create();
+    floorBuf.bind();
+    floorBuf.allocate(vertices.data(), int(vertices.count()*sizeof(float)));
+    floorBuf.release();
 }
 
 
-PlayField::~PlayField() {
+
+Floor::~Floor() {
 
 }
 
 
 void
-PlayField::draw(QOpenGLShaderProgram* pProgram) {
+Floor::draw(QOpenGLShaderProgram* pProgram) {
     // Tell OpenGL which VBOs to use
-    fieldBuf.bind();
+    floorBuf.bind();
 
     // Offset for position
     quintptr offset = 0;
@@ -53,5 +54,5 @@ PlayField::draw(QOpenGLShaderProgram* pProgram) {
     pProgram->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, 8*sizeof(float));
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    fieldBuf.release();
+    floorBuf.release();
 }

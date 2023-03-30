@@ -44,7 +44,8 @@ SOURCES += \
     utility.cpp \
     volleyapplication.cpp \
     volleycontroller.cpp \
-    volleypanel.cpp
+    volleypanel.cpp \
+    whiteline.cpp
 
 HEADERS += \
     button.h \
@@ -65,7 +66,8 @@ HEADERS += \
     utility.h \
     volleyapplication.h \
     volleycontroller.h \
-    volleypanel.h
+    volleypanel.h \
+    whiteline.h
 
 TRANSLATIONS += VScoreBoard_en_US.ts
 CONFIG += lrelease
@@ -81,7 +83,6 @@ RESOURCES += \
     shaders.qrc
 
 DISTFILES += \
-    cube.png \
     fAngular.glsl \
     fBookFlip.glsl \
     fshader.glsl \

@@ -6,15 +6,15 @@
 #include <QOpenGLBuffer>
 
 
-class PlayField : protected QOpenGLFunctions_3_3_Core
+class WhiteLine : protected QOpenGLFunctions_3_3_Core
 {
 public:
-    PlayField(float xField, float zField);
-    ~PlayField();
+    WhiteLine(float xDim, float zDim);
+    ~WhiteLine();
 
 public:
     void draw(QOpenGLShaderProgram* pProgram);
 
 protected:
-    QOpenGLBuffer fieldBuf;
+    QOpenGLBuffer lineBuf;
 };

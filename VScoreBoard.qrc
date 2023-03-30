@@ -47,11 +47,10 @@
         <file>res/cubemap_posx.jpg</file>
         <file>res/cubemap_posy.jpg</file>
         <file>res/cubemap_posz.jpg</file>
-        <file>cube.png</file>
-        <file>earth.png</file>
         <file>VolleyBall_0.png</file>
         <file>VolleyBall_1.png</file>
         <file>wood.png</file>
         <file>blue-carpet.jpg</file>
+        <file>white-carpet.jpg</file>
     </qresource>
 </RCC>

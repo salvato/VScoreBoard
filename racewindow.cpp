@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "racewindow.h"
 #include "floor.h"
 #include "playfield.h"
+#include "whiteline.h"
 #include "sphere.h"
 
 
@@ -106,7 +107,7 @@ RaceWindow::RaceWindow()
     lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
 
     resetAll();
-    scanTime = 15.0; // Tempo in secondi per l'intera "Corsa"
+    scanTime = 5.0; // Tempo in secondi per l'intera "Corsa"
     x0  = x1  =-xField;
     dx0 = dx1 = 0;
     connect(&closeTimer, SIGNAL(timeout()),
@@ -182,10 +183,14 @@ RaceWindow::initializeGL() {
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    pFloor     = new Floor(50.0f, 50.0f);
-    pPlayField = new PlayField(xField, zField);
-    pTeam0     = new Sphere(ballRadius, 40, 40);
-    pTeam1     = new Sphere(ballRadius, 40, 40);
+    pFloor       = new Floor(50.0f, 50.0f);
+    pPlayField   = new PlayField(xField, zField);
+    pCentralLine = new WhiteLine(0.05f, zField);
+    pXLine       = new WhiteLine(xField, 0.05f);
+    pZLine       = new WhiteLine(0.05f, zField);
+
+    pTeam0       = new Sphere(ballRadius, 40, 40);
+    pTeam1       = new Sphere(ballRadius, 40, 40);
 
     initEnvironment();
     initShaders();
@@ -195,6 +200,7 @@ RaceWindow::initializeGL() {
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc (GL_LESS); // depth-testing interprets a smaller value as "closer"
+    glEnable(GL_MULTISAMPLE);
 }
 
 
@@ -262,6 +268,11 @@ RaceWindow::initTextures() {
     pWoodTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     pWoodTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     pWoodTexture->setWrapMode(QOpenGLTexture::Repeat);
+
+    pLineTexture = new QOpenGLTexture(QImage(":/white-carpet.jpg").mirrored());
+    pLineTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    pLineTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    pLineTexture->setWrapMode(QOpenGLTexture::Repeat);
 
 // Framebuffer with texture for shadows...
     glGenFramebuffers(1, &depthMapFBO);
@@ -375,9 +386,32 @@ RaceWindow::paintGL() {
 
 void
 RaceWindow::ConfigureModelMatrices() {
+    floorModelMatrix.setToIdentity();
+    floorModelMatrix.translate(0.0f, 0.0f, 0.0f);
+
     fieldModelMatrix.setToIdentity();
-    fieldModelMatrix.scale(1.0f, 1.0f, 1.0f);
-    fieldModelMatrix.translate(0.0f, 0.0f, 0.0f);
+    fieldModelMatrix.translate(0.0f, 0.01f, 0.0f);
+
+    centralLineModelMatrix.setToIdentity();
+    centralLineModelMatrix.translate(0.0f, 0.02f, 0.0f);
+
+    leftLineModelMatrix.setToIdentity();
+    leftLineModelMatrix.translate(-xField+0.05f, 0.02f, 0.0f);
+
+    left3mLineModelMatrix.setToIdentity();
+    left3mLineModelMatrix.translate(-3.0f+0.05f, 0.02f, 0.0f);
+
+    rightLineModelMatrix.setToIdentity();
+    rightLineModelMatrix.translate(xField-0.05f, 0.02f, 0.0f);
+
+    right3mLineModelMatrix.setToIdentity();
+    right3mLineModelMatrix.translate(3.0f-0.05f, 0.02f, 0.0f);
+
+    bottomLineModelMatrix.setToIdentity();
+    bottomLineModelMatrix.translate(0.0f, 0.02f, zField-0.05f);
+
+    topLineModelMatrix.setToIdentity();
+    topLineModelMatrix.translate(0.0f, 0.02f, -zField+0.05f);
 
     float angle = qRadiansToDegrees(dx0/ballRadius);
     x0 += dx0;
@@ -400,10 +434,38 @@ RaceWindow::ConfigureModelMatrices() {
     team1ModelMatrix.setToIdentity();
     team1ModelMatrix.translate(x1, ballRadius, z1Start);
     team1ModelMatrix.rotate(rotation1);
-
-    floorModelMatrix.setToIdentity();
-    floorModelMatrix.translate(0.0f, -0.01f, 0.0f);
 }
+
+
+void
+RaceWindow::renderPlayField(QOpenGLShaderProgram* pProgram) {
+    pProgram->setUniformValue("model", fieldModelMatrix);
+    pFieldTexture->bind();
+    pPlayField->draw(pProgram);
+
+    pLineTexture->bind();
+    pProgram->setUniformValue("model", centralLineModelMatrix);
+    pCentralLine->draw(pProgram);
+
+    pProgram->setUniformValue("model", leftLineModelMatrix);
+    pZLine->draw(pProgram);
+
+    pProgram->setUniformValue("model", left3mLineModelMatrix);
+    pZLine->draw(pProgram);
+
+    pProgram->setUniformValue("model", rightLineModelMatrix);
+    pZLine->draw(pProgram);
+
+    pProgram->setUniformValue("model", right3mLineModelMatrix);
+    pZLine->draw(pProgram);
+
+    pProgram->setUniformValue("model", bottomLineModelMatrix);
+    pXLine->draw(pProgram);
+
+    pProgram->setUniformValue("model", topLineModelMatrix);
+    pXLine->draw(pProgram);
+}
+
 
 
 void
@@ -414,9 +476,7 @@ RaceWindow::renderScene(QOpenGLShaderProgram* pProgram) {
     pWoodTexture->bind();
     pFloor->draw(pProgram);
 
-    pProgram->setUniformValue("model", fieldModelMatrix);
-    pFieldTexture->bind();
-    pPlayField->draw(pProgram);
+    renderPlayField(pProgram);
 
     pProgram->setUniformValue("model", team0ModelMatrix);
     pTeam0Texture->bind();

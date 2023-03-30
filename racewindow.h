@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 QT_FORWARD_DECLARE_CLASS(PlayField)
+QT_FORWARD_DECLARE_CLASS(WhiteLine)
 QT_FORWARD_DECLARE_CLASS(Sphere)
 QT_FORWARD_DECLARE_CLASS(Floor)
 
@@ -69,6 +70,7 @@ protected:
     void resizeGL(int w, int h) override;
     void paintGL() override;
     void renderScene(QOpenGLShaderProgram *pProgram);
+    void renderPlayField(QOpenGLShaderProgram* pProgram);
     void renderQuad();
     void ConfigureModelMatrices();
 
@@ -91,6 +93,7 @@ private:
     QOpenGLTexture* pTeam0Texture  = nullptr;
     QOpenGLTexture* pTeam1Texture  = nullptr;
     QOpenGLTexture* pFieldTexture  = nullptr;
+    QOpenGLTexture* pLineTexture   = nullptr;
     QOpenGLTexture* pWoodTexture   = nullptr;
 
     QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
@@ -99,9 +102,19 @@ private:
     QOpenGLShaderProgram* pDebugDepthQuad;
 
     QMatrix4x4 floorModelMatrix;
+
     QMatrix4x4 fieldModelMatrix;
+    QMatrix4x4 centralLineModelMatrix;
+    QMatrix4x4 leftLineModelMatrix;
+    QMatrix4x4 left3mLineModelMatrix;
+    QMatrix4x4 rightLineModelMatrix;
+    QMatrix4x4 right3mLineModelMatrix;
+    QMatrix4x4 bottomLineModelMatrix;
+    QMatrix4x4 topLineModelMatrix;
+
     QMatrix4x4 team0ModelMatrix;
     QMatrix4x4 team1ModelMatrix;
+
     QMatrix4x4 cameraViewMatrix;
     QMatrix4x4 cameraProjectionMatrix;
     QMatrix4x4 translateMatrix;
@@ -116,6 +129,9 @@ private:
 
     Floor*     pFloor;
     PlayField* pPlayField;
+    WhiteLine* pCentralLine;
+    WhiteLine* pXLine;
+    WhiteLine* pZLine;
     Sphere*    pTeam0;
     Sphere*    pTeam1;
 

@@ -70,10 +70,10 @@ RaceWindow::RaceWindow(QWidget *parent)
     labelScore1.setText("0");
 
     pLayout->addWidget(&labelIcon0,  0, 0, 1, 1, Qt::AlignRight);
-    pLayout->addWidget(&labelTeam0,  0, 1, 1, 1);
+    pLayout->addWidget(&labelTeam0,  0, 1, 1, 1, Qt::AlignLeft);
     pLayout->addWidget(&labelScore0, 0, 2, 1, 1, Qt::AlignHCenter);
     pLayout->addWidget(&labelScore1, 0, 3, 1, 1, Qt::AlignHCenter);
-    pLayout->addWidget(&labelTeam1,  0, 4, 1, 1);
+    pLayout->addWidget(&labelTeam1,  0, 4, 1, 1, Qt::AlignRight);
     pLayout->addWidget(&labelIcon1,  0, 5, 1, 1, Qt::AlignLeft);
     pLayout->addWidget(pRaceWidget,  1, 0, 6, 6);
 

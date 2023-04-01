@@ -74,26 +74,20 @@ protected:
     void ConfigureModelMatrices();
 
     void initShaders();
+    void initShadowBuffer();
     void initTextures();
 
 private:
-//    struct VertexData {
-//        QVector3D position;
-//        QVector2D texCoord;
-//    };
-//    QOpenGLBuffer fieldBuf;
 
     QBasicTimer timer;
     QTimer closeTimer;
 
-    QOpenGLTexture* pEnvironment   = nullptr;
     QOpenGLTexture* pTeam0Texture  = nullptr;
     QOpenGLTexture* pTeam1Texture  = nullptr;
     QOpenGLTexture* pFieldTexture  = nullptr;
     QOpenGLTexture* pLineTexture   = nullptr;
     QOpenGLTexture* pWoodTexture   = nullptr;
 
-    QOpenGLShaderProgram* pEnvironmentProgram = nullptr;
     QOpenGLShaderProgram* pGameProgram = nullptr;
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
     QOpenGLShaderProgram* pDebugDepthQuad;
@@ -147,20 +141,12 @@ private:
     float zField  =  4.5;
     int   nVertices;
     float ballRadius;
-    double dx;
-    double dx0;
-    double dx1;
-    double x0;
-    double x1;
     QString sTeamName[2];
     QVector<QVector2D> score[5];
     int maxScore[5];
     int indexScore;
     int iCurrentSet;
     float scanTime;
-    float pointTime;
-    float pointSpace;
-    double t0;
     int refreshTime;
     const unsigned int SHADOW_WIDTH  = 1024;
     const unsigned int SHADOW_HEIGHT = 1024;
@@ -170,7 +156,11 @@ private:
     unsigned int quadVBO;
     float near_plane = 0.0f;
     float far_plane  = 7.5f;
-    QVector<float> floorVertices;
-    unsigned int floorVAO;
+    float speed;
+    QVector3D speed0;
+    QVector3D speed1;
+    float xTarget;
+    int t0, t1;
+    int iMoving;
 };
 

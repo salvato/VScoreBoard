@@ -52,15 +52,15 @@ RaceWidget::RaceWidget()
     sTeamName[0] = "Locali";
     sTeamName[1] = "Ospiti";
 
-    ballRadius = 0.1066f*4.0f; // 4 times bigger than real
+    ballRadius = 0.1066f * 4.0f; // 4 times bigger than real
 
     diffuseColor  = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
     specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
 
     cameraPosition = QVector4D(0.0f, 10.0f, 10.0f, 1.0f);
     cameraViewMatrix.lookAt(cameraPosition.toVector3D(),        // Eye
-                            QVector3D(0.0f,    0.0f,    0.0f),  // Center
-                            QVector3D(0.0f,    1.0f,    0.0f)); // Up
+                            QVector3D(0.0f, 0.0f, 0.0f),  // Center
+                            QVector3D(0.0f, 1.0f, 0.0f)); // Up
 
     lightPosition = QVector4D(-2.0f, 4.0f, -1.0f, 1.0f);
 
@@ -68,16 +68,20 @@ RaceWidget::RaceWidget()
     near_plane = -1.0f;
     far_plane  = extension;
     lightProjectionMatrix.setToIdentity();
-    lightProjectionMatrix.ortho(-extension, extension, -extension, extension, near_plane, far_plane);
+    lightProjectionMatrix.ortho(-extension,
+                                 extension,
+                                -extension,
+                                 extension,
+                                near_plane,
+                                far_plane);
     lightViewMatrix.lookAt(lightPosition.toVector3D(),     // Eye
                            QVector3D( 0.0f, 0.0f,  0.0f),  // Center
                            QVector3D( 0.0f, 1.0f,  0.0f)); // Up
     lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
 
     resetAll();
-    scanTime = 15.0; // Tempo in secondi per l'intera "Corsa"
-    x0  = x1  =-xField;
-    dx0 = dx1 = 0;
+    scanTime = 30.0; // Tempo in secondi per l'intera "Corsa"
+    speed = 2.0f*xField/scanTime;
     connect(&closeTimer, SIGNAL(timeout()),
             this, SLOT(onTimeToClose()));
 }
@@ -140,7 +144,7 @@ RaceWidget::resizeGL(int w, int h) {
     qreal aspect = qreal(w) / qreal(h ? h : 1);
     const qreal zNear = 0.01f;
     const qreal zFar  = 30.0f;
-    const qreal fov = 50.0;//abs(qRadiansToDegrees(atan2((xCamera-xField), (zCamera-zField))));
+    const qreal fov   = 50.0;
     cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
 }
 
@@ -149,26 +153,26 @@ void
 RaceWidget::initializeGL() {
     initializeOpenGLFunctions();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
     pFloor       = new Floor(50.0f, 50.0f);
 
     pPlayField   = new PlayField(xField, zField);
     pCentralLine = new WhiteLine(0.05f, zField);
     pXLine       = new WhiteLine(xField, 0.05f);
     pZLine       = new WhiteLine(0.05f, zField);
-    pPole        = new Pole(2.43f, 0.02f);
+    pPole        = new Pole(2.43f, 0.2f);
 
-    pTeam0       = new Avatar(ballRadius);
-    pTeam1       = new Avatar(ballRadius);
+    pTeam0       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z0Start));
+    pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
 
     initShaders();
     initTextures();
+    initShadowBuffer();
 
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc (GL_LESS); // depth-testing interprets a smaller value as "closer"
+    glDepthFunc (GL_LESS);
     glEnable(GL_MULTISAMPLE);
 }
 
@@ -218,7 +222,11 @@ RaceWidget::initTextures() {
     pLineTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     pLineTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     pLineTexture->setWrapMode(QOpenGLTexture::Repeat);
+}
 
+
+void
+RaceWidget::initShadowBuffer() {
 // Framebuffer with texture for shadows...
     glGenFramebuffers(1, &depthMapFBO);
 // create depth texture
@@ -246,33 +254,29 @@ RaceWidget::startRace(int iSet) {
         return;
     }
     iCurrentSet = iSet;
-    int totalPoints = score[iSet].count();
-    pointTime  = (scanTime/totalPoints)*1000.0; // Tempo in ms per passare da un punto al successivo
-    pointSpace = 2.0*xField/maxScore[iSet];     // Spazio da percorrere per ciascun punto.
-    refreshTime = 12; // in ms
-    float nTicks = pointTime/refreshTime;
-    dx = pointSpace/nTicks;
+    pTeam0->setPos(QVector3D(-xField, ballRadius, z0Start));
+    pTeam1->setPos(QVector3D(-xField, ballRadius, z1Start));
     indexScore = 0;
     if(score[iCurrentSet].at(indexScore+1).x() > score[iCurrentSet].at(indexScore).x()) {
-        dx0 = dx;
-        dx1 = 0.0;
+        pTeam0->setSpeed(QVector3D(speed, 0.0f, 0.0f));
+        pTeam1->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
+        iMoving = 0;
     }
     else {
-        dx0 = 0.0;
-        dx1 = dx;
+        pTeam0->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
+        pTeam1->setSpeed(QVector3D(speed, 0.0f, 0.0f));
+        iMoving = 1;
     }
-    x0  = x1  =-xField;
-    t0 = 0.0;
-    emit newScore(score[iCurrentSet].at(indexScore).x(), score[iCurrentSet].at(indexScore).y());
-//    qCritical() << score[iSet].at(indexScore+1);
-    // Use QBasicTimer because its faster than QTimer
+    xTarget = (2.0*xField)/float(maxScore[iCurrentSet]) - xField;
+    refreshTime = 15; // in ms
+    emit newScore(score[iCurrentSet].at(indexScore+1).x(), score[iCurrentSet].at(indexScore+1).y());
     timer.start(refreshTime, this);
+    t0 = QTime::currentTime().msecsSinceStartOfDay();
 }
 
 
 void
 RaceWidget::paintGL() {
-
     ConfigureModelMatrices();
 /**/
     pComputeDepthProgram->bind();
@@ -354,27 +358,13 @@ RaceWidget::ConfigureModelMatrices() {
     topPoleModelMatrix.setToIdentity();
     bottomPoleModelMatrix.translate(0.0f, 0.02f, -zField-0.5f);
 
-    float angle = qRadiansToDegrees(dx0/ballRadius);
-    x0 += dx0;
-    if(std::abs(x0) > xField) {
-        timer.stop();
-        closeTimer.start(3000);
-    }
-    rotation0 = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0,-1.0), angle) * rotation0;
     team0ModelMatrix.setToIdentity();
-    team0ModelMatrix.translate(x0, ballRadius, z0Start);
-    team0ModelMatrix.rotate(rotation0);
+    team0ModelMatrix.translate(pTeam0->getPos());
+    team0ModelMatrix.rotate(pTeam0->getRotation());
 
-    angle = qRadiansToDegrees(dx1/ballRadius);
-    x1 += dx1;
-    if(std::abs(x1) > xField) {
-        timer.stop();
-        closeTimer.start(3000);
-    }
-    rotation1 = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0,-1.0), angle) * rotation1;
     team1ModelMatrix.setToIdentity();
-    team1ModelMatrix.translate(x1, ballRadius, z1Start);
-    team1ModelMatrix.rotate(rotation1);
+    team1ModelMatrix.translate(pTeam1->getPos());
+    team1ModelMatrix.rotate(pTeam1->getRotation());
 }
 
 
@@ -414,7 +404,6 @@ RaceWidget::renderPlayField(QOpenGLShaderProgram* pProgram) {
 }
 
 
-
 void
 RaceWidget::renderScene(QOpenGLShaderProgram* pProgram) {
     glActiveTexture(GL_TEXTURE0);
@@ -435,10 +424,10 @@ RaceWidget::renderScene(QOpenGLShaderProgram* pProgram) {
 }
 
 
-// renderQuad() renders a 1x1 XY quad in NDC
-// -----------------------------------------
 void
 RaceWidget::renderQuad() {
+// renderQuad() renders a 1x1 XY quad in NDC
+// -----------------------------------------
     if (quadVAO == 0)     {
         float quadVertices[] = {
             // positions        // texture Coords
@@ -466,34 +455,45 @@ RaceWidget::renderQuad() {
 
 
 void
-RaceWidget::timerEvent(QTimerEvent*) {
-    t0 += refreshTime;
-    if(t0 > pointTime) {
-        t0 = 0.0;
-        indexScore++;
-        if(indexScore >= score[iCurrentSet].count()-1) {
-            timer.stop();
-            emit newScore(score[iCurrentSet].at(indexScore).x(), score[iCurrentSet].at(indexScore).y());
-            closeTimer.start(3000);
-            update();
-            return;
-        }
-        if(score[iCurrentSet].at(indexScore+1).x() > score[iCurrentSet].at(indexScore).x()) {
-            dx0 = dx;
-            dx1 = 0.0;
-        }
-        else {
-            dx0 = 0.0;
-            dx1 = dx;
-        }
-        emit newScore(score[iCurrentSet].at(indexScore).x(), score[iCurrentSet].at(indexScore).y());
-    }
-    update();
-}
-
-
-void
 RaceWidget::onTimeToClose() {
     closeTimer.stop();
     emit raceDone();
 }
+
+
+void
+RaceWidget::timerEvent(QTimerEvent*) {
+    float xCurrent = iMoving ? pTeam1->getPos().x() : pTeam0->getPos().x();
+    if(xCurrent >= xTarget) {
+        indexScore++;
+        if(indexScore > score[iCurrentSet].count()-2) {
+            pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
+            pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
+            timer.stop();
+            closeTimer.start(3000);
+            update();
+            return;
+        }
+        if(score[iCurrentSet].at(indexScore+1).x() >
+           score[iCurrentSet].at(indexScore).x()) {
+            iMoving = 0;
+            pTeam0->setSpeed(QVector3D(speed, 0.0f, 0.0f));
+            pTeam1->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
+            xTarget = score[iCurrentSet].at(indexScore+1).x()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;
+        }
+        else {
+            iMoving = 1;
+            pTeam0->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
+            pTeam1->setSpeed(QVector3D(speed, 0.0f, 0.0f));
+            xTarget = score[iCurrentSet].at(indexScore+1).y()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;
+        }
+        emit newScore(score[iCurrentSet].at(indexScore+1).x(),
+                      score[iCurrentSet].at(indexScore+1).y());
+    }
+    t1 = QTime::currentTime().msecsSinceStartOfDay();
+    pTeam0->updateStatus((t1-t0)/1000.0);
+    pTeam1->updateStatus((t1-t0)/1000.0);
+    t0 = t1;
+    update();
+}
+

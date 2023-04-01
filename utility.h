@@ -28,6 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define START_GRADIENT   8
 #define END_GRADIENT   128
 
+#define MAX_NAMELENGTH  15
+
 
 void logMessage(QFile *logFile, QString sFunctionName, QString sMessage);
 

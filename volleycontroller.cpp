@@ -457,7 +457,7 @@ VolleyController::buildControls() {
         // Teams
         pTeamName[iTeam] = new Edit(gsArgs.sTeam[iTeam], iTeam);
         pTeamName[iTeam]->setAlignment(Qt::AlignHCenter);
-        pTeamName[iTeam]->setMaxLength(15);
+        pTeamName[iTeam]->setMaxLength(MAX_NAMELENGTH);
         pal.setColor(QPalette::Text, Qt::white);
         pTeamName[iTeam]->setPalette(pal);
         // Timeout
@@ -933,6 +933,7 @@ VolleyController::onButtonStatisticsClicked() {
     }
     else {
         if(setSelectionDialog.exec() == QDialog::Accepted) {
+//            pRaceWindow->show();
             pRaceWindow->showFullScreen();
 //            pRaceWindow->showMaximized();
             if(pRaceWindow->isVisible()) {

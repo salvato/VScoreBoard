@@ -117,6 +117,5 @@ private:
     QFile*          pScoreFile;
     SetSelectionDialog setSelectionDialog;
     RaceWindow*     pRaceWindow;
-
 };
 

@@ -26,6 +26,7 @@ CONFIG += c++17
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    avatar.cpp \
     button.cpp \
     chartwindow.cpp \
     edit.cpp \
@@ -34,6 +35,8 @@ SOURCES += \
     generalsetupdialog.cpp \
     main.cpp \
     playfield.cpp \
+    pole.cpp \
+    racewidget.cpp \
     racewindow.cpp \
     scorecontroller.cpp \
     scorepanel.cpp \
@@ -48,6 +51,7 @@ SOURCES += \
     whiteline.cpp
 
 HEADERS += \
+    avatar.h \
     button.h \
     chartwindow.h \
     edit.h \
@@ -56,6 +60,8 @@ HEADERS += \
     generalsetupdialog.h \
     panelorientation.h \
     playfield.h \
+    pole.h \
+    racewidget.h \
     racewindow.h \
     scorecontroller.h \
     scorepanel.h \

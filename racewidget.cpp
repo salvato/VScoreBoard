@@ -154,7 +154,7 @@ void
 RaceWidget::initializeGL() {
     initializeOpenGLFunctions();
 
-    pFloor       = new Floor(50.0f, 50.0f);
+    pFloor       = new Floor(QSizeF(50.0f, 50.0f));
 
     pPlayField   = new PlayField(xField, zField);
     pCentralLine = new WhiteLine(0.05f, zField);
@@ -328,10 +328,6 @@ RaceWidget::paintGL() {
 
 void
 RaceWidget::ConfigureModelMatrices() {
-
-    floorModelMatrix.setToIdentity();
-    floorModelMatrix.translate(0.0f, 0.0f, 0.0f);
-
     fieldModelMatrix.setToIdentity();
     fieldModelMatrix.translate(0.0f, 0.01f, 0.0f);
 
@@ -366,14 +362,6 @@ RaceWidget::ConfigureModelMatrices() {
     netBandMatrix.scale(0.2f, 1.0f, 1.0f);
     netBandMatrix.translate(0.0f, 0.5*(zField+0.5f)-0.005f, 0.0f);
     netBandMatrix.rotate(90.0f, QVector3D(-1.0, 0.0, 0.0));
-
-    team0ModelMatrix.setToIdentity();
-    team0ModelMatrix.translate(pTeam0->getPos());
-    team0ModelMatrix.rotate(pTeam0->getRotation());
-
-    team1ModelMatrix.setToIdentity();
-    team1ModelMatrix.translate(pTeam1->getPos());
-    team1ModelMatrix.rotate(pTeam1->getRotation());
 
 }
 
@@ -421,17 +409,17 @@ void
 RaceWidget::renderScene(QOpenGLShaderProgram* pProgram) {
     glActiveTexture(GL_TEXTURE0);
 
-    pProgram->setUniformValue("model", floorModelMatrix);
+    pProgram->setUniformValue("model", pFloor->modelMatrix());
     pWoodTexture->bind();
     pFloor->draw(pProgram);
 
     renderPlayField(pProgram);
 
-    pProgram->setUniformValue("model", team0ModelMatrix);
+    pProgram->setUniformValue("model", pTeam0->modelMatrix());
     pTeam0Texture->bind();
     pTeam0->draw(pProgram);
 
-    pProgram->setUniformValue("model", team1ModelMatrix);
+    pProgram->setUniformValue("model", pTeam1->modelMatrix());
     pTeam1Texture->bind();
     pTeam1->draw(pProgram);
 }

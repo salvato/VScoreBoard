@@ -2,8 +2,20 @@
 #include <QVector>
 
 
-Floor::Floor(int xFloor, int zFloor) {
+Floor::Floor(QSizeF      _size,
+             QVector3D   _position,
+             QQuaternion _rotation,
+             QVector3D   _speed)
+    : size(_size)
+    , position(_position)
+    , rotation(_rotation)
+    , speed(_speed)
+{
     initializeOpenGLFunctions();
+
+    float xFloor = size.width();
+    float zFloor = size.height();
+    speed = QVector3D(0.0f, 0.0f, 0.0f);
 
     QVector<float>  vertices;
     vertices <<
@@ -55,4 +67,56 @@ Floor::draw(QOpenGLShaderProgram* pProgram) {
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     floorBuf.release();
+}
+
+
+QVector3D
+Floor::getPos() {
+    return position;
+}
+
+
+void
+Floor::setPos(QVector3D newPos) {
+    position = newPos;
+}
+
+
+QQuaternion
+Floor::getRotation() {
+    return rotation;
+}
+
+
+void
+Floor::setRotation(QQuaternion newRotation) {
+    rotation = newRotation;
+}
+
+
+QVector3D
+Floor::getSpeed(){
+    return speed;
+}
+
+
+void
+Floor::setSpeed(QVector3D newSpeed) {
+    speed = newSpeed;
+}
+
+
+void
+Floor::updateStatus(float deltaTime) {
+    (void) deltaTime;
+}
+
+
+QMatrix4x4
+Floor::modelMatrix() {
+    QMatrix4x4 M;
+    M.setToIdentity();
+    M.translate(position);
+    M.rotate(rotation);
+    return M;
 }

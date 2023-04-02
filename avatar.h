@@ -18,6 +18,7 @@ public:
     QQuaternion getRotation();
     void setRotation(QQuaternion newRotation);
     void updateStatus(float deltaTime);
+    QMatrix4x4 modelMatrix();
 
 private:
     float radius;

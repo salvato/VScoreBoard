@@ -92,8 +92,6 @@ private:
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
     QOpenGLShaderProgram* pDebugDepthQuad;
 
-    QMatrix4x4 floorModelMatrix;
-
     QMatrix4x4 fieldModelMatrix;
     QMatrix4x4 centralLineModelMatrix;
     QMatrix4x4 leftLineModelMatrix;
@@ -105,9 +103,6 @@ private:
     QMatrix4x4 bottomPoleModelMatrix;
     QMatrix4x4 topPoleModelMatrix;
     QMatrix4x4 netBandMatrix;
-
-    QMatrix4x4 team0ModelMatrix;
-    QMatrix4x4 team1ModelMatrix;
 
     QMatrix4x4 cameraViewMatrix;
     QMatrix4x4 cameraProjectionMatrix;

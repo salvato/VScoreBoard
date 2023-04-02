@@ -59,3 +59,13 @@ Avatar::updateStatus(float deltaTime) {
     QQuaternion qz = QQuaternion::fromAxisAndAngle(QVector3D( 1.0f,  0.0f,  0.0f), qRadiansToDegrees(angle.z()));
     rotation *= qx * qy * qz;
 }
+
+
+QMatrix4x4
+Avatar::modelMatrix() {
+    QMatrix4x4 M;
+    M.setToIdentity();
+    M.translate(position);
+    M.rotate(rotation);
+    return M;
+}

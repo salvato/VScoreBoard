@@ -57,6 +57,7 @@ struct VertexData
 {
     QVector3D position;
     QVector2D texCoord;
+    QVector3D normals;
 };
 
 
@@ -83,42 +84,48 @@ Cube::~Cube() {
 void
 Cube::initGeometry(float height, float diameter) {
     float ray = 0.5*diameter;
+    QVector3D normal0 = QVector3D( 0.0, 0.0, 1.0);
+    QVector3D normal1 = QVector3D( 1.0, 0.0, 0.0);
+    QVector3D normal2 = QVector3D( 0.0, 0.0,-1.0);
+    QVector3D normal3 = QVector3D(-1.0, 0.0, 0.0);
+    QVector3D normal4 = QVector3D( 0.0,-1.0, 0.0);
+    QVector3D normal5 = QVector3D( 0.0, 1.0, 0.0);
     VertexData vertices[] = {
         // Vertex data for face 0
-        {QVector3D(-ray, -height,  ray), QVector2D(0.0f, 0.0f)},  // v0
-        {QVector3D( ray, -height,  ray), QVector2D(0.33f, 0.0f)}, // v1
-        {QVector3D(-ray,  height,  ray), QVector2D(0.0f, 0.5f)},  // v2
-        {QVector3D( ray,  height,  ray), QVector2D(0.33f, 0.5f)}, // v3
+        {QVector3D(-ray, -height,  ray), QVector2D(0.0f, 0.0f), normal0},  // v0
+        {QVector3D( ray, -height,  ray), QVector2D(1.0f, 0.0f), normal0}, // v1
+        {QVector3D(-ray,  height,  ray), QVector2D(0.0f, 1.0f), normal0},  // v2
+        {QVector3D( ray,  height,  ray), QVector2D(1.0f, 1.0f), normal0}, // v3
 
         // Vertex data for face 1
-        {QVector3D( ray, -height,  ray), QVector2D( 0.0f, 0.5f)}, // v4
-        {QVector3D( ray, -height, -ray), QVector2D(0.33f, 0.5f)}, // v5
-        {QVector3D( ray,  height,  ray), QVector2D(0.0f, 1.0f)},  // v6
-        {QVector3D( ray,  height, -ray), QVector2D(0.33f, 1.0f)}, // v7
+        {QVector3D( ray, -height,  ray), QVector2D(0.0f, 0.0f), normal1}, // v4
+        {QVector3D( ray, -height, -ray), QVector2D(1.0f, 0.0f), normal1}, // v5
+        {QVector3D( ray,  height,  ray), QVector2D(0.0f, 1.0f), normal1},  // v6
+        {QVector3D( ray,  height, -ray), QVector2D(1.0f, 1.0f), normal1}, // v7
 
         // Vertex data for face 2
-        {QVector3D( ray, -height, -ray), QVector2D(0.66f, 0.5f)}, // v8
-        {QVector3D(-ray, -height, -ray), QVector2D(1.0f, 0.5f)},  // v9
-        {QVector3D( ray,  height, -ray), QVector2D(0.66f, 1.0f)}, // v10
-        {QVector3D(-ray,  height, -ray), QVector2D(1.0f, 1.0f)},  // v11
+        {QVector3D( ray, -height, -ray), QVector2D(0.0f, 0.0f), normal2}, // v8
+        {QVector3D(-ray, -height, -ray), QVector2D(1.0f, 0.0f), normal2},  // v9
+        {QVector3D( ray,  height, -ray), QVector2D(0.0f, 1.0f), normal2}, // v10
+        {QVector3D(-ray,  height, -ray), QVector2D(1.0f, 1.0f), normal2},  // v11
 
         // Vertex data for face 3
-        {QVector3D(-ray, -height, -ray), QVector2D(0.66f, 0.0f)}, // v12
-        {QVector3D(-ray, -height,  ray), QVector2D(1.0f, 0.0f)},  // v13
-        {QVector3D(-ray,  height, -ray), QVector2D(0.66f, 0.5f)}, // v14
-        {QVector3D(-ray,  height,  ray), QVector2D(1.0f, 0.5f)},  // v15
+        {QVector3D(-ray, -height, -ray), QVector2D(0.0f, 0.0f), normal3}, // v12
+        {QVector3D(-ray, -height,  ray), QVector2D(1.0f, 0.0f), normal3},  // v13
+        {QVector3D(-ray,  height, -ray), QVector2D(0.0f, 1.0f), normal3}, // v14
+        {QVector3D(-ray,  height,  ray), QVector2D(1.0f, 1.0f), normal3},  // v15
 
         // Vertex data for face 4
-        {QVector3D(-ray, -height, -ray), QVector2D(0.33f, 0.0f)}, // v16
-        {QVector3D( ray, -height, -ray), QVector2D(0.66f, 0.0f)}, // v17
-        {QVector3D(-ray, -height,  ray), QVector2D(0.33f, 0.5f)}, // v18
-        {QVector3D( ray, -height,  ray), QVector2D(0.66f, 0.5f)}, // v19
+        {QVector3D(-ray, -height, -ray), QVector2D(0.0f, 0.0f), normal4}, // v16
+        {QVector3D( ray, -height, -ray), QVector2D(1.0f, 0.0f), normal4}, // v17
+        {QVector3D(-ray, -height,  ray), QVector2D(0.0f, 1.0f), normal4}, // v18
+        {QVector3D( ray, -height,  ray), QVector2D(1.0f, 1.0f), normal4}, // v19
 
         // Vertex data for face 5
-        {QVector3D(-ray,  height,  ray), QVector2D(0.33f, 0.5f)}, // v20
-        {QVector3D( ray,  height,  ray), QVector2D(0.66f, 0.5f)}, // v21
-        {QVector3D(-ray,  height, -ray), QVector2D(0.33f, 1.0f)}, // v22
-        {QVector3D( ray,  height, -ray), QVector2D(0.66f, 1.0f)}  // v23
+        {QVector3D(-ray,  height,  ray), QVector2D(0.0f, 0.0f), normal5}, // v20
+        {QVector3D( ray,  height,  ray), QVector2D(1.0f, 0.0f), normal5}, // v21
+        {QVector3D(-ray,  height, -ray), QVector2D(0.0f, 1.0f), normal5}, // v22
+        {QVector3D( ray,  height, -ray), QVector2D(1.0f, 1.0f), normal5}  // v23
     };
 
     GLushort indices[] = {
@@ -141,7 +148,7 @@ Cube::initGeometry(float height, float diameter) {
 
 
 void
-Cube::draw(QOpenGLShaderProgram *program) {
+Cube::draw(QOpenGLShaderProgram* pProgram) {
     // Tell OpenGL which VBOs to use
     arrayBuf.bind();
     indexBuf.bind();
@@ -150,17 +157,25 @@ Cube::draw(QOpenGLShaderProgram *program) {
     quintptr offset = 0;
 
     // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = program->attributeLocation("vPosition");
-    program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+    int vertexLocation = pProgram->attributeLocation("vPosition");
+    pProgram->enableAttributeArray(vertexLocation);
+    pProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
 
     // Offset for texture coordinate
     offset += sizeof(QVector3D);
 
     // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    int texcoordLocation = program->attributeLocation("vTexture");
-    program->enableAttributeArray(texcoordLocation);
-    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+    int texcoordLocation = pProgram->attributeLocation("vTexture");
+    pProgram->enableAttributeArray(texcoordLocation);
+    pProgram->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
+    // Offset for texture coordinate
+    offset += sizeof(QVector2D);
+
+    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
+    int normalLocation = pProgram->attributeLocation("vNormal");
+    pProgram->enableAttributeArray(normalLocation);
+    pProgram->setAttributeBuffer(normalLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
 
     // Draw cube geometry using indices from VBO 1
     glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, nullptr);

@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTime>
 
 
+QT_FORWARD_DECLARE_CLASS(Object)
 QT_FORWARD_DECLARE_CLASS(PlayField)
 QT_FORWARD_DECLARE_CLASS(WhiteLine)
 QT_FORWARD_DECLARE_CLASS(Avatar)
@@ -102,6 +103,8 @@ private:
     QVector4D diffuseColor;
     QVector4D specularColor;
     QVector4D cameraPosition;
+
+    QVector<Object*> gameObjects;
 
     Floor*     pFloor;
     PlayField* pPlayField;

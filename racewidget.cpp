@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "floor.h"
 #include "playfield.h"
 #include "whiteline.h"
-//#include "pole.h"
 #include "pole.h"
 #include "avatar.h"
 
@@ -153,38 +152,45 @@ RaceWidget::resizeGL(int w, int h) {
 void
 RaceWidget::initializeGL() {
     initializeOpenGLFunctions();
-
+    gameObjects.clear();
     pFloor       = new Floor(QSizeF(50.0f, 50.0f));
+    gameObjects.append(pFloor);
 
     // Slightltly higer than Floor
     pPlayField   = new PlayField(QSizeF(xField, zField), QVector3D(0.0f, 0.01f, 0.0f));
+    gameObjects.append(pPlayField);
 
     // Slightltly higer than PlayField
     pLeftLine    = new WhiteLine(QSizeF(0.05f, zField), QVector3D(-xField+0.05f, 0.02f, 0.0f));
+    gameObjects.append(pLeftLine);
     pLeft3mLine  = new WhiteLine(QSizeF(0.05f, zField), QVector3D(-3.0f+0.05f, 0.02f, 0.0f));
+    gameObjects.append(pLeft3mLine);
     pCentralLine = new WhiteLine(QSizeF(0.05f, zField), QVector3D(0.0f, 0.02f, 0.0f));
+    gameObjects.append(pCentralLine);
     pRight3mLine = new WhiteLine(QSizeF(0.05f, zField), QVector3D(3.0f-0.05f, 0.02f, 0.0f));
+    gameObjects.append(pRight3mLine);
     pRightLine   = new WhiteLine(QSizeF(0.05f, zField), QVector3D(xField-0.05f, 0.02f, 0.0f));
-
+    gameObjects.append(pRightLine);
     pBottomLine  = new WhiteLine(QSizeF(xField, 0.05f), QVector3D(0.0f, 0.02f,  zField-0.05f));
+    gameObjects.append(pBottomLine);
     pTopLine     = new WhiteLine(QSizeF(xField, 0.05f), QVector3D(0.0f, 0.02f, -zField+0.05f));
-
+    gameObjects.append(pTopLine);
     pBottomPole  = new Pole(QSizeF(2.43f, 0.2f), QVector3D(0.0f, 2.43f*0.5f+0.02f,  zField+0.5f));
+    gameObjects.append(pBottomPole);
     pTopPole     = new Pole(QSizeF(2.43f, 0.2f), QVector3D(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f));
-
-//    pNetBand     = new Pole(QSizeF(2.0*zField+1.0f, 0.05f),
-//                            QVector3D(xField, 0.5*(zField+0.5f)-0.005f, 0.0f),
-//                            QQuaternion(45.0f, QVector3D(-1.0, 0.0, 0.0)),
-//                            QVector3D(1.0f, 1.0f, 1.0f));
+    gameObjects.append(pTopPole);
 
     QQuaternion q = QQuaternion::fromAxisAndAngle(QVector3D(-1.0f, 0.0f, 0.0f), 90.0f);
     pNetBand     = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
                             QVector3D(0.0f, 2.43f+0.02f, 0.0f),
                             q,
                             QVector3D(0.2f, 1.0f, 1.0f));
+    gameObjects.append(pNetBand);
 
     pTeam0       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z0Start));
+    gameObjects.append(pTeam0);
     pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
+    gameObjects.append(pTeam1);
 
     initShaders();
     initTextures();
@@ -470,8 +476,10 @@ RaceWidget::timerEvent(QTimerEvent*) {
                       score[iCurrentSet].at(indexScore+1).y());
     }
     t1 = QTime::currentTime().msecsSinceStartOfDay();
-    pTeam0->updateStatus((t1-t0)/1000.0);
-    pTeam1->updateStatus((t1-t0)/1000.0);
+    float t = (t1-t0)/1000.0;
+    for(int i=0; i<gameObjects.count(); i++) {
+        gameObjects.at(i)->updateStatus(t);
+    }
     t0 = t1;
     update();
 }

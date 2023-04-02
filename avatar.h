@@ -14,7 +14,7 @@ public:
            QVector3D   _speed    = QVector3D(0.0f, 0.0f, 0.0f));
 
 public:
-    void updateStatus(float deltaTime);
+    void updateStatus(float deltaTime) override;
 
 private:
     float       radius;

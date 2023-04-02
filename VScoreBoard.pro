@@ -29,13 +29,13 @@ SOURCES += \
     avatar.cpp \
     button.cpp \
     chartwindow.cpp \
-    cube.cpp \
     edit.cpp \
     floor.cpp \
     generalsetuparguments.cpp \
     generalsetupdialog.cpp \
     main.cpp \
     playfield.cpp \
+    pole.cpp \
     racewidget.cpp \
     racewindow.cpp \
     scorecontroller.cpp \
@@ -54,13 +54,13 @@ HEADERS += \
     avatar.h \
     button.h \
     chartwindow.h \
-    cube.h \
     edit.h \
     floor.h \
     generalsetuparguments.h \
     generalsetupdialog.h \
     panelorientation.h \
     playfield.h \
+    pole.h \
     racewidget.h \
     racewindow.h \
     scorecontroller.h \

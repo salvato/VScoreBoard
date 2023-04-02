@@ -36,7 +36,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QT_FORWARD_DECLARE_CLASS(PlayField)
 QT_FORWARD_DECLARE_CLASS(WhiteLine)
 QT_FORWARD_DECLARE_CLASS(Avatar)
-QT_FORWARD_DECLARE_CLASS(Cube)
 QT_FORWARD_DECLARE_CLASS(Pole)
 QT_FORWARD_DECLARE_CLASS(Floor)
 
@@ -105,6 +104,7 @@ private:
     QMatrix4x4 topLineModelMatrix;
     QMatrix4x4 bottomPoleModelMatrix;
     QMatrix4x4 topPoleModelMatrix;
+    QMatrix4x4 netBandMatrix;
 
     QMatrix4x4 team0ModelMatrix;
     QMatrix4x4 team1ModelMatrix;
@@ -126,7 +126,8 @@ private:
     WhiteLine* pCentralLine;
     WhiteLine* pXLine;
     WhiteLine* pZLine;
-    Cube*      pPole;
+    Pole*      pPole;
+    Pole*      pNetBand;
     Avatar*    pTeam0;
     Avatar*    pTeam1;
 
@@ -162,6 +163,6 @@ private:
     QVector3D speed1;
     float xTarget;
     int t0, t1;
-    int iMoving;
+    int teamMoving;
 };
 

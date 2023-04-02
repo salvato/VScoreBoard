@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "playfield.h"
 #include "whiteline.h"
 //#include "pole.h"
-#include "cube.h"
+#include "pole.h"
 #include "avatar.h"
 
 
@@ -73,8 +73,8 @@ RaceWidget::RaceWidget()
                                  extension,
                                 -extension,
                                  extension,
-                                near_plane,
-                                far_plane);
+                                 near_plane,
+                                 far_plane);
     lightViewMatrix.lookAt(lightPosition.toVector3D(),     // Eye
                            QVector3D( 0.0f, 0.0f,  0.0f),  // Center
                            QVector3D( 0.0f, 1.0f,  0.0f)); // Up
@@ -160,8 +160,8 @@ RaceWidget::initializeGL() {
     pCentralLine = new WhiteLine(0.05f, zField);
     pXLine       = new WhiteLine(xField, 0.05f);
     pZLine       = new WhiteLine(0.05f, zField);
-    pPole        = new Cube(2.43f, 0.2f);
-//    pPole        = new Cube();
+    pPole        = new Pole(2.43f, 0.2f);
+    pNetBand     = new Pole(2.0*zField+1.0f, 0.05f);
 
     pTeam0       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z0Start));
     pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
@@ -262,12 +262,12 @@ RaceWidget::startRace(int iSet) {
     if(score[iCurrentSet].at(indexScore+1).x() > score[iCurrentSet].at(indexScore).x()) {
         pTeam0->setSpeed(QVector3D(speed, 0.0f, 0.0f));
         pTeam1->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
-        iMoving = 0;
+        teamMoving = 0;
     }
     else {
         pTeam0->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
         pTeam1->setSpeed(QVector3D(speed, 0.0f, 0.0f));
-        iMoving = 1;
+        teamMoving = 1;
     }
     xTarget = (2.0*xField)/float(maxScore[iCurrentSet]) - xField;
     refreshTime = 15; // in ms
@@ -357,10 +357,15 @@ RaceWidget::ConfigureModelMatrices() {
     topLineModelMatrix.translate(0.0f, 0.02f, -zField+0.05f);
 
     bottomPoleModelMatrix.setToIdentity();
-    bottomPoleModelMatrix.translate(0.0f, 2.02f, zField+0.5f);
+    bottomPoleModelMatrix.translate(0.0f, 2.43f*0.5f+0.02f, zField+0.5f);
 
     topPoleModelMatrix.setToIdentity();
-    topPoleModelMatrix.translate(0.0f, 2.02f, -zField-0.5f);
+    topPoleModelMatrix.translate(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f);
+
+    netBandMatrix.setToIdentity();
+    netBandMatrix.scale(0.2f, 1.0f, 1.0f);
+    netBandMatrix.translate(0.0f, 0.5*(zField+0.5f)-0.005f, 0.0f);
+    netBandMatrix.rotate(90.0f, QVector3D(-1.0, 0.0, 0.0));
 
     team0ModelMatrix.setToIdentity();
     team0ModelMatrix.translate(pTeam0->getPos());
@@ -406,6 +411,9 @@ RaceWidget::renderPlayField(QOpenGLShaderProgram* pProgram) {
 
     pProgram->setUniformValue("model", bottomPoleModelMatrix);
     pPole->draw(pProgram);
+
+    pProgram->setUniformValue("model", netBandMatrix);
+    pNetBand->draw(pProgram);
 }
 
 
@@ -468,7 +476,7 @@ RaceWidget::onTimeToClose() {
 
 void
 RaceWidget::timerEvent(QTimerEvent*) {
-    float xCurrent = iMoving ? pTeam1->getPos().x() : pTeam0->getPos().x();
+    float xCurrent = teamMoving ? pTeam1->getPos().x() : pTeam0->getPos().x();
     if(xCurrent >= xTarget) {
         indexScore++;
         if(indexScore > score[iCurrentSet].count()-2) {
@@ -481,13 +489,13 @@ RaceWidget::timerEvent(QTimerEvent*) {
         }
         if(score[iCurrentSet].at(indexScore+1).x() >
            score[iCurrentSet].at(indexScore).x()) {
-            iMoving = 0;
+            teamMoving = 0;
             pTeam0->setSpeed(QVector3D(speed, 0.0f, 0.0f));
             pTeam1->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
             xTarget = score[iCurrentSet].at(indexScore+1).x()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;
         }
         else {
-            iMoving = 1;
+            teamMoving = 1;
             pTeam0->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
             pTeam1->setSpeed(QVector3D(speed, 0.0f, 0.0f));
             xTarget = score[iCurrentSet].at(indexScore+1).y()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;

@@ -4,13 +4,14 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
-class Cube : protected QOpenGLFunctions
+class Pole : protected QOpenGLFunctions
 {
 public:
-    Cube(float height, float diameter);
-    virtual ~Cube();
+    Pole(float height, float diameter);
+    virtual ~Pole();
 
     void draw(QOpenGLShaderProgram *program);
+    void updateStatus(float deltaTime);
 
 private:
     void initGeometry(float height, float diameter);

@@ -300,8 +300,6 @@ RaceWidget::startRace(int iSet) {
 
 void
 RaceWidget::paintGL() {
-    ConfigureModelMatrices();
-/**/
     pComputeDepthProgram->bind();
     pComputeDepthProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -343,15 +341,6 @@ RaceWidget::paintGL() {
     glBindTexture(GL_TEXTURE_2D, depthMap);
     renderQuad();
 #endif
-}
-
-
-void
-RaceWidget::ConfigureModelMatrices() {
-//    netBandMatrix.setToIdentity();
-//    netBandMatrix.scale(0.2f, 1.0f, 1.0f);
-//    netBandMatrix.translate(0.0f, 0.5*(zField+0.5f)-0.005f, 0.0f);
-//    netBandMatrix.rotate(90.0f, QVector3D(-1.0, 0.0, 0.0));
 }
 
 

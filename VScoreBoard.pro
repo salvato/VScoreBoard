@@ -34,6 +34,7 @@ SOURCES += \
     generalsetuparguments.cpp \
     generalsetupdialog.cpp \
     main.cpp \
+    object.cpp \
     playfield.cpp \
     pole.cpp \
     racewidget.cpp \
@@ -58,6 +59,7 @@ HEADERS += \
     floor.h \
     generalsetuparguments.h \
     generalsetupdialog.h \
+    object.h \
     panelorientation.h \
     playfield.h \
     pole.h \

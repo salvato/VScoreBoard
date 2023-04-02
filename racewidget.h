@@ -71,7 +71,6 @@ protected:
     void renderScene(QOpenGLShaderProgram *pProgram);
     void renderPlayField(QOpenGLShaderProgram* pProgram);
     void renderQuad();
-    void ConfigureModelMatrices();
 
     void initShaders();
     void initShadowBuffer();
@@ -91,10 +90,6 @@ private:
     QOpenGLShaderProgram* pGameProgram = nullptr;
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
     QOpenGLShaderProgram* pDebugDepthQuad;
-
-//    QMatrix4x4 bottomPoleModelMatrix;
-//    QMatrix4x4 topPoleModelMatrix;
-//    QMatrix4x4 netBandMatrix;
 
     QMatrix4x4 cameraViewMatrix;
     QMatrix4x4 cameraProjectionMatrix;

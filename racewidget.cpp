@@ -58,7 +58,7 @@ RaceWidget::RaceWidget()
     specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
 
 //    cameraPosition = QVector4D(0.0f, 10.0f, 10.0f, 1.0f);
-    cameraPosition = QVector4D(-1.5f*xField, 10.0f, 0.0f, 1.0f);
+    cameraPosition = QVector4D(-xField, 5.0f, 0.0f, 1.0f);
     cameraViewMatrix.lookAt(cameraPosition.toVector3D(),  // Eye
                             QVector3D(0.0f, 0.0f, 0.0f),  // Center
                             QVector3D(0.0f, 1.0f, 0.0f)); // Up
@@ -182,22 +182,28 @@ RaceWidget::initializeGL() {
     gameObjects.append(pTopPole);
 
     QQuaternion q = QQuaternion::fromAxisAndAngle(QVector3D(-1.0f, 0.0f, 0.0f), 90.0f);
-    pNetBand     = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+    pNetBandTop  = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
                             QVector3D(0.0f, 2.43f+0.02f, 0.0f),
                             q,
                             QVector3D(0.2f, 1.0f, 1.0f));
-    gameObjects.append(pNetBand);
+    gameObjects.append(pNetBandTop);
+
+    pNetBandBottom = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+                              QVector3D(0.0f, 1.43f+0.02f, 0.0f),
+                              q,
+                              QVector3D(0.2f, 1.0f, 1.0f));
+    gameObjects.append(pNetBandBottom);
 
     pTeam0       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z0Start));
     gameObjects.append(pTeam0);
     pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
     gameObjects.append(pTeam1);
 
-    for(int i=0; i<9; i++) {
-        hRopes.append(new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+    for(int i=0; i<8; i++) {
+        hRopes.append(new Pole(QSizeF(2.0f*zField+1.0f, 0.01f),
                                QVector3D(0.0f, 2.43f-0.03f-((i+1)*0.1f), 0.0f),
                                q,
-                               QVector3D(0.01f, 1.0f, 1.0f)));
+                               QVector3D(1.0f, 1.0f, 1.0f)));
         gameObjects.append(hRopes.at(i));
     }
 
@@ -273,7 +279,8 @@ RaceWidget::initTextures() {
     pTopLine->setTexture(pLineTexture);
     pBottomPole->setTexture(pLineTexture);
     pTopPole->setTexture(pLineTexture);
-    pNetBand->setTexture(pLineTexture);
+    pNetBandTop->setTexture(pLineTexture);
+    pNetBandBottom->setTexture(pLineTexture);
 
     pRopeTexture = new QOpenGLTexture(QImage(":/corda_nera.jpg").mirrored());
     for(int i=0; i<hRopes.count(); i++) {
@@ -376,45 +383,6 @@ RaceWidget::paintGL() {
     glBindTexture(GL_TEXTURE_2D, depthMap);
     renderQuad();
 #endif
-}
-
-
-void
-RaceWidget::renderPlayField(QOpenGLShaderProgram* pProgram) {
-//    pProgram->setUniformValue("model", pPlayField->modelMatrix());
-//    pFieldTexture->bind();
-    pPlayField->draw(pProgram);
-
-//    pLineTexture->bind();
-//    pProgram->setUniformValue("model", pCentralLine->modelMatrix());
-    pCentralLine->draw(pProgram);
-
-//    pProgram->setUniformValue("model", pLeftLine->modelMatrix());
-    pLeftLine->draw(pProgram);
-
-//    pProgram->setUniformValue("model", pLeft3mLine->modelMatrix());
-    pLeft3mLine->draw(pProgram);
-
-//    pProgram->setUniformValue("model", pRightLine->modelMatrix());
-    pRightLine->draw(pProgram);
-
-//    pProgram->setUniformValue("model", pRight3mLine->modelMatrix());
-    pRight3mLine->draw(pProgram);
-
-//    pProgram->setUniformValue("model", pBottomLine->modelMatrix());
-    pBottomLine->draw(pProgram);
-
-//    pProgram->setUniformValue("model", pTopLine->modelMatrix());
-    pTopLine->draw(pProgram);
-
-//    pProgram->setUniformValue("model", pTopPole->modelMatrix());
-    pTopPole->draw(pProgram);
-
-//    pProgram->setUniformValue("model", pBottomPole->modelMatrix());
-    pBottomPole->draw(pProgram);
-
-//    pProgram->setUniformValue("model", pNetBand->modelMatrix());
-    pNetBand->draw(pProgram);
 }
 
 

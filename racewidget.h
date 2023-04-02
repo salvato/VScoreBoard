@@ -70,7 +70,6 @@ protected:
     void resizeGL(int w, int h) override;
     void paintGL() override;
     void renderScene(QOpenGLShaderProgram *pProgram);
-    void renderPlayField(QOpenGLShaderProgram* pProgram);
     void renderQuad();
 
     void initShaders();
@@ -118,7 +117,8 @@ private:
     WhiteLine* pTopLine;
     Pole*      pBottomPole;
     Pole*      pTopPole;
-    Pole*      pNetBand;
+    Pole*      pNetBandTop;
+    Pole*      pNetBandBottom;
     Avatar*    pTeam0;
     Avatar*    pTeam1;
     QVector<Pole*> hRopes;

@@ -1,14 +1,16 @@
 #include "avatar.h"
 
 
-Avatar::Avatar(float _radius,
-               QVector3D _position,
+Avatar::Avatar(float       _radius,
+               QVector3D   _position,
                QQuaternion _rotation,
-               QVector3D _speed)
+               QVector3D   _scale,
+               QVector3D   _speed)
     : Sphere(_radius, 40, 40)
     , radius(_radius)
     , position(_position)
     , rotation(_rotation)
+    , scale(_scale)
     , speed(_speed)
 {
 }
@@ -61,11 +63,24 @@ Avatar::updateStatus(float deltaTime) {
 }
 
 
+void
+Avatar::setScale(QVector3D newScale) {
+    scale = newScale;
+}
+
+
+QVector3D
+Avatar::getScale() {
+    return scale;
+}
+
+
 QMatrix4x4
 Avatar::modelMatrix() {
     QMatrix4x4 M;
     M.setToIdentity();
     M.translate(position);
     M.rotate(rotation);
+    M.scale(scale);
     return M;
 }

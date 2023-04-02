@@ -92,9 +92,9 @@ private:
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
     QOpenGLShaderProgram* pDebugDepthQuad;
 
-    QMatrix4x4 bottomPoleModelMatrix;
-    QMatrix4x4 topPoleModelMatrix;
-    QMatrix4x4 netBandMatrix;
+//    QMatrix4x4 bottomPoleModelMatrix;
+//    QMatrix4x4 topPoleModelMatrix;
+//    QMatrix4x4 netBandMatrix;
 
     QMatrix4x4 cameraViewMatrix;
     QMatrix4x4 cameraProjectionMatrix;
@@ -117,7 +117,8 @@ private:
     WhiteLine* pRightLine;
     WhiteLine* pBottomLine;
     WhiteLine* pTopLine;
-    Pole*      pPole;
+    Pole*      pBottomPole;
+    Pole*      pTopPole;
     Pole*      pNetBand;
     Avatar*    pTeam0;
     Avatar*    pTeam1;

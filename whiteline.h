@@ -10,12 +10,15 @@ class WhiteLine : protected QOpenGLFunctions_3_3_Core
 {
 public:
     WhiteLine(QSizeF      _size,
-              QVector3D   _position=QVector3D(0.0f, 0.0f, 0.0f),
-              QQuaternion _rotation=QQuaternion(),
-              QVector3D   _speed   =QVector3D(0.0f, 0.0f, 0.0f));
+              QVector3D   _position = QVector3D(0.0f, 0.0f, 0.0f),
+              QQuaternion _rotation = QQuaternion(),
+              QVector3D   _scale    = QVector3D(1.0f, 1.0f, 1.0f),
+              QVector3D   _speed    = QVector3D(0.0f, 0.0f, 0.0f));
     ~WhiteLine();
 
 public:
+    void setScale(QVector3D newScale);
+    QVector3D getScale();
     QVector3D getPos();
     void setPos(QVector3D newPos);
     QVector3D getSpeed();
@@ -33,5 +36,6 @@ private:
     QSizeF      size;
     QVector3D   position;
     QQuaternion rotation;
+    QVector3D   scale;
     QVector3D   speed;
 };

@@ -935,8 +935,8 @@ VolleyController::onButtonStatisticsClicked() {
         if(setSelectionDialog.exec() == QDialog::Accepted) {
             pRaceWindow->resetAll();
 //            pRaceWindow->show();
-            pRaceWindow->showFullScreen();
-//            pRaceWindow->showMaximized();
+//            pRaceWindow->showFullScreen();
+            pRaceWindow->showMaximized();
             if(pRaceWindow->isVisible()) {
                 pPixmap->load(":/buttonIcons/sign_stop.png");
                 while(!bEnd) {

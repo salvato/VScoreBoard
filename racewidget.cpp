@@ -169,8 +169,19 @@ RaceWidget::initializeGL() {
     pBottomLine  = new WhiteLine(QSizeF(xField, 0.05f), QVector3D(0.0f, 0.02f,  zField-0.05f));
     pTopLine     = new WhiteLine(QSizeF(xField, 0.05f), QVector3D(0.0f, 0.02f, -zField+0.05f));
 
-    pPole        = new Pole(2.43f, 0.2f);
-    pNetBand     = new Pole(2.0*zField+1.0f, 0.05f);
+    pBottomPole  = new Pole(QSizeF(2.43f, 0.2f), QVector3D(0.0f, 2.43f*0.5f+0.02f,  zField+0.5f));
+    pTopPole     = new Pole(QSizeF(2.43f, 0.2f), QVector3D(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f));
+
+//    pNetBand     = new Pole(QSizeF(2.0*zField+1.0f, 0.05f),
+//                            QVector3D(xField, 0.5*(zField+0.5f)-0.005f, 0.0f),
+//                            QQuaternion(45.0f, QVector3D(-1.0, 0.0, 0.0)),
+//                            QVector3D(1.0f, 1.0f, 1.0f));
+
+    QQuaternion q = QQuaternion::fromAxisAndAngle(QVector3D(-1.0f, 0.0f, 0.0f), 90.0f);
+    pNetBand     = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+                            QVector3D(0.0f, 2.43f+0.02f, 0.0f),
+                            q,
+                            QVector3D(0.2f, 1.0f, 1.0f));
 
     pTeam0       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z0Start));
     pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
@@ -337,17 +348,10 @@ RaceWidget::paintGL() {
 
 void
 RaceWidget::ConfigureModelMatrices() {
-    bottomPoleModelMatrix.setToIdentity();
-    bottomPoleModelMatrix.translate(0.0f, 2.43f*0.5f+0.02f, zField+0.5f);
-
-    topPoleModelMatrix.setToIdentity();
-    topPoleModelMatrix.translate(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f);
-
-    netBandMatrix.setToIdentity();
-    netBandMatrix.scale(0.2f, 1.0f, 1.0f);
-    netBandMatrix.translate(0.0f, 0.5*(zField+0.5f)-0.005f, 0.0f);
-    netBandMatrix.rotate(90.0f, QVector3D(-1.0, 0.0, 0.0));
-
+//    netBandMatrix.setToIdentity();
+//    netBandMatrix.scale(0.2f, 1.0f, 1.0f);
+//    netBandMatrix.translate(0.0f, 0.5*(zField+0.5f)-0.005f, 0.0f);
+//    netBandMatrix.rotate(90.0f, QVector3D(-1.0, 0.0, 0.0));
 }
 
 
@@ -379,13 +383,13 @@ RaceWidget::renderPlayField(QOpenGLShaderProgram* pProgram) {
     pProgram->setUniformValue("model", pTopLine->modelMatrix());
     pTopLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", topPoleModelMatrix);
-    pPole->draw(pProgram);
+    pProgram->setUniformValue("model", pTopPole->modelMatrix());
+    pTopPole->draw(pProgram);
 
-    pProgram->setUniformValue("model", bottomPoleModelMatrix);
-    pPole->draw(pProgram);
+    pProgram->setUniformValue("model", pBottomPole->modelMatrix());
+    pBottomPole->draw(pProgram);
 
-    pProgram->setUniformValue("model", netBandMatrix);
+    pProgram->setUniformValue("model", pNetBand->modelMatrix());
     pNetBand->draw(pProgram);
 }
 

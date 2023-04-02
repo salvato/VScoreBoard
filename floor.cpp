@@ -5,10 +5,12 @@
 Floor::Floor(QSizeF      _size,
              QVector3D   _position,
              QQuaternion _rotation,
+             QVector3D   _scale,
              QVector3D   _speed)
     : size(_size)
     , position(_position)
     , rotation(_rotation)
+    , scale(_scale)
     , speed(_speed)
 {
     initializeOpenGLFunctions();
@@ -106,6 +108,18 @@ Floor::setSpeed(QVector3D newSpeed) {
 
 
 void
+Floor::setScale(QVector3D newScale) {
+    scale = newScale;
+}
+
+
+QVector3D
+Floor::getScale() {
+    return scale;
+}
+
+
+void
 Floor::updateStatus(float deltaTime) {
     (void) deltaTime;
 }
@@ -117,5 +131,6 @@ Floor::modelMatrix() {
     M.setToIdentity();
     M.translate(position);
     M.rotate(rotation);
+    M.scale(scale);
     return M;
 }

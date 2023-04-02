@@ -3,10 +3,12 @@
 WhiteLine::WhiteLine(QSizeF      _size,
                      QVector3D   _position,
                      QQuaternion _rotation,
+                     QVector3D   _scale,
                      QVector3D   _speed)
     : size(_size)
     , position(_position)
     , rotation(_rotation)
+    , scale(_scale)
     , speed(_speed)
 {
     initializeOpenGLFunctions();
@@ -102,6 +104,18 @@ WhiteLine::setSpeed(QVector3D newSpeed) {
 
 
 void
+WhiteLine::setScale(QVector3D newScale) {
+    scale = newScale;
+}
+
+
+QVector3D
+WhiteLine::getScale() {
+    return scale;
+}
+
+
+void
 WhiteLine::updateStatus(float deltaTime) {
     (void) deltaTime;
 }
@@ -113,5 +127,6 @@ WhiteLine::modelMatrix() {
     M.setToIdentity();
     M.translate(position);
     M.rotate(rotation);
+    M.scale(scale);
     return M;
 }

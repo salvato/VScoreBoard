@@ -11,8 +11,17 @@ struct VertexData
 };
 
 
-Pole::Pole(float height, float diameter)
-    : indexBuf(QOpenGLBuffer::IndexBuffer)
+Pole::Pole(QSizeF      _size,
+           QVector3D   _position,
+           QQuaternion _rotation,
+           QVector3D   _scale,
+           QVector3D   _speed)
+    : size(_size)
+    , position(_position)
+    , rotation(_rotation)
+    , scale(_scale)
+    , speed(_speed)
+    , indexBuf(QOpenGLBuffer::IndexBuffer)
 {
     initializeOpenGLFunctions();
 
@@ -21,7 +30,7 @@ Pole::Pole(float height, float diameter)
     indexBuf.create();
 
     // Initializes the geometry and transfers it to VBOs
-    initGeometry(height, diameter);
+    initGeometry(size.width(), size.height());
 }
 
 
@@ -122,7 +131,66 @@ Pole::draw(QOpenGLShaderProgram* pProgram) {
 }
 
 
+QVector3D
+Pole::getPos() {
+    return position;
+}
+
+
+void
+Pole::setPos(QVector3D newPos) {
+    position = newPos;
+}
+
+
+QQuaternion
+Pole::getRotation() {
+    return rotation;
+}
+
+
+void
+Pole::setRotation(QQuaternion newRotation) {
+    rotation = newRotation;
+}
+
+
+QVector3D
+Pole::getSpeed(){
+    return speed;
+}
+
+
+void
+Pole::setSpeed(QVector3D newSpeed) {
+    speed = newSpeed;
+}
+
+
 void
 Pole::updateStatus(float deltaTime) {
-    (void)deltaTime;
+    (void) deltaTime;
+}
+
+
+void
+Pole::setScale(QVector3D newScale) {
+    scale = newScale;
+}
+
+
+QVector3D
+Pole::getScale() {
+    return scale;
+}
+
+
+QMatrix4x4
+Pole::modelMatrix() {
+    QMatrix4x4 M;
+    M.setToIdentity();
+    M.translate(position);
+    M.rotate(rotation);
+    M.scale(scale);
+    return M;
 }

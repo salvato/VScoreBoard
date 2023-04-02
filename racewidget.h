@@ -87,6 +87,7 @@ private:
     QOpenGLTexture* pFieldTexture  = nullptr;
     QOpenGLTexture* pLineTexture   = nullptr;
     QOpenGLTexture* pWoodTexture   = nullptr;
+    QOpenGLTexture* pRopeTexture   = nullptr;
 
     QOpenGLShaderProgram* pGameProgram = nullptr;
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
@@ -120,10 +121,8 @@ private:
     Pole*      pNetBand;
     Avatar*    pTeam0;
     Avatar*    pTeam1;
+    QVector<Pole*> hRopes;
 
-    QVector3D rotationAxis;
-    QQuaternion rotation1;
-    QQuaternion rotation0;
     float xCamera =  0.0;
     float yCamera = 15.0;
     float zCamera = 20.0;
@@ -131,7 +130,7 @@ private:
     float z1Start = -2.0;
     float xField  =  9.0;
     float zField  =  4.5;
-    int   nVertices;
+
     float ballRadius;
     QString sTeamName[2];
     QVector<QVector2D> score[5];

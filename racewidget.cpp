@@ -57,8 +57,9 @@ RaceWidget::RaceWidget()
     diffuseColor  = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
     specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
 
-    cameraPosition = QVector4D(0.0f, 10.0f, 10.0f, 1.0f);
-    cameraViewMatrix.lookAt(cameraPosition.toVector3D(),        // Eye
+//    cameraPosition = QVector4D(0.0f, 10.0f, 10.0f, 1.0f);
+    cameraPosition = QVector4D(-1.5f*xField, 10.0f, 0.0f, 1.0f);
+    cameraViewMatrix.lookAt(cameraPosition.toVector3D(),  // Eye
                             QVector3D(0.0f, 0.0f, 0.0f),  // Center
                             QVector3D(0.0f, 1.0f, 0.0f)); // Up
 
@@ -192,6 +193,14 @@ RaceWidget::initializeGL() {
     pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
     gameObjects.append(pTeam1);
 
+    for(int i=0; i<9; i++) {
+        hRopes.append(new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+                               QVector3D(0.0f, 2.43f-0.03f-((i+1)*0.1f), 0.0f),
+                               q,
+                               QVector3D(0.01f, 1.0f, 1.0f)));
+        gameObjects.append(hRopes.at(i));
+    }
+
     initShaders();
     initTextures();
     initShadowBuffer();
@@ -265,6 +274,11 @@ RaceWidget::initTextures() {
     pBottomPole->setTexture(pLineTexture);
     pTopPole->setTexture(pLineTexture);
     pNetBand->setTexture(pLineTexture);
+
+    pRopeTexture = new QOpenGLTexture(QImage(":/corda_nera.jpg").mirrored());
+    for(int i=0; i<hRopes.count(); i++) {
+        hRopes.at(i)->setTexture(pRopeTexture);
+    }
 }
 
 

@@ -7,16 +7,15 @@ Floor::Floor(QSizeF      _size,
              QQuaternion _rotation,
              QVector3D   _scale,
              QVector3D   _speed)
-    : size(_size)
-    , position(_position)
-    , rotation(_rotation)
-    , scale(_scale)
-    , speed(_speed)
+    : Object(_position,
+             _rotation,
+             _scale,
+             _speed)
 {
     initializeOpenGLFunctions();
 
-    float xFloor = size.width();
-    float zFloor = size.height();
+    float xFloor = _size.width();
+    float zFloor = _size.height();
 
     QVector<float>  vertices;
     vertices <<
@@ -37,9 +36,8 @@ Floor::Floor(QSizeF      _size,
 }
 
 
-
 Floor::~Floor() {
-
+    floorBuf.destroy();
 }
 
 
@@ -68,69 +66,4 @@ Floor::draw(QOpenGLShaderProgram* pProgram) {
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     floorBuf.release();
-}
-
-
-QVector3D
-Floor::getPos() {
-    return position;
-}
-
-
-void
-Floor::setPos(QVector3D newPos) {
-    position = newPos;
-}
-
-
-QQuaternion
-Floor::getRotation() {
-    return rotation;
-}
-
-
-void
-Floor::setRotation(QQuaternion newRotation) {
-    rotation = newRotation;
-}
-
-
-QVector3D
-Floor::getSpeed(){
-    return speed;
-}
-
-
-void
-Floor::setSpeed(QVector3D newSpeed) {
-    speed = newSpeed;
-}
-
-
-void
-Floor::setScale(QVector3D newScale) {
-    scale = newScale;
-}
-
-
-QVector3D
-Floor::getScale() {
-    return scale;
-}
-
-
-void
-Floor::updateStatus(float deltaTime) {
-    (void) deltaTime;
-}
-
-
-QMatrix4x4
-Floor::modelMatrix() {
-    QMatrix4x4 M;
-    M.setToIdentity();
-    M.translate(position);
-    M.rotate(rotation);
-    M.scale(scale);
-    return M;
 }

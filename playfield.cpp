@@ -4,16 +4,17 @@
 
 PlayField::PlayField(QSizeF      _size,
                      QVector3D   _position,
-                     QQuaternion _rotation,
+                     QQuaternion _rotation, QVector3D _scale,
                      QVector3D   _speed)
-    : size(_size)
-    , position(_position)
-    , rotation(_rotation)
-    , speed(_speed)
+    : Object(_position,
+             _rotation,
+             _scale,
+             _speed)
 {
     initializeOpenGLFunctions();
-    float xField = size.width();
-    float zField = size.height();
+
+    float xField = _size.width();
+    float zField = _size.height();
 
     QVector<float> vertices;
     vertices <<
@@ -35,6 +36,7 @@ PlayField::PlayField(QSizeF      _size,
 
 
 PlayField::~PlayField() {
+    fieldBuf.destroy();
 }
 
 
@@ -65,54 +67,3 @@ PlayField::draw(QOpenGLShaderProgram* pProgram) {
     fieldBuf.release();
 }
 
-
-QVector3D
-PlayField::getPos() {
-    return position;
-}
-
-
-void
-PlayField::setPos(QVector3D newPos) {
-    position = newPos;
-}
-
-
-QQuaternion
-PlayField::getRotation() {
-    return rotation;
-}
-
-
-void
-PlayField::setRotation(QQuaternion newRotation) {
-    rotation = newRotation;
-}
-
-
-QVector3D
-PlayField::getSpeed(){
-    return speed;
-}
-
-
-void
-PlayField::setSpeed(QVector3D newSpeed) {
-    speed = newSpeed;
-}
-
-
-void
-PlayField::updateStatus(float deltaTime) {
-    (void) deltaTime;
-}
-
-
-QMatrix4x4
-PlayField::modelMatrix() {
-    QMatrix4x4 M;
-    M.setToIdentity();
-    M.translate(position);
-    M.rotate(rotation);
-    return M;
-}

@@ -1,10 +1,12 @@
 #pragma once
 
+#include "object.h"
+
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
-class Pole : protected QOpenGLFunctions
+class Pole : public Object, protected QOpenGLFunctions
 {
 public:
     Pole(QSizeF      _size,
@@ -12,31 +14,15 @@ public:
          QQuaternion _rotation = QQuaternion(),
          QVector3D   _scale    = QVector3D(1.0f, 1.0f, 1.0f),
          QVector3D   _speed    = QVector3D(0.0f, 0.0f, 0.0f));
-    virtual ~Pole();
+    ~Pole();
 
 public:
-    void setScale(QVector3D newScale);
-    QVector3D getScale();
-    QVector3D getPos();
-    void setPos(QVector3D newPos);
-    QVector3D getSpeed();
-    void setSpeed(QVector3D newSpeed);
-    QQuaternion getRotation();
-    void setRotation(QQuaternion newRotation);
-    void updateStatus(float deltaTime);
-    QMatrix4x4 modelMatrix();
     void draw(QOpenGLShaderProgram* pProgram);
 
 private:
     void initGeometry(float height, float diameter);
 
 private:
-    QSizeF      size;
-    QVector3D   position;
-    QQuaternion rotation;
-    QVector3D   scale;
-    QVector3D   speed;
-
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
 };

@@ -5,16 +5,15 @@ WhiteLine::WhiteLine(QSizeF      _size,
                      QQuaternion _rotation,
                      QVector3D   _scale,
                      QVector3D   _speed)
-    : size(_size)
-    , position(_position)
-    , rotation(_rotation)
-    , scale(_scale)
-    , speed(_speed)
+    : Object(_position,
+             _rotation,
+             _scale,
+             _speed)
 {
     initializeOpenGLFunctions();
 
-    float xDim = size.width();
-    float zDim = size.height();
+    float xDim = _size.width();
+    float zDim = _size.height();
 
     QVector<float> vertices;
     vertices <<
@@ -36,6 +35,7 @@ WhiteLine::WhiteLine(QSizeF      _size,
 
 
 WhiteLine::~WhiteLine() {
+    lineBuf.destroy();
 }
 
 
@@ -64,69 +64,4 @@ WhiteLine::draw(QOpenGLShaderProgram* pProgram) {
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     lineBuf.release();
-}
-
-
-QVector3D
-WhiteLine::getPos() {
-    return position;
-}
-
-
-void
-WhiteLine::setPos(QVector3D newPos) {
-    position = newPos;
-}
-
-
-QQuaternion
-WhiteLine::getRotation() {
-    return rotation;
-}
-
-
-void
-WhiteLine::setRotation(QQuaternion newRotation) {
-    rotation = newRotation;
-}
-
-
-QVector3D
-WhiteLine::getSpeed(){
-    return speed;
-}
-
-
-void
-WhiteLine::setSpeed(QVector3D newSpeed) {
-    speed = newSpeed;
-}
-
-
-void
-WhiteLine::setScale(QVector3D newScale) {
-    scale = newScale;
-}
-
-
-QVector3D
-WhiteLine::getScale() {
-    return scale;
-}
-
-
-void
-WhiteLine::updateStatus(float deltaTime) {
-    (void) deltaTime;
-}
-
-
-QMatrix4x4
-WhiteLine::modelMatrix() {
-    QMatrix4x4 M;
-    M.setToIdentity();
-    M.translate(position);
-    M.rotate(rotation);
-    M.scale(scale);
-    return M;
 }

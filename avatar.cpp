@@ -6,49 +6,12 @@ Avatar::Avatar(float       _radius,
                QQuaternion _rotation,
                QVector3D   _scale,
                QVector3D   _speed)
-    : Sphere(_radius, 40, 40)
-    , radius(_radius)
-    , position(_position)
-    , rotation(_rotation)
-    , scale(_scale)
-    , speed(_speed)
+    : Object(_position,
+             _rotation,
+             _scale,
+             _speed)
+    , Sphere(_radius, 40, 40)
 {
-}
-
-
-QVector3D
-Avatar::getPos() {
-    return position;
-}
-
-
-void
-Avatar::setPos(QVector3D newPos) {
-    position = newPos;
-}
-
-
-QQuaternion
-Avatar::getRotation() {
-    return rotation;
-}
-
-
-void
-Avatar::setRotation(QQuaternion newRotation) {
-    rotation = newRotation;
-}
-
-
-QVector3D
-Avatar::getSpeed(){
-    return speed;
-}
-
-
-void   
-Avatar::setSpeed(QVector3D newSpeed) {
-    speed = newSpeed;
 }
 
 
@@ -62,25 +25,3 @@ Avatar::updateStatus(float deltaTime) {
     rotation *= qx * qy * qz;
 }
 
-
-void
-Avatar::setScale(QVector3D newScale) {
-    scale = newScale;
-}
-
-
-QVector3D
-Avatar::getScale() {
-    return scale;
-}
-
-
-QMatrix4x4
-Avatar::modelMatrix() {
-    QMatrix4x4 M;
-    M.setToIdentity();
-    M.translate(position);
-    M.rotate(rotation);
-    M.scale(scale);
-    return M;
-}

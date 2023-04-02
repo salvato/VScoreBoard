@@ -96,6 +96,7 @@ RaceWidget::~RaceWidget() {
 
 void
 RaceWidget::closeEvent(QCloseEvent* event) {
+    timer.stop();
     makeCurrent();
     doneCurrent();
     emit raceDone();
@@ -194,13 +195,25 @@ RaceWidget::initializeGL() {
                               QVector3D(0.2f, 1.0f, 1.0f));
     gameObjects.append(pNetBandBottom);
 
+    pNetBandLeft = new Pole(QSizeF(1.0f, 0.05f),
+                            QVector3D(0.0f, 1.93f+0.02f, -zField),
+                            QQuaternion(),
+                            QVector3D(0.2f, 1.0f, 1.0f));
+    gameObjects.append(pNetBandLeft);
+
+    pNetBandRight = new Pole(QSizeF(1.0f, 0.05f),
+                             QVector3D(0.0f, 1.93f+0.02f, zField),
+                             QQuaternion(),
+                             QVector3D(0.2f, 1.0f, 1.0f));
+    gameObjects.append(pNetBandRight);
+
     pTeam0       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z0Start));
     gameObjects.append(pTeam0);
     pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
     gameObjects.append(pTeam1);
 
     for(int i=0; i<8; i++) {
-        hRopes.append(new Pole(QSizeF(2.0f*zField+1.0f, 0.01f),
+        hRopes.append(new Pole(QSizeF(2.0f*zField, 0.01f),
                                QVector3D(0.0f, 2.43f-0.03f-((i+1)*0.1f), 0.0f),
                                q,
                                QVector3D(1.0f, 1.0f, 1.0f)));

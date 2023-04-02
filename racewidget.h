@@ -119,6 +119,8 @@ private:
     Pole*      pTopPole;
     Pole*      pNetBandTop;
     Pole*      pNetBandBottom;
+    Pole*      pNetBandLeft;
+    Pole*      pNetBandRight;
     Avatar*    pTeam0;
     Avatar*    pTeam1;
     QVector<Pole*> hRopes;

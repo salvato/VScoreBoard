@@ -1,7 +1,18 @@
 #include "whiteline.h"
 
-WhiteLine::WhiteLine(float xDim, float zDim) {
+WhiteLine::WhiteLine(QSizeF      _size,
+                     QVector3D   _position,
+                     QQuaternion _rotation,
+                     QVector3D   _speed)
+    : size(_size)
+    , position(_position)
+    , rotation(_rotation)
+    , speed(_speed)
+{
     initializeOpenGLFunctions();
+
+    float xDim = size.width();
+    float zDim = size.height();
 
     QVector<float> vertices;
     vertices <<
@@ -51,4 +62,56 @@ WhiteLine::draw(QOpenGLShaderProgram* pProgram) {
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     lineBuf.release();
+}
+
+
+QVector3D
+WhiteLine::getPos() {
+    return position;
+}
+
+
+void
+WhiteLine::setPos(QVector3D newPos) {
+    position = newPos;
+}
+
+
+QQuaternion
+WhiteLine::getRotation() {
+    return rotation;
+}
+
+
+void
+WhiteLine::setRotation(QQuaternion newRotation) {
+    rotation = newRotation;
+}
+
+
+QVector3D
+WhiteLine::getSpeed(){
+    return speed;
+}
+
+
+void
+WhiteLine::setSpeed(QVector3D newSpeed) {
+    speed = newSpeed;
+}
+
+
+void
+WhiteLine::updateStatus(float deltaTime) {
+    (void) deltaTime;
+}
+
+
+QMatrix4x4
+WhiteLine::modelMatrix() {
+    QMatrix4x4 M;
+    M.setToIdentity();
+    M.translate(position);
+    M.rotate(rotation);
+    return M;
 }

@@ -15,7 +15,6 @@ Floor::Floor(QSizeF      _size,
 
     float xFloor = size.width();
     float zFloor = size.height();
-    speed = QVector3D(0.0f, 0.0f, 0.0f);
 
     QVector<float>  vertices;
     vertices <<

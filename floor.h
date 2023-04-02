@@ -26,12 +26,12 @@ public:
     QMatrix4x4 modelMatrix();
     void draw(QOpenGLShaderProgram* pProgram);
 
+protected:
+    QOpenGLBuffer floorBuf;
+
 private:
     QSizeF      size;
     QVector3D   position;
     QQuaternion rotation;
     QVector3D   speed;
-
-protected:
-    QOpenGLBuffer floorBuf;
 };

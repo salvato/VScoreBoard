@@ -156,10 +156,19 @@ RaceWidget::initializeGL() {
 
     pFloor       = new Floor(QSizeF(50.0f, 50.0f));
 
-    pPlayField   = new PlayField(xField, zField);
-    pCentralLine = new WhiteLine(0.05f, zField);
-    pXLine       = new WhiteLine(xField, 0.05f);
-    pZLine       = new WhiteLine(0.05f, zField);
+    // Slightltly higer than Floor
+    pPlayField   = new PlayField(QSizeF(xField, zField), QVector3D(0.0f, 0.01f, 0.0f));
+
+    // Slightltly higer than PlayField
+    pLeftLine    = new WhiteLine(QSizeF(0.05f, zField), QVector3D(-xField+0.05f, 0.02f, 0.0f));
+    pLeft3mLine  = new WhiteLine(QSizeF(0.05f, zField), QVector3D(-3.0f+0.05f, 0.02f, 0.0f));
+    pCentralLine = new WhiteLine(QSizeF(0.05f, zField), QVector3D(0.0f, 0.02f, 0.0f));
+    pRight3mLine = new WhiteLine(QSizeF(0.05f, zField), QVector3D(3.0f-0.05f, 0.02f, 0.0f));
+    pRightLine   = new WhiteLine(QSizeF(0.05f, zField), QVector3D(xField-0.05f, 0.02f, 0.0f));
+
+    pBottomLine  = new WhiteLine(QSizeF(xField, 0.05f), QVector3D(0.0f, 0.02f,  zField-0.05f));
+    pTopLine     = new WhiteLine(QSizeF(xField, 0.05f), QVector3D(0.0f, 0.02f, -zField+0.05f));
+
     pPole        = new Pole(2.43f, 0.2f);
     pNetBand     = new Pole(2.0*zField+1.0f, 0.05f);
 
@@ -328,30 +337,6 @@ RaceWidget::paintGL() {
 
 void
 RaceWidget::ConfigureModelMatrices() {
-    fieldModelMatrix.setToIdentity();
-    fieldModelMatrix.translate(0.0f, 0.01f, 0.0f);
-
-    centralLineModelMatrix.setToIdentity();
-    centralLineModelMatrix.translate(0.0f, 0.02f, 0.0f);
-
-    leftLineModelMatrix.setToIdentity();
-    leftLineModelMatrix.translate(-xField+0.05f, 0.02f, 0.0f);
-
-    left3mLineModelMatrix.setToIdentity();
-    left3mLineModelMatrix.translate(-3.0f+0.05f, 0.02f, 0.0f);
-
-    rightLineModelMatrix.setToIdentity();
-    rightLineModelMatrix.translate(xField-0.05f, 0.02f, 0.0f);
-
-    right3mLineModelMatrix.setToIdentity();
-    right3mLineModelMatrix.translate(3.0f-0.05f, 0.02f, 0.0f);
-
-    bottomLineModelMatrix.setToIdentity();
-    bottomLineModelMatrix.translate(0.0f, 0.02f, zField-0.05f);
-
-    topLineModelMatrix.setToIdentity();
-    topLineModelMatrix.translate(0.0f, 0.02f, -zField+0.05f);
-
     bottomPoleModelMatrix.setToIdentity();
     bottomPoleModelMatrix.translate(0.0f, 2.43f*0.5f+0.02f, zField+0.5f);
 
@@ -368,31 +353,31 @@ RaceWidget::ConfigureModelMatrices() {
 
 void
 RaceWidget::renderPlayField(QOpenGLShaderProgram* pProgram) {
-    pProgram->setUniformValue("model", fieldModelMatrix);
+    pProgram->setUniformValue("model", pPlayField->modelMatrix());
     pFieldTexture->bind();
     pPlayField->draw(pProgram);
 
     pLineTexture->bind();
-    pProgram->setUniformValue("model", centralLineModelMatrix);
+    pProgram->setUniformValue("model", pCentralLine->modelMatrix());
     pCentralLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", leftLineModelMatrix);
-    pZLine->draw(pProgram);
+    pProgram->setUniformValue("model", pLeftLine->modelMatrix());
+    pLeftLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", left3mLineModelMatrix);
-    pZLine->draw(pProgram);
+    pProgram->setUniformValue("model", pLeft3mLine->modelMatrix());
+    pLeft3mLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", rightLineModelMatrix);
-    pZLine->draw(pProgram);
+    pProgram->setUniformValue("model", pRightLine->modelMatrix());
+    pRightLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", right3mLineModelMatrix);
-    pZLine->draw(pProgram);
+    pProgram->setUniformValue("model", pRight3mLine->modelMatrix());
+    pRight3mLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", bottomLineModelMatrix);
-    pXLine->draw(pProgram);
+    pProgram->setUniformValue("model", pBottomLine->modelMatrix());
+    pBottomLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", topLineModelMatrix);
-    pXLine->draw(pProgram);
+    pProgram->setUniformValue("model", pTopLine->modelMatrix());
+    pTopLine->draw(pProgram);
 
     pProgram->setUniformValue("model", topPoleModelMatrix);
     pPole->draw(pProgram);

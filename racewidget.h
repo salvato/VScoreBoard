@@ -92,14 +92,6 @@ private:
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
     QOpenGLShaderProgram* pDebugDepthQuad;
 
-    QMatrix4x4 fieldModelMatrix;
-    QMatrix4x4 centralLineModelMatrix;
-    QMatrix4x4 leftLineModelMatrix;
-    QMatrix4x4 left3mLineModelMatrix;
-    QMatrix4x4 rightLineModelMatrix;
-    QMatrix4x4 right3mLineModelMatrix;
-    QMatrix4x4 bottomLineModelMatrix;
-    QMatrix4x4 topLineModelMatrix;
     QMatrix4x4 bottomPoleModelMatrix;
     QMatrix4x4 topPoleModelMatrix;
     QMatrix4x4 netBandMatrix;
@@ -118,9 +110,13 @@ private:
 
     Floor*     pFloor;
     PlayField* pPlayField;
+    WhiteLine* pLeftLine;
+    WhiteLine* pLeft3mLine;
     WhiteLine* pCentralLine;
-    WhiteLine* pXLine;
-    WhiteLine* pZLine;
+    WhiteLine* pRight3mLine;
+    WhiteLine* pRightLine;
+    WhiteLine* pBottomLine;
+    WhiteLine* pTopLine;
     Pole*      pPole;
     Pole*      pNetBand;
     Avatar*    pTeam0;

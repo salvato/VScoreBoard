@@ -2,8 +2,18 @@
 #include <QVector>
 
 
-PlayField::PlayField(float xField, float zField) {
+PlayField::PlayField(QSizeF      _size,
+                     QVector3D   _position,
+                     QQuaternion _rotation,
+                     QVector3D   _speed)
+    : size(_size)
+    , position(_position)
+    , rotation(_rotation)
+    , speed(_speed)
+{
     initializeOpenGLFunctions();
+    float xField = size.width();
+    float zField = size.height();
 
     QVector<float> vertices;
     vertices <<
@@ -53,4 +63,56 @@ PlayField::draw(QOpenGLShaderProgram* pProgram) {
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     fieldBuf.release();
+}
+
+
+QVector3D
+PlayField::getPos() {
+    return position;
+}
+
+
+void
+PlayField::setPos(QVector3D newPos) {
+    position = newPos;
+}
+
+
+QQuaternion
+PlayField::getRotation() {
+    return rotation;
+}
+
+
+void
+PlayField::setRotation(QQuaternion newRotation) {
+    rotation = newRotation;
+}
+
+
+QVector3D
+PlayField::getSpeed(){
+    return speed;
+}
+
+
+void
+PlayField::setSpeed(QVector3D newSpeed) {
+    speed = newSpeed;
+}
+
+
+void
+PlayField::updateStatus(float deltaTime) {
+    (void) deltaTime;
+}
+
+
+QMatrix4x4
+PlayField::modelMatrix() {
+    QMatrix4x4 M;
+    M.setToIdentity();
+    M.translate(position);
+    M.rotate(rotation);
+    return M;
 }

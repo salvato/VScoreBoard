@@ -1,5 +1,8 @@
 #include "object.h"
 
+#include<QOpenGLShaderProgram>
+
+
 Object::Object(QVector3D   _position,
                QQuaternion _rotation,
                QVector3D   _scale,
@@ -63,6 +66,18 @@ Object::setScale(QVector3D newScale) {
 QVector3D
 Object::getScale() {
     return scale;
+}
+
+
+void
+Object::setTexture(QOpenGLTexture* _pTexture) {
+    pTexture = _pTexture;
+}
+
+
+void
+Object::draw(QOpenGLShaderProgram* pProgram) {
+    (void) pProgram;
 }
 
 

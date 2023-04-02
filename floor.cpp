@@ -1,5 +1,7 @@
 #include "floor.h"
+
 #include <QVector>
+#include <QOpenglTexture>
 
 
 Floor::Floor(QSizeF      _size,
@@ -43,7 +45,10 @@ Floor::~Floor() {
 
 void
 Floor::draw(QOpenGLShaderProgram* pProgram) {
-    // Tell OpenGL which VBOs to use
+    if(pTexture)
+        pTexture->bind();
+    pProgram->setUniformValue("model", modelMatrix());
+
     floorBuf.bind();
 
     // Offset for position

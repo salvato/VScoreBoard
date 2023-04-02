@@ -17,7 +17,7 @@ public:
     ~Pole();
 
 public:
-    void draw(QOpenGLShaderProgram* pProgram);
+    void draw(QOpenGLShaderProgram* pProgram) override;
 
 private:
     void initGeometry(float height, float diameter);

@@ -5,6 +5,8 @@
 #include <QQuaternion>
 #include <QMatrix4x4>
 
+class QOpenGLShaderProgram;
+class QOpenGLTexture;
 
 class Object
 {
@@ -25,8 +27,11 @@ public:
     void setRotation(QQuaternion newRotation);
     virtual void updateStatus(float deltaTime);
     QMatrix4x4 modelMatrix();
+    void setTexture(QOpenGLTexture* pTexture);
+    virtual void draw(QOpenGLShaderProgram* pProgram);
 
 protected:
+    QOpenGLTexture* pTexture  = nullptr;
     QVector3D   position;
     QQuaternion rotation;
     QVector3D   scale;

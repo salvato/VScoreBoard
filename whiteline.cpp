@@ -1,5 +1,7 @@
 #include "whiteline.h"
 
+#include <QOpenglTexture>
+
 WhiteLine::WhiteLine(QSizeF      _size,
                      QVector3D   _position,
                      QQuaternion _rotation,
@@ -41,7 +43,10 @@ WhiteLine::~WhiteLine() {
 
 void
 WhiteLine::draw(QOpenGLShaderProgram* pProgram) {
-    // Tell OpenGL which VBOs to use
+    if(pTexture)
+        pTexture->bind();
+    pProgram->setUniformValue("model", modelMatrix());
+
     lineBuf.bind();
 
     // Offset for position

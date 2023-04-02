@@ -15,6 +15,7 @@ public:
 
 public:
     void updateStatus(float deltaTime) override;
+    void draw(QOpenGLShaderProgram* pProgram) override;
 
 private:
     float       radius;

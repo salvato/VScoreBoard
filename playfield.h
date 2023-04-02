@@ -18,7 +18,7 @@ public:
     ~PlayField();
 
 public:
-    void draw(QOpenGLShaderProgram* pProgram);
+    void draw(QOpenGLShaderProgram* pProgram) override;
 
 protected:
     QOpenGLBuffer fieldBuf;

@@ -2,6 +2,7 @@
 
 #include <QVector2D>
 #include <QVector3D>
+#include <QOpenglTexture>
 
 struct VertexData
 {
@@ -108,7 +109,10 @@ Pole::initGeometry(float height, float diameter) {
 
 void
 Pole::draw(QOpenGLShaderProgram* pProgram) {
-    // Tell OpenGL which VBOs to use
+    if(pTexture)
+        pTexture->bind();
+    pProgram->setUniformValue("model", modelMatrix());
+
     arrayBuf.bind();
     indexBuf.bind();
 

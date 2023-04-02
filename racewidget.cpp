@@ -230,26 +230,41 @@ RaceWidget::initTextures() {
     pTeam0Texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     pTeam0Texture->setMagnificationFilter(QOpenGLTexture::Linear);
     pTeam0Texture->setWrapMode(QOpenGLTexture::Repeat);
+    pTeam0->setTexture(pTeam0Texture);
 
     pTeam1Texture = new QOpenGLTexture(QImage(":/VolleyBall_1.png").mirrored());
     pTeam1Texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     pTeam1Texture->setMagnificationFilter(QOpenGLTexture::Linear);
     pTeam1Texture->setWrapMode(QOpenGLTexture::Repeat);
+    pTeam1->setTexture(pTeam1Texture);
 
     pFieldTexture = new QOpenGLTexture(QImage(":/blue-carpet.jpg").mirrored());
     pFieldTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     pFieldTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     pFieldTexture->setWrapMode(QOpenGLTexture::Repeat);
+    pPlayField->setTexture(pFieldTexture);
 
     pWoodTexture = new QOpenGLTexture(QImage(":/wood.png").mirrored());
     pWoodTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     pWoodTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     pWoodTexture->setWrapMode(QOpenGLTexture::Repeat);
+    pFloor->setTexture(pWoodTexture);
 
     pLineTexture = new QOpenGLTexture(QImage(":/white-carpet.jpg").mirrored());
     pLineTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     pLineTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     pLineTexture->setWrapMode(QOpenGLTexture::Repeat);
+
+    pLeftLine->setTexture(pLineTexture);
+    pLeft3mLine->setTexture(pLineTexture);
+    pCentralLine->setTexture(pLineTexture);
+    pRight3mLine->setTexture(pLineTexture);
+    pRightLine->setTexture(pLineTexture);
+    pBottomLine->setTexture(pLineTexture);
+    pTopLine->setTexture(pLineTexture);
+    pBottomPole->setTexture(pLineTexture);
+    pTopPole->setTexture(pLineTexture);
+    pNetBand->setTexture(pLineTexture);
 }
 
 
@@ -352,39 +367,39 @@ RaceWidget::paintGL() {
 
 void
 RaceWidget::renderPlayField(QOpenGLShaderProgram* pProgram) {
-    pProgram->setUniformValue("model", pPlayField->modelMatrix());
-    pFieldTexture->bind();
+//    pProgram->setUniformValue("model", pPlayField->modelMatrix());
+//    pFieldTexture->bind();
     pPlayField->draw(pProgram);
 
-    pLineTexture->bind();
-    pProgram->setUniformValue("model", pCentralLine->modelMatrix());
+//    pLineTexture->bind();
+//    pProgram->setUniformValue("model", pCentralLine->modelMatrix());
     pCentralLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", pLeftLine->modelMatrix());
+//    pProgram->setUniformValue("model", pLeftLine->modelMatrix());
     pLeftLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", pLeft3mLine->modelMatrix());
+//    pProgram->setUniformValue("model", pLeft3mLine->modelMatrix());
     pLeft3mLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", pRightLine->modelMatrix());
+//    pProgram->setUniformValue("model", pRightLine->modelMatrix());
     pRightLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", pRight3mLine->modelMatrix());
+//    pProgram->setUniformValue("model", pRight3mLine->modelMatrix());
     pRight3mLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", pBottomLine->modelMatrix());
+//    pProgram->setUniformValue("model", pBottomLine->modelMatrix());
     pBottomLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", pTopLine->modelMatrix());
+//    pProgram->setUniformValue("model", pTopLine->modelMatrix());
     pTopLine->draw(pProgram);
 
-    pProgram->setUniformValue("model", pTopPole->modelMatrix());
+//    pProgram->setUniformValue("model", pTopPole->modelMatrix());
     pTopPole->draw(pProgram);
 
-    pProgram->setUniformValue("model", pBottomPole->modelMatrix());
+//    pProgram->setUniformValue("model", pBottomPole->modelMatrix());
     pBottomPole->draw(pProgram);
 
-    pProgram->setUniformValue("model", pNetBand->modelMatrix());
+//    pProgram->setUniformValue("model", pNetBand->modelMatrix());
     pNetBand->draw(pProgram);
 }
 
@@ -393,19 +408,9 @@ void
 RaceWidget::renderScene(QOpenGLShaderProgram* pProgram) {
     glActiveTexture(GL_TEXTURE0);
 
-    pProgram->setUniformValue("model", pFloor->modelMatrix());
-    pWoodTexture->bind();
-    pFloor->draw(pProgram);
-
-    renderPlayField(pProgram);
-
-    pProgram->setUniformValue("model", pTeam0->modelMatrix());
-    pTeam0Texture->bind();
-    pTeam0->draw(pProgram);
-
-    pProgram->setUniformValue("model", pTeam1->modelMatrix());
-    pTeam1Texture->bind();
-    pTeam1->draw(pProgram);
+    for(int i=0; i<gameObjects.count(); i++) {
+        gameObjects.at(i)->draw(pProgram);
+    }
 }
 
 

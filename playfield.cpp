@@ -1,5 +1,7 @@
 #include "playfield.h"
+
 #include <QVector>
+#include <QOpenglTexture>
 
 
 PlayField::PlayField(QSizeF      _size,
@@ -42,7 +44,10 @@ PlayField::~PlayField() {
 
 void
 PlayField::draw(QOpenGLShaderProgram* pProgram) {
-    // Tell OpenGL which VBOs to use
+    if(pTexture)
+        pTexture->bind();
+    pProgram->setUniformValue("model", modelMatrix());
+
     fieldBuf.bind();
 
     // Offset for position

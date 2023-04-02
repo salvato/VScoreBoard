@@ -1,5 +1,7 @@
 #include "avatar.h"
 
+#include <QOpenglTexture>
+
 
 Avatar::Avatar(float       _radius,
                QVector3D   _position,
@@ -12,6 +14,15 @@ Avatar::Avatar(float       _radius,
              _speed)
     , Sphere(_radius, 40, 40)
 {
+}
+
+
+void
+Avatar::draw(QOpenGLShaderProgram* pProgram) {
+    if(pTexture)
+        pTexture->bind();
+    pProgram->setUniformValue("model", modelMatrix());
+    Sphere::draw(pProgram);
 }
 
 

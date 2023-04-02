@@ -156,27 +156,16 @@ Cube::draw(QOpenGLShaderProgram* pProgram) {
     // Offset for position
     quintptr offset = 0;
 
-    // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = pProgram->attributeLocation("vPosition");
-    pProgram->enableAttributeArray(vertexLocation);
-    pProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+    pProgram->enableAttributeArray("vPosition");
+    pProgram->setAttributeBuffer("vPosition", GL_FLOAT, offset, 3, sizeof(VertexData));
 
-    // Offset for texture coordinate
     offset += sizeof(QVector3D);
+    pProgram->enableAttributeArray("vTexture");
+    pProgram->setAttributeBuffer("vTexture", GL_FLOAT, offset, 2, sizeof(VertexData));
 
-    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    int texcoordLocation = pProgram->attributeLocation("vTexture");
-    pProgram->enableAttributeArray(texcoordLocation);
-    pProgram->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-
-    // Offset for texture coordinate
     offset += sizeof(QVector2D);
+    pProgram->enableAttributeArray("vNormal");
+    pProgram->setAttributeBuffer("vNormal", GL_FLOAT, offset, 3, sizeof(VertexData));
 
-    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    int normalLocation = pProgram->attributeLocation("vNormal");
-    pProgram->enableAttributeArray(normalLocation);
-    pProgram->setAttributeBuffer(normalLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-    // Draw cube geometry using indices from VBO 1
     glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, nullptr);
 }

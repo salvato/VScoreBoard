@@ -21,7 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "floor.h"
 #include "playfield.h"
 #include "whiteline.h"
-#include "pole.h"
+//#include "pole.h"
+#include "cube.h"
 #include "avatar.h"
 
 
@@ -80,7 +81,7 @@ RaceWidget::RaceWidget()
     lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
 
     resetAll();
-    scanTime = 30.0; // Tempo in secondi per l'intera "Corsa"
+    scanTime = 10.0; // Tempo in secondi per l'intera "Corsa"
     speed = 2.0f*xField/scanTime;
     connect(&closeTimer, SIGNAL(timeout()),
             this, SLOT(onTimeToClose()));
@@ -159,7 +160,8 @@ RaceWidget::initializeGL() {
     pCentralLine = new WhiteLine(0.05f, zField);
     pXLine       = new WhiteLine(xField, 0.05f);
     pZLine       = new WhiteLine(0.05f, zField);
-    pPole        = new Pole(2.43f, 0.2f);
+    pPole        = new Cube(2.43f, 0.2f);
+//    pPole        = new Cube();
 
     pTeam0       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z0Start));
     pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
@@ -269,7 +271,8 @@ RaceWidget::startRace(int iSet) {
     }
     xTarget = (2.0*xField)/float(maxScore[iCurrentSet]) - xField;
     refreshTime = 15; // in ms
-    emit newScore(score[iCurrentSet].at(indexScore+1).x(), score[iCurrentSet].at(indexScore+1).y());
+    emit newScore(score[iCurrentSet].at(indexScore+1).x(),
+                  score[iCurrentSet].at(indexScore+1).y());
     timer.start(refreshTime, this);
     t0 = QTime::currentTime().msecsSinceStartOfDay();
 }
@@ -325,6 +328,7 @@ RaceWidget::paintGL() {
 
 void
 RaceWidget::ConfigureModelMatrices() {
+
     floorModelMatrix.setToIdentity();
     floorModelMatrix.translate(0.0f, 0.0f, 0.0f);
 
@@ -353,10 +357,10 @@ RaceWidget::ConfigureModelMatrices() {
     topLineModelMatrix.translate(0.0f, 0.02f, -zField+0.05f);
 
     bottomPoleModelMatrix.setToIdentity();
-    bottomPoleModelMatrix.translate(0.0f, 0.02f, zField+0.5f);
+    bottomPoleModelMatrix.translate(0.0f, 2.02f, zField+0.5f);
 
     topPoleModelMatrix.setToIdentity();
-    bottomPoleModelMatrix.translate(0.0f, 0.02f, -zField-0.5f);
+    topPoleModelMatrix.translate(0.0f, 2.02f, -zField-0.5f);
 
     team0ModelMatrix.setToIdentity();
     team0ModelMatrix.translate(pTeam0->getPos());
@@ -365,6 +369,7 @@ RaceWidget::ConfigureModelMatrices() {
     team1ModelMatrix.setToIdentity();
     team1ModelMatrix.translate(pTeam1->getPos());
     team1ModelMatrix.rotate(pTeam1->getRotation());
+
 }
 
 
@@ -467,9 +472,9 @@ RaceWidget::timerEvent(QTimerEvent*) {
     if(xCurrent >= xTarget) {
         indexScore++;
         if(indexScore > score[iCurrentSet].count()-2) {
+            timer.stop();
             pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
             pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
-            timer.stop();
             closeTimer.start(3000);
             update();
             return;

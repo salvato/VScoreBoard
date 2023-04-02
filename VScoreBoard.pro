@@ -29,6 +29,7 @@ SOURCES += \
     avatar.cpp \
     button.cpp \
     chartwindow.cpp \
+    cube.cpp \
     edit.cpp \
     floor.cpp \
     generalsetuparguments.cpp \
@@ -54,6 +55,7 @@ HEADERS += \
     avatar.h \
     button.h \
     chartwindow.h \
+    cube.h \
     edit.h \
     floor.h \
     generalsetuparguments.h \

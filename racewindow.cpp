@@ -78,6 +78,10 @@ RaceWindow::RaceWindow(QWidget *parent)
     pLayout->addWidget(pRaceWidget,  1, 0, 6, 6);
 
     setLayout(pLayout);
+
+    timerStart.setSingleShot(true);
+    connect(&timerStart, SIGNAL(timeout()),
+            this, SLOT(onTimeToStartRace()));
 }
 
 
@@ -107,7 +111,14 @@ RaceWindow::resetAll() {
 
 void
 RaceWindow::startRace(int iSet) {
-    pRaceWidget->startRace(iSet);
+    iCurrentSet = iSet;
+    timerStart.start(3000);
+}
+
+
+void
+RaceWindow::onTimeToStartRace() {
+    pRaceWidget->startRace(iCurrentSet);
 }
 
 

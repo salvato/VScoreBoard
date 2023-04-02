@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QT_FORWARD_DECLARE_CLASS(PlayField)
 QT_FORWARD_DECLARE_CLASS(WhiteLine)
 QT_FORWARD_DECLARE_CLASS(Avatar)
+QT_FORWARD_DECLARE_CLASS(Cube)
 QT_FORWARD_DECLARE_CLASS(Pole)
 QT_FORWARD_DECLARE_CLASS(Floor)
 
@@ -125,7 +126,7 @@ private:
     WhiteLine* pCentralLine;
     WhiteLine* pXLine;
     WhiteLine* pZLine;
-    Pole*      pPole;
+    Cube*      pPole;
     Avatar*    pTeam0;
     Avatar*    pTeam1;
 

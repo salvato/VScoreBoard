@@ -23,6 +23,7 @@ public:
 
 public slots:
     void onNewScore(int s0, int s1);
+    void onTimeToStartRace();
     //void closeEvent(QCloseEvent*) override;
 
 private:
@@ -42,4 +43,6 @@ private:
     QLabel labelIcon1;
     QLabel labelScore0;
     QLabel labelScore1;
+
+    QTimer timerStart;
 };

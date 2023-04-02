@@ -1,6 +1,8 @@
 #include "pole.h"
 
-Pole::Pole(float height, float diameter) {
+Pole::Pole(float height, float diameter)
+    : indexBuf(QOpenGLBuffer::IndexBuffer)
+{
     float ray = 0.5f*diameter;
     QVector<QVector3D> vertices;
     QVector<QVector3D> normals;
@@ -100,9 +102,6 @@ Pole::Pole(float height, float diameter) {
 
     nverts = vertices.count();
 
-    int VertexSize = nverts*sizeof(QVector3D);
-    int TexSize    = nverts*sizeof(QVector2D);
-    int NormalSize = VertexSize;
 
     GLushort indices[] = {
          0,  1,  2,  3,  3,     // Face 0 - triangle strip ( v0,  v1,  v2,  v3)
@@ -113,19 +112,29 @@ Pole::Pole(float height, float diameter) {
         20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
     };
 
+    int VertexSize = nverts*sizeof(QVector3D);
+    int TexSize    = nverts*sizeof(QVector2D);
+    int NormalSize = VertexSize;
     int nIndices = sizeof(indices)/sizeof(*indices);
+    qCritical() << "VertexSize" << VertexSize
+                << "TexSize" << TexSize
+                << "NormalSize" << NormalSize
+                << "nIndices" << nIndices;
+
     // Transfer vertex data to VBO
     pPoleBuf = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    if(!pPoleBuf->create()) {
-        qCritical() << __FUNCTION__ << __LINE__ << "Error! Exiting";
-        exit(EXIT_FAILURE);
-    }
     pPoleBuf->setUsagePattern(QOpenGLBuffer::StaticDraw);
-    pPoleBuf->bind();
+    pPoleBuf->create();
+    if(!pPoleBuf->bind())
+        exit(EXIT_FAILURE);
     pPoleBuf->allocate(VertexSize+TexSize+NormalSize);
-    pPoleBuf->write(0, vertices.constData(), VertexSize);
-    pPoleBuf->write(VertexSize, texCoords.constData(), TexSize);
-    pPoleBuf->write(VertexSize + TexSize, normals.constData(), NormalSize);
+
+    quintptr offset = 0;
+    pPoleBuf->write(offset, vertices.constData(),  VertexSize);
+    offset += VertexSize;
+    pPoleBuf->write(offset, texCoords.constData(), TexSize);
+    offset += TexSize;
+    pPoleBuf->write(offset, normals.constData(),   NormalSize);
     pPoleBuf->release();
 
     vertices.clear();
@@ -135,6 +144,7 @@ Pole::Pole(float height, float diameter) {
     indexBuf.create();
     indexBuf.bind();
     indexBuf.allocate(indices, nIndices * sizeof(GLushort));
+    indexBuf.write(0, indices, nIndices);
 }
 
 
@@ -149,15 +159,15 @@ Pole::draw(QOpenGLShaderProgram* pProgram) {
 
     quintptr offset = 0;
     pProgram->enableAttributeArray("vPosition");
-    pProgram->setAttributeBuffer("vPosition", GL_FLOAT, offset, 3, 0);
+    pProgram->setAttributeBuffer("vPosition", GL_FLOAT, offset, 3, sizeof(QVector3D));
 
     offset += nverts * sizeof(QVector3D);
     pProgram->enableAttributeArray("vTexture");
-    pProgram->setAttributeBuffer("vTexture", GL_FLOAT, offset, 2, 0);
+    pProgram->setAttributeBuffer("vTexture", GL_FLOAT, offset, 2, sizeof(QVector2D));
 
     offset += nverts * sizeof(QVector2D);
     pProgram->enableAttributeArray("vNormal");
-    pProgram->setAttributeBuffer("vNormal", GL_FLOAT, offset, 3, 0);
+    pProgram->setAttributeBuffer("vNormal", GL_FLOAT, offset, 3, sizeof(QVector3D));
 
-//    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, nullptr);
+    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, nullptr);
 }

@@ -927,12 +927,13 @@ VolleyController::onButtonStatisticsClicked() {
     bool bEnd   = false;
     QPixmap* pPixmap = new QPixmap();
     QSize iconSize = QSize(48,48);
-    if(pCharts->isVisible()) {
+    if(pRaceWindow->isVisible()) {
         pRaceWindow->hide();
         pPixmap->load(":/buttonIcons/plot.png");
     }
     else {
         if(setSelectionDialog.exec() == QDialog::Accepted) {
+            pRaceWindow->resetAll();
 //            pRaceWindow->show();
             pRaceWindow->showFullScreen();
 //            pRaceWindow->showMaximized();

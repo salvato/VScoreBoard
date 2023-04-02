@@ -57,8 +57,8 @@ RaceWidget::RaceWidget()
     diffuseColor  = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
     specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
 
-//    cameraPosition = QVector4D(0.0f, 10.0f, 10.0f, 1.0f);
-    cameraPosition = QVector4D(-xField, 5.0f, 0.0f, 1.0f);
+    cameraPosition = QVector4D(0.0f, 10.0f, 10.0f, 1.0f);
+//    cameraPosition = QVector4D(-xField, 5.0f, 0.0f, 1.0f);
     cameraViewMatrix.lookAt(cameraPosition.toVector3D(),  // Eye
                             QVector3D(0.0f, 0.0f, 0.0f),  // Center
                             QVector3D(0.0f, 1.0f, 0.0f)); // Up
@@ -182,43 +182,62 @@ RaceWidget::initializeGL() {
     pTopPole     = new Pole(QSizeF(2.43f, 0.2f), QVector3D(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f));
     gameObjects.append(pTopPole);
 
+    // Net White Bands
     QQuaternion q = QQuaternion::fromAxisAndAngle(QVector3D(-1.0f, 0.0f, 0.0f), 90.0f);
     pNetBandTop  = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
                             QVector3D(0.0f, 2.43f+0.02f, 0.0f),
                             q,
                             QVector3D(0.2f, 1.0f, 1.0f));
     gameObjects.append(pNetBandTop);
-
     pNetBandBottom = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
                               QVector3D(0.0f, 1.43f+0.02f, 0.0f),
                               q,
                               QVector3D(0.2f, 1.0f, 1.0f));
     gameObjects.append(pNetBandBottom);
-
     pNetBandLeft = new Pole(QSizeF(1.0f, 0.05f),
                             QVector3D(0.0f, 1.93f+0.02f, -zField),
                             QQuaternion(),
                             QVector3D(0.2f, 1.0f, 1.0f));
     gameObjects.append(pNetBandLeft);
-
     pNetBandRight = new Pole(QSizeF(1.0f, 0.05f),
                              QVector3D(0.0f, 1.93f+0.02f, zField),
                              QQuaternion(),
                              QVector3D(0.2f, 1.0f, 1.0f));
     gameObjects.append(pNetBandRight);
-
-    pTeam0       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z0Start));
-    gameObjects.append(pTeam0);
-    pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
-    gameObjects.append(pTeam1);
-
+    // Horizontal wires
     for(int i=0; i<8; i++) {
         hRopes.append(new Pole(QSizeF(2.0f*zField, 0.01f),
                                QVector3D(0.0f, 2.43f-0.03f-((i+1)*0.1f), 0.0f),
                                q,
                                QVector3D(1.0f, 1.0f, 1.0f)));
-        gameObjects.append(hRopes.at(i));
+        gameObjects.append(hRopes.last());
     }
+    // Verticalal wires
+    for(int i=0; i<int(zField*10.0)-1; i++) {
+        vRopes.append(new Pole(QSizeF(0.9f, 0.01f),
+                               QVector3D(0.0f, 1.93f+0.02f, (i+1)*0.1f),
+                               QQuaternion(),
+                               QVector3D(1.0f, 1.0f, 1.0f)));
+        gameObjects.append(vRopes.last());
+    }
+    for(int i=0; i<int(zField*10.0)-1; i++) {
+        vRopes.append(new Pole(QSizeF(0.9f, 0.01f),
+                               QVector3D(0.0f, 1.93f+0.02f, -(i+1)*0.1f),
+                               QQuaternion(),
+                               QVector3D(1.0f, 1.0f, 1.0f)));
+        gameObjects.append(vRopes.last());
+    }
+    vRopes.append(new Pole(QSizeF(0.9f, 0.01f),
+                           QVector3D(0.0f, 1.93f+0.02f, 0.0f),
+                           QQuaternion(),
+                           QVector3D(1.0f, 1.0f, 1.0f)));
+    gameObjects.append(vRopes.last());
+
+    // Now the Team Avatars
+    pTeam0       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z0Start));
+    gameObjects.append(pTeam0);
+    pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
+    gameObjects.append(pTeam1);
 
     initShaders();
     initTextures();
@@ -298,6 +317,9 @@ RaceWidget::initTextures() {
     pRopeTexture = new QOpenGLTexture(QImage(":/corda_nera.jpg").mirrored());
     for(int i=0; i<hRopes.count(); i++) {
         hRopes.at(i)->setTexture(pRopeTexture);
+    }
+    for(int i=0; i<vRopes.count(); i++) {
+        vRopes.at(i)->setTexture(pRopeTexture);
     }
 }
 

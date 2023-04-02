@@ -124,6 +124,7 @@ private:
     Avatar*    pTeam0;
     Avatar*    pTeam1;
     QVector<Pole*> hRopes;
+    QVector<Pole*> vRopes;
 
     float xCamera =  0.0;
     float yCamera = 15.0;

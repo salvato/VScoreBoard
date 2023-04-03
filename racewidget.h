@@ -76,19 +76,12 @@ protected:
     void initShaders();
     void initShadowBuffer();
     void initTextures();
-    void fireworks();
+    void initGameObjects();
 
 private:
 
     QBasicTimer timer;
     QTimer closeTimer;
-
-    QOpenGLTexture* pTeam0Texture  = nullptr;
-    QOpenGLTexture* pTeam1Texture  = nullptr;
-    QOpenGLTexture* pFieldTexture  = nullptr;
-    QOpenGLTexture* pLineTexture   = nullptr;
-    QOpenGLTexture* pWoodTexture   = nullptr;
-    QOpenGLTexture* pRopeTexture   = nullptr;
 
     QOpenGLShaderProgram* pGameProgram = nullptr;
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;

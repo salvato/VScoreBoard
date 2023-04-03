@@ -62,7 +62,7 @@ ParticleGenerator::Update(float dt, Object& object, unsigned int newParticles, Q
 
 // render all particles
 void
-ParticleGenerator::Draw() {
+ParticleGenerator::draw() {
     // use additive blending to give it a 'glow' effect
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     pShader->bind();

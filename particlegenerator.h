@@ -19,7 +19,7 @@ public:
     // update all particles
     void Update(float dt, Object &object, unsigned int newParticles, QVector3D offset = QVector3D(0.0f, 0.0f, 0.0f));
     // render all particles
-    void Draw();
+    void draw();
 
 private:
     // state

@@ -3,12 +3,14 @@
 #include <QOpenglTexture>
 
 
-Avatar::Avatar(float       _radius,
-               QVector3D   _position,
-               QQuaternion _rotation,
-               QVector3D   _scale,
-               QVector3D   _speed)
-    : Object(_position,
+Avatar::Avatar(float           _radius,
+               QOpenGLTexture* _pTexture,
+               QVector3D       _position,
+               QQuaternion     _rotation,
+               QVector3D       _scale,
+               QVector3D       _speed)
+    : Object(_pTexture,
+             _position,
              _rotation,
              _scale,
              _speed)

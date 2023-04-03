@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whiteline.h"
 #include "pole.h"
 #include "avatar.h"
+#include "particlegenerator.h"
+#include "resourcemanager.h"
 
 
 #include <QApplication>
@@ -154,52 +156,84 @@ RaceWidget::resizeGL(int w, int h) {
 void
 RaceWidget::initializeGL() {
     initializeOpenGLFunctions();
+
+    initShaders();
+    initTextures();
+    initShadowBuffer();
+
     gameObjects.clear();
-    pFloor       = new Floor(QSizeF(50.0f, 50.0f));
+    pFloor       = new Floor(QSizeF(50.0f, 50.0f),
+                             ResourceManager::GetTexture("floor"));
     gameObjects.append(pFloor);
 
     // Slightltly higer than Floor
-    pPlayField   = new PlayField(QSizeF(xField, zField), QVector3D(0.0f, 0.01f, 0.0f));
+    pPlayField   = new PlayField(QSizeF(xField, zField),
+                                 ResourceManager::GetTexture("field"),
+                                 QVector3D(0.0f, 0.01f, 0.0f));
     gameObjects.append(pPlayField);
 
     // Slightltly higer than PlayField
-    pLeftLine    = new WhiteLine(QSizeF(0.05f, zField), QVector3D(-xField+0.05f, 0.02f, 0.0f));
+    pLeftLine    = new WhiteLine(QSizeF(0.05f, zField),
+                              ResourceManager::GetTexture("line"),
+                              QVector3D(-xField+0.05f, 0.02f, 0.0f));
     gameObjects.append(pLeftLine);
-    pLeft3mLine  = new WhiteLine(QSizeF(0.05f, zField), QVector3D(-3.0f+0.05f, 0.02f, 0.0f));
+
+    pLeft3mLine  = new WhiteLine(QSizeF(0.05f, zField),
+                                 ResourceManager::GetTexture("line"),
+                                 QVector3D(-3.0f+0.05f, 0.02f, 0.0f));
     gameObjects.append(pLeft3mLine);
-    pCentralLine = new WhiteLine(QSizeF(0.05f, zField), QVector3D(0.0f, 0.02f, 0.0f));
+
+    pCentralLine = new WhiteLine(QSizeF(0.05f, zField),
+                                 ResourceManager::GetTexture("line"),
+                                 QVector3D(0.0f, 0.02f, 0.0f));
     gameObjects.append(pCentralLine);
-    pRight3mLine = new WhiteLine(QSizeF(0.05f, zField), QVector3D(3.0f-0.05f, 0.02f, 0.0f));
+    pRight3mLine = new WhiteLine(QSizeF(0.05f, zField),
+                                 ResourceManager::GetTexture("line"),
+                                 QVector3D(3.0f-0.05f, 0.02f, 0.0f));
     gameObjects.append(pRight3mLine);
-    pRightLine   = new WhiteLine(QSizeF(0.05f, zField), QVector3D(xField-0.05f, 0.02f, 0.0f));
+    pRightLine   = new WhiteLine(QSizeF(0.05f, zField),
+                                 ResourceManager::GetTexture("line"),
+                                 QVector3D(xField-0.05f, 0.02f, 0.0f));
     gameObjects.append(pRightLine);
-    pBottomLine  = new WhiteLine(QSizeF(xField, 0.05f), QVector3D(0.0f, 0.02f,  zField-0.05f));
+    pBottomLine  = new WhiteLine(QSizeF(xField, 0.05f),
+                                 ResourceManager::GetTexture("line"),
+                                 QVector3D(0.0f, 0.02f,  zField-0.05f));
     gameObjects.append(pBottomLine);
-    pTopLine     = new WhiteLine(QSizeF(xField, 0.05f), QVector3D(0.0f, 0.02f, -zField+0.05f));
+    pTopLine     = new WhiteLine(QSizeF(xField, 0.05f),
+                                 ResourceManager::GetTexture("line"),
+                                 QVector3D(0.0f, 0.02f, -zField+0.05f));
     gameObjects.append(pTopLine);
-    pBottomPole  = new Pole(QSizeF(2.43f, 0.2f), QVector3D(0.0f, 2.43f*0.5f+0.02f,  zField+0.5f));
+    pBottomPole  = new Pole(QSizeF(2.43f, 0.2f),
+                            ResourceManager::GetTexture("line"),
+                            QVector3D(0.0f, 2.43f*0.5f+0.02f,  zField+0.5f));
     gameObjects.append(pBottomPole);
-    pTopPole     = new Pole(QSizeF(2.43f, 0.2f), QVector3D(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f));
+    pTopPole     = new Pole(QSizeF(2.43f, 0.2f),
+                            ResourceManager::GetTexture("line"),
+                            QVector3D(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f));
     gameObjects.append(pTopPole);
 
     // Net White Bands
     QQuaternion q = QQuaternion::fromAxisAndAngle(QVector3D(-1.0f, 0.0f, 0.0f), 90.0f);
     pNetBandTop  = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+                            ResourceManager::GetTexture("line"),
                             QVector3D(0.0f, 2.43f+0.02f, 0.0f),
                             q,
                             QVector3D(0.2f, 1.0f, 1.0f));
     gameObjects.append(pNetBandTop);
     pNetBandBottom = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+                              ResourceManager::GetTexture("line"),
                               QVector3D(0.0f, 1.43f+0.02f, 0.0f),
                               q,
                               QVector3D(0.2f, 1.0f, 1.0f));
     gameObjects.append(pNetBandBottom);
     pNetBandLeft = new Pole(QSizeF(1.0f, 0.05f),
+                            ResourceManager::GetTexture("line"),
                             QVector3D(0.0f, 1.93f+0.02f, -zField),
                             QQuaternion(),
                             QVector3D(0.2f, 1.0f, 1.0f));
     gameObjects.append(pNetBandLeft);
     pNetBandRight = new Pole(QSizeF(1.0f, 0.05f),
+                             ResourceManager::GetTexture("line"),
                              QVector3D(0.0f, 1.93f+0.02f, zField),
                              QQuaternion(),
                              QVector3D(0.2f, 1.0f, 1.0f));
@@ -207,6 +241,7 @@ RaceWidget::initializeGL() {
     // Horizontal wires
     for(int i=0; i<8; i++) {
         hRopes.append(new Pole(QSizeF(2.0f*zField, 0.01f),
+                               ResourceManager::GetTexture("corda"),
                                QVector3D(0.0f, 2.43f-0.03f-((i+1)*0.1f), 0.0f),
                                q,
                                QVector3D(1.0f, 1.0f, 1.0f)));
@@ -215,6 +250,7 @@ RaceWidget::initializeGL() {
     // Verticalal wires
     for(int i=0; i<int(zField*10.0)-1; i++) {
         vRopes.append(new Pole(QSizeF(0.9f, 0.01f),
+                               ResourceManager::GetTexture("corda"),
                                QVector3D(0.0f, 1.93f+0.02f, (i+1)*0.1f),
                                QQuaternion(),
                                QVector3D(1.0f, 1.0f, 1.0f)));
@@ -222,26 +258,32 @@ RaceWidget::initializeGL() {
     }
     for(int i=0; i<int(zField*10.0)-1; i++) {
         vRopes.append(new Pole(QSizeF(0.9f, 0.01f),
+                               ResourceManager::GetTexture("corda"),
                                QVector3D(0.0f, 1.93f+0.02f, -(i+1)*0.1f),
                                QQuaternion(),
                                QVector3D(1.0f, 1.0f, 1.0f)));
         gameObjects.append(vRopes.last());
     }
     vRopes.append(new Pole(QSizeF(0.9f, 0.01f),
+                           ResourceManager::GetTexture("corda"),
                            QVector3D(0.0f, 1.93f+0.02f, 0.0f),
                            QQuaternion(),
                            QVector3D(1.0f, 1.0f, 1.0f)));
     gameObjects.append(vRopes.last());
 
     // Now the Team Avatars
-    pTeam0       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z0Start));
+    pTeam0       = new Avatar(ballRadius,
+                        ResourceManager::GetTexture("team0"),
+                        QVector3D(-xField, ballRadius, z0Start));
     gameObjects.append(pTeam0);
-    pTeam1       = new Avatar(ballRadius, QVector3D(-xField, ballRadius, z1Start));
+    pTeam1       = new Avatar(ballRadius,
+                        ResourceManager::GetTexture("team1"),
+                        QVector3D(-xField, ballRadius, z1Start));
     gameObjects.append(pTeam1);
 
-    initShaders();
-    initTextures();
-    initShadowBuffer();
+    pParticles = new ParticleGenerator(ResourceManager::GetShader("particle"),
+                                       ResourceManager::GetTexture("particle"),
+                                       500);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_CULL_FACE);
@@ -254,25 +296,37 @@ RaceWidget::initializeGL() {
 
 void
 RaceWidget::initShaders() {
-    pGameProgram = new QOpenGLShaderProgram();
-    pGameProgram->addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/Shaders/vRace.glsl");
-    pGameProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fRace.glsl");
-    pGameProgram->link();
-
-    pComputeDepthProgram = new QOpenGLShaderProgram();
-    pComputeDepthProgram->addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/Shaders/vDepth.glsl");
-    pComputeDepthProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fDepth.glsl");
-    pComputeDepthProgram->link();
-
-    pDebugDepthQuad = new QOpenGLShaderProgram();
-    pDebugDepthQuad->addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/Shaders/vDebug_quad.glsl");
-    pDebugDepthQuad->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fDebug_quad_depth.glsl");
-    pDebugDepthQuad->link();
+    ResourceManager::LoadShader(":/Shaders/vRace.glsl",
+                                ":/Shaders/fRace.glsl",
+                                QString(),
+                                "race");
+    ResourceManager::LoadShader(":/Shaders/vDepth.glsl",
+                                ":/Shaders/fDepth.glsl",
+                                QString(),
+                                "depth");
+    ResourceManager::LoadShader(":/Shaders/vParticle.glsl",
+                                ":/Shaders/fParticle.glsl",
+                                QString(),
+                                "particle");
+#ifdef SHOW_DEPTH
+    ResourceManager::LoadShader(":/Shaders/vDebug_quad.glsl",
+                                ":/Shaders/vDebug_quad.glsl",
+                                QString(),
+                                "debug");
+#endif
 }
 
 
 void
 RaceWidget::initTextures() {
+    ResourceManager::LoadTexture(":/VolleyBall_0.png", "team0");
+    ResourceManager::LoadTexture(":/VolleyBall_0.png", "team1");
+    ResourceManager::LoadTexture(":/blue-carpet.jpg",  "field");
+    ResourceManager::LoadTexture(":/wood.png",         "floor");
+    ResourceManager::LoadTexture(":/white-carpet.jpg", "line");
+    ResourceManager::LoadTexture(":/corda_nera.jpg",   "corda");
+    ResourceManager::LoadTexture(":/particle.png",     "particle");
+/*
     pTeam0Texture = new QOpenGLTexture(QImage(":/VolleyBall_0.png").mirrored());
     pTeam0Texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     pTeam0Texture->setMagnificationFilter(QOpenGLTexture::Linear);
@@ -321,6 +375,7 @@ RaceWidget::initTextures() {
     for(int i=0; i<vRopes.count(); i++) {
         vRopes.at(i)->setTexture(pRopeTexture);
     }
+*/
 }
 
 
@@ -377,6 +432,7 @@ RaceWidget::startRace(int iSet) {
 
 void
 RaceWidget::paintGL() {
+    pComputeDepthProgram = ResourceManager::GetShader("depth");
     pComputeDepthProgram->bind();
     pComputeDepthProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -392,6 +448,7 @@ RaceWidget::paintGL() {
     glCullFace(GL_BACK); // Reset right culling face
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    pGameProgram = ResourceManager::GetShader("race");
     pGameProgram->bind();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, depthMap);
@@ -499,11 +556,36 @@ RaceWidget::timerEvent(QTimerEvent*) {
                       score[iCurrentSet].at(indexScore+1).y());
     }
     t1 = QTime::currentTime().msecsSinceStartOfDay();
-    float t = (t1-t0)/1000.0;
+    float dt = (t1-t0)/1000.0;
     for(int i=0; i<gameObjects.count(); i++) {
-        gameObjects.at(i)->updateStatus(t);
+        gameObjects.at(i)->updateStatus(dt);
     }
+    pParticles->Update(dt, *pTeam0, 2, QVector3D(ballRadius, ballRadius, ballRadius));
     t0 = t1;
     update();
+
+
 }
 
+
+void
+RaceWidget::fireworks() {
+}
+
+/*
+unsigned int nr_new_particles = 2;
+// add new particles
+for(uint i=0; i<nr_new_particles; ++i) {
+    int unusedParticle = FirstUnusedParticle();
+    RespawnParticle(particles[unusedParticle], object, offset);
+}
+// update all particles
+for(uint i=0; i<nr_particles; ++i) {
+    Particle &p = particles[i];
+    p.Life -= dt; // reduce life
+    if (p.Life > 0.0f) {	// particle is alive, thus update
+        p.Position -= p.Velocity * dt;
+        p.Color.a -= dt * 2.5f;
+    }
+}
+*/

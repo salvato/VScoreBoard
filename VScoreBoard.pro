@@ -41,6 +41,7 @@ SOURCES += \
     pole.cpp \
     racewidget.cpp \
     racewindow.cpp \
+    resourcemanager.cpp \
     scorecontroller.cpp \
     scorepanel.cpp \
     setselectiondialog.cpp \
@@ -69,6 +70,7 @@ HEADERS += \
     pole.h \
     racewidget.h \
     racewindow.h \
+    resourcemanager.h \
     scorecontroller.h \
     scorepanel.h \
     setselectiondialog.h \

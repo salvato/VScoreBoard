@@ -11,10 +11,11 @@ class QOpenGLTexture;
 class Object
 {
 public:
-    Object(QVector3D   _position = QVector3D(0.0f, 0.0f, 0.0f),
-           QQuaternion _rotation = QQuaternion(),
-           QVector3D   _scale    = QVector3D(1.0f, 1.0f, 1.0f),
-           QVector3D   _speed    = QVector3D(0.0f, 0.0f, 0.0f));
+    Object(QOpenGLTexture* _pTexture = nullptr,
+           QVector3D       _position = QVector3D(0.0f, 0.0f, 0.0f),
+           QQuaternion     _rotation = QQuaternion(),
+           QVector3D       _scale    = QVector3D(1.0f, 1.0f, 1.0f),
+           QVector3D       _speed    = QVector3D(0.0f, 0.0f, 0.0f));
 
 public:
     void setScale(QVector3D newScale);
@@ -27,11 +28,10 @@ public:
     void setRotation(QQuaternion newRotation);
     virtual void updateStatus(float deltaTime);
     QMatrix4x4 modelMatrix();
-    void setTexture(QOpenGLTexture* pTexture);
     virtual void draw(QOpenGLShaderProgram* pProgram);
 
 protected:
-    QOpenGLTexture* pTexture  = nullptr;
+    QOpenGLTexture* pTexture;
     QVector3D   position;
     QQuaternion rotation;
     QVector3D   scale;

@@ -39,6 +39,7 @@ QT_FORWARD_DECLARE_CLASS(WhiteLine)
 QT_FORWARD_DECLARE_CLASS(Avatar)
 QT_FORWARD_DECLARE_CLASS(Pole)
 QT_FORWARD_DECLARE_CLASS(Floor)
+QT_FORWARD_DECLARE_CLASS(ParticleGenerator)
 
 
 class RaceWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
@@ -75,6 +76,7 @@ protected:
     void initShaders();
     void initShadowBuffer();
     void initTextures();
+    void fireworks();
 
 private:
 
@@ -158,5 +160,8 @@ private:
     float xTarget;
     int t0, t1;
     int teamMoving;
+
+    ParticleGenerator* pParticles;
+
 };
 

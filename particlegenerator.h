@@ -24,16 +24,16 @@ public:
 private:
     // state
     QVector<Particle*> particles;
-    unsigned int amount;
+    uint amount;
     // render state
     QOpenGLShaderProgram* pShader;
     QOpenGLTexture* pTexture;
-    unsigned int VAO;
+    uint VAO;
     // initializes buffer and vertex attributes
     void init();
     // returns the first Particle index that's currently unused
     // e.g. Life <= 0.0f or 0 if no particle is currently inactive
-    unsigned int firstUnusedParticle();
+    uint firstUnusedParticle();
     // respawns particle
     void respawnParticle(Particle* pParticle, Object object, QVector3D offset = QVector3D(0.0f, 0.0f, 0.0f));
 };

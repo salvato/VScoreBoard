@@ -3,14 +3,16 @@
 #include <QOpenglTexture>
 
 
-Particle::Particle(QVector4D   _color,
-                   float       _life,
-                   QSizeF      _size,
-                   QVector3D   _position,
-                   QQuaternion _rotation,
-                   QVector3D   _scale,
-                   QVector3D   _speed)
-    : Object(_position,
+Particle::Particle(QVector4D       _color,
+                   float           _life,
+                   QSizeF          _size,
+                   QOpenGLTexture* _pTexture,
+                   QVector3D       _position,
+                   QQuaternion     _rotation,
+                   QVector3D       _scale,
+                   QVector3D       _speed)
+    : Object(_pTexture,
+             _position,
              _rotation,
              _scale,
              _speed)

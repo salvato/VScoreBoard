@@ -7,47 +7,8 @@ ParticleGenerator::ParticleGenerator(QOpenGLShaderProgram* pShader, QOpenGLTextu
     , pShader(pShader)
     , pTexture(pTexture)
 {
+    initializeOpenGLFunctions();
     init();
-}
-
-
-void
-ParticleGenerator::Update(float dt, Object& object, unsigned int newParticles, QVector3D offset) {
-    // add new particles
-    for (unsigned int i = 0; i < newParticles; ++i) {
-        int unusedParticle = firstUnusedParticle();
-        respawnParticle(particles[unusedParticle], object, offset);
-    }
-    // update all particles
-    for (unsigned int i = 0; i < amount; ++i) {
-        ;
-        particles.at(i)->life -= dt; // reduce life
-        if (particles.at(i)->life > 0.0f) {	// particle is alive, thus update
-            particles.at(i)->setPos(particles.at(i)->getPos() - particles.at(i)->getSpeed() * dt);
-            particles.at(i)->color.setW(particles.at(i)->color.w() - dt*2.5f);
-        }
-    }
-}
-
-
-// render all particles
-void
-ParticleGenerator::Draw() {
-    // use additive blending to give it a 'glow' effect
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    pShader->bind();
-    for(int i=0; i< particles.count(); i++) {
-        if(particles.at(i)->life > 0.0f) {
-            pShader->setUniformValue("offset", particles.at(i)->getPos());
-            pShader->setUniformValue("color", particles.at(i)->color);
-            pTexture->bind();
-            glBindVertexArray(VAO);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            glBindVertexArray(0);
-        }
-    }
-    // don't forget to reset to default blending mode
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 
@@ -81,10 +42,48 @@ ParticleGenerator::init() {
 }
 
 
+void
+ParticleGenerator::Update(float dt, Object& object, unsigned int newParticles, QVector3D offset) {
+    // add new particles
+    for (unsigned int i = 0; i < newParticles; ++i) {
+        int unusedParticle = firstUnusedParticle();
+        respawnParticle(particles[unusedParticle], object, offset);
+    }
+    // update all particles
+    for (unsigned int i = 0; i < amount; ++i) {
+        particles.at(i)->life -= dt; // reduce life
+        if (particles.at(i)->life > 0.0f) {	// particle is alive, thus update
+            particles.at(i)->setPos(particles.at(i)->getPos() - particles.at(i)->getSpeed() * dt);
+            particles.at(i)->color.setW(particles.at(i)->color.w() - dt*2.5f);
+        }
+    }
+}
+
+
+// render all particles
+void
+ParticleGenerator::Draw() {
+    // use additive blending to give it a 'glow' effect
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    pShader->bind();
+    for(int i=0; i< particles.count(); i++) {
+        if(particles.at(i)->life > 0.0f) {
+            pShader->setUniformValue("offset", particles.at(i)->getPos());
+            pShader->setUniformValue("color", particles.at(i)->color);
+            pTexture->bind();
+            glBindVertexArray(VAO);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glBindVertexArray(0);
+        }
+    }
+    // don't forget to reset to default blending mode
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+
 // stores the index of the last particle used (for quick access to next dead particle)
-unsigned int lastUsedParticle = 0;
-unsigned int
-ParticleGenerator::firstUnusedParticle() {
+uint lastUsedParticle = 0;
+uint ParticleGenerator::firstUnusedParticle() {
     // first search from last used particle, this will usually return almost instantly
     for(uint i=lastUsedParticle; i<amount; ++i) {
         if(particles.at(i)->life <= 0.0f){

@@ -42,9 +42,11 @@ SlideWidget::SlideWidget()
     updateSlideList();
 
     QList<QScreen*> screens = QApplication::screens();
+    pMyScreen = screens.at(0);
     QRect screenres = screens.at(0)->geometry();
     if(screens.count() > 1) {
-        screenres = screens.at(1)->geometry();
+        pMyScreen = screens.at(1);
+        screenres = pMyScreen->geometry();
         QPoint point = QPoint(screenres.x(), screenres.y());
         move(point);
     }
@@ -112,13 +114,12 @@ SlideWidget::setSlideDir(QString sNewDir) {
 void
 SlideWidget::showFullScreen() {
     // Let's Capture a Screenshot of the panel as the first image
-    QList<QScreen*> screens = QApplication::screens();
-    QImage tempImage = QImage(screens.at(1)->geometry().width(),
-                              screens.at(1)->geometry().height(),
+    QImage tempImage = QImage(pMyScreen->geometry().width(),
+                              pMyScreen->geometry().height(),
                               QImage::Format_RGBA8888_Premultiplied);
     QPainter painter(&tempImage);
     painter.fillRect(tempImage.rect(), Qt::white);
-    QImage image = screens.at(1)->grabWindow(0).toImage();
+    QImage image = pMyScreen->grabWindow(0).toImage();
     if(!image.isNull()) {
         image = image.scaled(pBaseImage->size(),
                              Qt::KeepAspectRatio).mirrored();
@@ -449,7 +450,7 @@ SlideWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-    glClearDepthf(5.0f);
+    glClearDepth(5.0);
 
     if(pTexture0 && pTexture1) {
         pCurrentProgram->setUniformValue(iTex0Loc, 0);

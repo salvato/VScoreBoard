@@ -35,6 +35,8 @@ SOURCES += \
     generalsetupdialog.cpp \
     main.cpp \
     object.cpp \
+    particle.cpp \
+    particlegenerator.cpp \
     playfield.cpp \
     pole.cpp \
     racewidget.cpp \
@@ -61,6 +63,8 @@ HEADERS += \
     generalsetupdialog.h \
     object.h \
     panelorientation.h \
+    particle.h \
+    particlegenerator.h \
     playfield.h \
     pole.h \
     racewidget.h \

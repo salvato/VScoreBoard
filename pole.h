@@ -2,11 +2,11 @@
 
 #include "object.h"
 
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
-class Pole : public Object, protected QOpenGLFunctions
+class Pole : public Object, protected QOpenGLFunctions_3_3_Core
 {
 public:
     Pole(QSizeF      _size,

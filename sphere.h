@@ -1,13 +1,13 @@
 #pragma once
 
 
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 
 
-class Sphere : protected QOpenGLFunctions
+class Sphere : protected QOpenGLFunctions_3_3_Core
 {
 public:
     // construct a sphere centered at origin

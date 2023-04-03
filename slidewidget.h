@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
 #include <QMatrix4x4>
 #include <QQuaternion>
 #include <QVector2D>
@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTimer>
 
 
-class SlideWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class SlideWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
     Q_OBJECT
 
@@ -102,4 +102,5 @@ private:
     GLint     iProgressLoc;
     GLfloat   progress;
     GLfloat   aspectRatio;
+    QScreen*  pMyScreen;
 };

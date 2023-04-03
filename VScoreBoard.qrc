@@ -53,5 +53,7 @@
         <file>blue-carpet.jpg</file>
         <file>white-carpet.jpg</file>
         <file>corda_nera.jpg</file>
+        <file>ball0.png</file>
+        <file>ball1.png</file>
     </qresource>
 </RCC>

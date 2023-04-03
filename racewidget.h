@@ -121,20 +121,26 @@ private:
     Pole*      pNetBandBottom;
     Pole*      pNetBandLeft;
     Pole*      pNetBandRight;
-    Avatar*    pTeam0;
-    Avatar*    pTeam1;
     QVector<Pole*> hRopes;
     QVector<Pole*> vRopes;
+    Avatar*    pTeam0;
+    Avatar*    pTeam1;
+
+    const float z0Start =  2.0;
+    const float z1Start = -2.0;
+    const float xField  =  9.0;
+    const float zField  =  4.5;
+    const uint SHADOW_WIDTH  = 1024;
+    const uint SHADOW_HEIGHT = 1024;
+
+    float ballRadius;
 
     float xCamera =  0.0;
     float yCamera = 15.0;
     float zCamera = 20.0;
-    float z0Start =  2.0;
-    float z1Start = -2.0;
-    float xField  =  9.0;
-    float zField  =  4.5;
+    float near_plane = 0.0f;
+    float far_plane  = 7.5f;
 
-    float ballRadius;
     QString sTeamName[2];
     QVector<QVector2D> score[5];
     int maxScore[5];
@@ -142,14 +148,10 @@ private:
     int iCurrentSet;
     float scanTime;
     int refreshTime;
-    const unsigned int SHADOW_WIDTH  = 1024;
-    const unsigned int SHADOW_HEIGHT = 1024;
     unsigned int depthMapFBO;
     unsigned int depthMap;
     unsigned int quadVAO = 0;
-    unsigned int quadVBO;
-    float near_plane = 0.0f;
-    float far_plane  = 7.5f;
+    unsigned int quadVBO = 0;
     float speed;
     QVector3D speed0;
     QVector3D speed1;

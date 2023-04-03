@@ -52,8 +52,10 @@ RaceWindow::RaceWindow(QWidget *parent)
     sTeamName[0] = "Locali";
     sTeamName[1] = "Ospiti";
 
-    QPixmap pixmap(":/ball2.png");
-    pixmap = pixmap.scaledToWidth(iFontSize);
+    QPixmap pixmap0(":/ball0.png");
+    pixmap0 = pixmap0.scaledToWidth(iFontSize);
+    QPixmap pixmap1(":/ball1.png");
+    pixmap1 = pixmap1.scaledToWidth(iFontSize);
     pRaceWidget = new RaceWidget();
     connect(pRaceWidget, SIGNAL(raceDone()),
             this, SIGNAL(raceDone()));
@@ -64,8 +66,8 @@ RaceWindow::RaceWindow(QWidget *parent)
 
     labelTeam0.setText(sTeamName[0]);
     labelTeam1.setText(sTeamName[1]);
-    labelIcon0.setPixmap(pixmap);
-    labelIcon1.setPixmap(pixmap);
+    labelIcon0.setPixmap(pixmap0);
+    labelIcon1.setPixmap(pixmap1);
     labelScore0.setText("0");
     labelScore1.setText("0");
 

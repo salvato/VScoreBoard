@@ -477,6 +477,7 @@ RaceWidget::timerEvent(QTimerEvent*) {
             timer.stop();
             pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
             pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
+            // Start Fireworks...
             closeTimer.start(3000);
             update();
             return;

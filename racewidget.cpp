@@ -59,11 +59,11 @@ RaceWidget::RaceWidget()
 
     ballRadius = 0.1066f * 4.0f; // 4 times bigger than real
 
-    diffuseColor  = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
-    specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
+    lightColor  = QVector3D(1.0f, 1.0f, 1.0f);
 
-    scanTime = 30.0; // Tempo in secondi per l'intera "Corsa"
-    speed    = 2.0f*xField/scanTime;
+    scanTime  = 30; // Tempo in secondi per l'intera "Corsa"
+    closeTime = 7000;
+    speed     = 2.0f*xField/float(scanTime);
 
 /*
     cameraPosition = QVector4D(0.0f, 5.0f, 0.0f, 1.0f);
@@ -480,13 +480,14 @@ RaceWidget::paintGL() {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, depthMap);
 
-    pGameProgram->setUniformValue("view",             cameraProjectionMatrix);
-    pGameProgram->setUniformValue("camera",           cameraViewMatrix);
-    pGameProgram->setUniformValue("viewPos",          cameraPosition);
-    pGameProgram->setUniformValue("lightPos",         lightPosition);
-    pGameProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
-    pGameProgram->setUniformValue("diffuseTexture",   0);
-    pGameProgram->setUniformValue("shadowMap",        1);
+    pGameProgram->setUniformValue("view",              cameraProjectionMatrix);
+    pGameProgram->setUniformValue("camera",            cameraViewMatrix);
+    pGameProgram->setUniformValue("viewPos",           cameraPosition);
+    pGameProgram->setUniformValue("lightPos",          lightPosition);
+    pGameProgram->setUniformValue("lightColor",        lightColor);
+    pGameProgram->setUniformValue("lightSpaceMatrix",  lightSpaceMatrix);
+    pGameProgram->setUniformValue("diffuseTexture",    0);
+    pGameProgram->setUniformValue("shadowMap",         1);
 
 #ifndef SHOW_DEPTH
     renderScene(pGameProgram);
@@ -580,7 +581,7 @@ RaceWidget::timerEvent(QTimerEvent*) {
                 bFireWorks = true;
                 // Start Fireworks...
                 regenerateParticles = 2;
-                fireworksTimer.start(5000);
+                fireworksTimer.start(closeTime);
                 update();
                 return;
             }

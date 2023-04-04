@@ -98,8 +98,7 @@ private:
     QMatrix4x4 lightViewMatrix;
     QMatrix4x4 lightSpaceMatrix;
 
-    QVector4D diffuseColor;
-    QVector4D specularColor;
+    QVector3D lightColor;
 
     QVector3D lightPosition;
 
@@ -154,7 +153,8 @@ private:
     int maxScore[5];
     int indexScore;
     int iCurrentSet;
-    float scanTime;
+    int scanTime;
+    int closeTime;
     int refreshTime;
     unsigned int depthMapFBO;
     unsigned int depthMap;

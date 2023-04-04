@@ -55,10 +55,12 @@ public:
     void updateLabel(int iTeam, QString sLabel);
     void resetScore(int iSet);
     void resetAll();
+    void resetInitialStatus();
     void startRace(int iSet);
 
 public slots:
     void closeEvent(QCloseEvent*) override;
+    void hideEvent(QHideEvent *event) override;
     void onStopFireworks();
     void onTimeToClose();
 
@@ -96,10 +98,19 @@ private:
     QMatrix4x4 lightViewMatrix;
     QMatrix4x4 lightSpaceMatrix;
 
-    QVector4D lightPosition;
     QVector4D diffuseColor;
     QVector4D specularColor;
-    QVector4D cameraPosition;
+
+    QVector3D lightPosition;
+
+    QVector3D cameraPosition0;
+    QVector3D cameraCenter0;
+    QVector3D cameraUp0;
+    QVector3D cameraSpeed0;
+    QVector3D cameraPosition;
+    QVector3D cameraCenter;
+    QVector3D cameraUp;
+    QVector3D cameraSpeed;
 
     QVector<Object*> gameObjects;
 
@@ -160,5 +171,6 @@ private:
     int regenerateParticles;
     bool bRacing;
     bool bFireWorks;
+    QVector3D origin;
 };
 

@@ -39,6 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 RaceWidget::RaceWidget()
     : QOpenGLWidget()
+    , pTeam0(nullptr)
+    , pTeam1(nullptr)
     , bRacing(false)
     , bFireWorks(false)
 
@@ -60,13 +62,32 @@ RaceWidget::RaceWidget()
     diffuseColor  = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
     specularColor = QVector4D(1.0f, 1.0f, 1.0f, 1.0f);
 
-    cameraPosition = QVector4D(0.0f, 10.0f, 10.0f, 1.0f);
-//    cameraPosition = QVector4D(-xField, 5.0f, 0.0f, 1.0f);
-    cameraViewMatrix.lookAt(cameraPosition.toVector3D(),  // Eye
-                            QVector3D(0.0f, 0.0f, 0.0f),  // Center
-                            QVector3D(0.0f, 1.0f, 0.0f)); // Up
+    scanTime = 30.0; // Tempo in secondi per l'intera "Corsa"
+    speed    = 2.0f*xField/scanTime;
 
-    lightPosition = QVector4D(-2.0f, 4.0f, -1.0f, 1.0f);
+/*
+    cameraPosition = QVector4D(0.0f, 5.0f, 0.0f, 1.0f);
+    cameraViewMatrix.lookAt(cameraPosition.toVector3D(),  // Eye
+                            QVector3D(xField, 0.0f, 0.0f),  // Center
+                            QVector3D(0.0f, 1.0f, 0.0f)); // Up
+*/
+
+    cameraPosition0 = QVector3D(-3.0, 10.0f, 10.0f);
+    cameraCenter0   = QVector3D(cameraPosition0.x(), 0.0f, 0.25*zField);
+    cameraUp0       = QVector3D( 0.0f,  1.0f,  0.0f);
+    cameraSpeed0    = QVector3D(0.3f*speed,  0.0f,  0.0f);
+
+    cameraPosition  = cameraPosition0;
+    cameraCenter    = cameraCenter0;
+    cameraUp        = cameraUp0;
+    cameraSpeed     = cameraSpeed0;
+
+    cameraViewMatrix.setToIdentity();
+    cameraViewMatrix.lookAt(cameraPosition, // Eye
+                            cameraCenter,   // Center
+                            cameraUp);      // Up
+
+    lightPosition = QVector3D(-2.0f, 4.0f, -1.0f);
 
     float extension = std::max(xField, zField)*1.5;
     near_plane = -1.0f;
@@ -78,14 +99,12 @@ RaceWidget::RaceWidget()
                                  extension,
                                  near_plane,
                                  far_plane);
-    lightViewMatrix.lookAt(lightPosition.toVector3D(),     // Eye
-                           QVector3D( 0.0f, 0.0f,  0.0f),  // Center
+    lightViewMatrix.lookAt(lightPosition,                  // Eye
+                           QVector3D( 0.0f, 0.0f, 0.25f*zField),  // Center
                            QVector3D( 0.0f, 1.0f,  0.0f)); // Up
     lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
 
     resetAll();
-    scanTime = 10.0; // Tempo in secondi per l'intera "Corsa"
-    speed = 2.0f*xField/scanTime;
     connect(&fireworksTimer, SIGNAL(timeout()),
              this, SLOT(onStopFireworks()));
     connect(&closeTimer, SIGNAL(timeout()),
@@ -94,6 +113,10 @@ RaceWidget::RaceWidget()
 
 
 RaceWidget::~RaceWidget() {
+    timer.stop();
+    fireworksTimer.stop();
+    closeTimer.stop();
+    emit raceDone();
     makeCurrent();
     doneCurrent();
 }
@@ -102,10 +125,48 @@ RaceWidget::~RaceWidget() {
 void
 RaceWidget::closeEvent(QCloseEvent* event) {
     timer.stop();
+    fireworksTimer.stop();
+    closeTimer.stop();
+    emit raceDone();
     makeCurrent();
     doneCurrent();
+    event->accept();
+}
+
+
+void
+RaceWidget::hideEvent(QHideEvent *event) {
+    timer.stop();
+    fireworksTimer.stop();
+    closeTimer.stop();
     emit raceDone();
     event->accept();
+}
+
+
+void
+RaceWidget::resetInitialStatus() {
+    bRacing    = false;
+    bFireWorks = false;
+    emit newScore(0, 0);
+    cameraPosition = cameraPosition0;
+    cameraCenter   = cameraCenter0;
+    cameraUp       = cameraUp0;
+    cameraSpeed    = cameraSpeed0;
+    cameraViewMatrix.setToIdentity();
+    cameraViewMatrix.lookAt(cameraPosition, // Eye
+                            cameraCenter,   // Center
+                            cameraUp);      // Up
+    if(pTeam0) {
+        pTeam0->setPos(QVector3D(-xField, ballRadius, z0Start));
+        pTeam1->setPos(QVector3D(-xField, ballRadius, z1Start));
+        pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
+        pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
+        if(!timer.isActive()) {
+            timer.start(refreshTime, this);
+            t0 = QTime::currentTime().msecsSinceStartOfDay();
+        }
+    }
 }
 
 
@@ -386,6 +447,10 @@ RaceWidget::startRace(int iSet) {
     xTarget = (2.0*xField)/float(maxScore[iCurrentSet]) - xField;
     emit newScore(score[iCurrentSet].at(indexScore+1).x(),
                   score[iCurrentSet].at(indexScore+1).y());
+    if(!timer.isActive()) {
+        timer.start(refreshTime, this);
+        t0 = QTime::currentTime().msecsSinceStartOfDay();
+    }
 }
 
 
@@ -417,8 +482,8 @@ RaceWidget::paintGL() {
 
     pGameProgram->setUniformValue("view",             cameraProjectionMatrix);
     pGameProgram->setUniformValue("camera",           cameraViewMatrix);
-    pGameProgram->setUniformValue("viewPos",          cameraPosition.toVector3D());
-    pGameProgram->setUniformValue("lightPos",         lightPosition.toVector3D());
+    pGameProgram->setUniformValue("viewPos",          cameraPosition);
+    pGameProgram->setUniformValue("lightPos",         lightPosition);
     pGameProgram->setUniformValue("lightSpaceMatrix", lightSpaceMatrix);
     pGameProgram->setUniformValue("diffuseTexture",   0);
     pGameProgram->setUniformValue("shadowMap",        1);
@@ -500,12 +565,14 @@ RaceWidget::onTimeToClose() {
 
 void
 RaceWidget::timerEvent(QTimerEvent*) {
+    t1 = QTime::currentTime().msecsSinceStartOfDay();
+    float dt = (t1-t0)/1000.0;
     if(bRacing) {
         float xCurrent = teamMoving ? pTeam1->getPos().x() : pTeam0->getPos().x();
         if(xCurrent >= xTarget) {
             indexScore++;
             if(indexScore > score[iCurrentSet].count()-2) {
-                QVector3D origin = teamMoving ? pTeam1->getPos() : pTeam0->getPos();
+                origin = teamMoving ? pTeam1->getPos() : pTeam0->getPos();
                 pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
                 pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
                 pParticles->init(origin);
@@ -533,14 +600,32 @@ RaceWidget::timerEvent(QTimerEvent*) {
             emit newScore(score[iCurrentSet].at(indexScore+1).x(),
                           score[iCurrentSet].at(indexScore+1).y());
         }
+        cameraPosition += cameraSpeed*dt;
+        cameraCenter.setX(cameraPosition.x());
+        cameraViewMatrix.setToIdentity();
+        cameraViewMatrix.lookAt(cameraPosition, // Eye
+                                cameraCenter,   // Center
+                                cameraUp);      // Up
     }
-    t1 = QTime::currentTime().msecsSinceStartOfDay();
-    float dt = (t1-t0)/1000.0;
     for(int i=0; i<gameObjects.count(); i++) {
         gameObjects.at(i)->updateStatus(dt);
     }
-    if(bFireWorks)
+    if(bFireWorks) {
         pParticles->Update(dt, regenerateParticles, QVector3D(0.0f, ballRadius, 0.0f));
+        if(cameraCenter.x() < origin.x()) {
+            cameraCenter.setX(cameraCenter.x()+0.25*speed*dt);
+        }
+        if(cameraCenter.z() > origin.z()) {
+            cameraCenter.setZ(cameraCenter.z()-0.25*speed*dt);
+        }
+        if(cameraCenter.z() < origin.z()) {
+            cameraCenter.setZ(cameraCenter.z()+0.25*speed*dt);
+        }
+        cameraViewMatrix.setToIdentity();
+        cameraViewMatrix.lookAt(cameraPosition, // Eye
+                                cameraCenter,   // Center
+                                cameraUp);      // Up
+    }
     t0 = t1;
     update();
 }

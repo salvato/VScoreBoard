@@ -86,6 +86,11 @@ RaceWindow::RaceWindow(QWidget *parent)
             this, SLOT(onTimeToStartRace()));
 }
 
+void
+RaceWindow::closeEvent(QCloseEvent* event) {
+    event->accept();
+}
+
 
 void
 RaceWindow::updateLabel(int iTeam, QString sLabel) {
@@ -114,6 +119,7 @@ RaceWindow::resetAll() {
 void
 RaceWindow::startRace(int iSet) {
     iCurrentSet = iSet;
+    pRaceWidget->resetInitialStatus();
     timerStart.start(3000);
 }
 

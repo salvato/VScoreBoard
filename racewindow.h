@@ -24,7 +24,7 @@ public:
 public slots:
     void onNewScore(int s0, int s1);
     void onTimeToStartRace();
-    //void closeEvent(QCloseEvent*) override;
+    void closeEvent(QCloseEvent*) override;
 
 private:
     QPalette        panelPalette;

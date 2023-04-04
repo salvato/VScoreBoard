@@ -2,9 +2,8 @@
 #include "particlegenerator.h"
 
 
-ParticleGenerator::ParticleGenerator(QOpenGLShaderProgram* pShader, QOpenGLTexture* pTexture, uint amount)
+ParticleGenerator::ParticleGenerator(QOpenGLTexture* pTexture, uint amount)
     : amount(amount)
-    , pShader(pShader)
     , pTexture(pTexture)
 {
     initializeOpenGLFunctions();
@@ -43,7 +42,7 @@ ParticleGenerator::init() {
 
 
 void
-ParticleGenerator::Update(float dt, Object& object, unsigned int newParticles, QVector3D offset) {
+ParticleGenerator::Update(float dt, Object& object, uint newParticles, QVector3D offset) {
     // add new particles
     for (unsigned int i = 0; i < newParticles; ++i) {
         int unusedParticle = firstUnusedParticle();
@@ -62,7 +61,7 @@ ParticleGenerator::Update(float dt, Object& object, unsigned int newParticles, Q
 
 // render all particles
 void
-ParticleGenerator::draw() {
+ParticleGenerator::draw(QOpenGLShaderProgram* pShader) {
     // use additive blending to give it a 'glow' effect
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     pShader->bind();

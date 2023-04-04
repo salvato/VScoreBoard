@@ -148,6 +148,18 @@ RaceWidget::resizeGL(int w, int h) {
     const qreal zFar  = 30.0f;
     const qreal fov   = 50.0;
     cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
+    QMatrix4x4 projection;
+    projection.setToIdentity();
+    projection.ortho(0.0f,
+                     static_cast<float>(w),
+                     static_cast<float>(h),
+                     0.0f,
+                     -1.0f,
+                     1.0f);
+    ResourceManager::GetShader("particle")->bind();
+    ResourceManager::GetShader("particle")->setUniformValue("sprite", 0);
+    ResourceManager::GetShader("particle")->setUniformValue("projection", projection);
+    ResourceManager::GetShader("particle")->release();
 }
 
 
@@ -273,9 +285,7 @@ RaceWidget::initGameObjects() {
                         QVector3D(-xField, ballRadius, z1Start));
     gameObjects.append(pTeam1);
 
-    pParticles = new ParticleGenerator(ResourceManager::GetShader("particle"),
-                                       ResourceManager::GetTexture("particle"),
-                                       500);
+    pParticles = new ParticleGenerator(ResourceManager::GetTexture("particle"), 500);
 }
 
 
@@ -393,7 +403,10 @@ RaceWidget::paintGL() {
     glClear(GL_DEPTH_BUFFER_BIT);
     glActiveTexture(GL_TEXTURE0);
     glCullFace(GL_FRONT); // To fix peter panning
-    renderScene(pComputeDepthProgram);
+    glActiveTexture(GL_TEXTURE0);
+    for(int i=0; i<gameObjects.count(); i++) {
+        gameObjects.at(i)->draw(pComputeDepthProgram);
+    }
     pComputeDepthProgram->release();
     glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 
@@ -434,11 +447,10 @@ RaceWidget::paintGL() {
 void
 RaceWidget::renderScene(QOpenGLShaderProgram* pProgram) {
     glActiveTexture(GL_TEXTURE0);
-
     for(int i=0; i<gameObjects.count(); i++) {
         gameObjects.at(i)->draw(pProgram);
     }
-    pParticles->Draw();
+    pParticles->draw(ResourceManager::GetShader("particle"));
 }
 
 

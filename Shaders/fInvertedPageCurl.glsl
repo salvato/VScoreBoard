@@ -1,4 +1,5 @@
-#version 150
+#version 330 core
+
 // author: Hewlett-Packard
 // license: BSD 3 Clause
 // Adapted by Sergey Kosarevsky from:

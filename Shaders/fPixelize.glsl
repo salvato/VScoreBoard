@@ -1,4 +1,5 @@
-#version 150
+#version 330 core
+
 // Author: gre
 // License: MIT
 // forked from https://gist.github.com/benraziel/c528607361d90a072e98

@@ -1,4 +1,5 @@
-#version 150
+#version 330 core
+
 // License: MIT
 // Author: Xaychru
 // ported by gre from https://gist.github.com/Xaychru/ce1d48f0ce00bb379750

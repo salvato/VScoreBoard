@@ -1,4 +1,5 @@
-#version 150
+#version 330 core
+
 // Author: paniq
 // License: MIT
 uniform float strength = 0.1;

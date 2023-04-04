@@ -1,4 +1,4 @@
-#version 150
+#version 330 core
 
 #ifdef GL_ES
 // Set default precision to high

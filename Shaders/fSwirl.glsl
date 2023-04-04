@@ -1,4 +1,5 @@
-#version 150
+#version 330 core
+
 // License: MIT
 // Author: Sergey Kosarevsky
 // ( http://www.linderdaum.com )

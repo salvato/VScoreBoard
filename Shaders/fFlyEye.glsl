@@ -1,4 +1,5 @@
-#version 150
+#version 330 core
+
 // Author: gre
 // License: MIT
 uniform float size = 0.04;

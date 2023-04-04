@@ -1,4 +1,5 @@
-#version 150
+#version 330 core
+
 // author: Paweł Płóciennik
 // license: MIT
 uniform float amplitude = 30;

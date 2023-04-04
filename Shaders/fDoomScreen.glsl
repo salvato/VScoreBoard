@@ -1,4 +1,5 @@
-#version 150
+#version 330 core
+
 // Author: Zeh Fernando
 // License: MIT
 

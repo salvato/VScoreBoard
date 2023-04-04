@@ -1,4 +1,5 @@
-#version 150
+#version 330 core
+
 // Name: Power Kaleido
 // Author: Boundless
 // License: MIT

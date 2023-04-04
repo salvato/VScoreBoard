@@ -39,6 +39,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 RaceWidget::RaceWidget()
     : QOpenGLWidget()
+    , bRacing(false)
+    , bFireWorks(false)
+
 {
     QList<QScreen*> screens = QApplication::screens();
     QRect screenres = screens.at(0)->geometry();
@@ -83,6 +86,8 @@ RaceWidget::RaceWidget()
     resetAll();
     scanTime = 10.0; // Tempo in secondi per l'intera "Corsa"
     speed = 2.0f*xField/scanTime;
+    connect(&fireworksTimer, SIGNAL(timeout()),
+             this, SLOT(onStopFireworks()));
     connect(&closeTimer, SIGNAL(timeout()),
             this, SLOT(onTimeToClose()));
 }
@@ -148,18 +153,6 @@ RaceWidget::resizeGL(int w, int h) {
     const qreal zFar  = 30.0f;
     const qreal fov   = 50.0;
     cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
-    QMatrix4x4 projection;
-    projection.setToIdentity();
-    projection.ortho(0.0f,
-                     static_cast<float>(w),
-                     static_cast<float>(h),
-                     0.0f,
-                     -1.0f,
-                     1.0f);
-    ResourceManager::GetShader("particle")->bind();
-    ResourceManager::GetShader("particle")->setUniformValue("sprite", 0);
-    ResourceManager::GetShader("particle")->setUniformValue("projection", projection);
-    ResourceManager::GetShader("particle")->release();
 }
 
 
@@ -320,7 +313,7 @@ RaceWidget::initTextures() {
     ResourceManager::LoadTexture(":/wood.png",         "floor");
     ResourceManager::LoadTexture(":/white-carpet.jpg", "line");
     ResourceManager::LoadTexture(":/corda_nera.jpg",   "corda");
-    ResourceManager::LoadTexture(":/particle.png",     "particle");
+    ResourceManager::LoadTexture(":/white-carpet.jpg", "particle");
 }
 
 
@@ -362,6 +355,10 @@ RaceWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
     glEnable(GL_MULTISAMPLE);
+
+    refreshTime = 15; // in ms
+    timer.start(refreshTime, this);
+    t0 = QTime::currentTime().msecsSinceStartOfDay();
 }
 
 
@@ -370,6 +367,8 @@ RaceWidget::startRace(int iSet) {
     if(maxScore[iSet] == 0) {
         return;
     }
+    bRacing = true;
+    bFireWorks = false;
     iCurrentSet = iSet;
     pTeam0->setPos(QVector3D(-xField, ballRadius, z0Start));
     pTeam1->setPos(QVector3D(-xField, ballRadius, z1Start));
@@ -385,11 +384,8 @@ RaceWidget::startRace(int iSet) {
         teamMoving = 1;
     }
     xTarget = (2.0*xField)/float(maxScore[iCurrentSet]) - xField;
-    refreshTime = 15; // in ms
     emit newScore(score[iCurrentSet].at(indexScore+1).x(),
                   score[iCurrentSet].at(indexScore+1).y());
-    timer.start(refreshTime, this);
-    t0 = QTime::currentTime().msecsSinceStartOfDay();
 }
 
 
@@ -450,7 +446,8 @@ RaceWidget::renderScene(QOpenGLShaderProgram* pProgram) {
     for(int i=0; i<gameObjects.count(); i++) {
         gameObjects.at(i)->draw(pProgram);
     }
-    pParticles->draw(ResourceManager::GetShader("particle"));
+    if(bFireWorks)
+        pParticles->draw(pProgram);
 }
 
 
@@ -485,48 +482,65 @@ RaceWidget::renderQuad() {
 
 
 void
+RaceWidget::onStopFireworks() {
+    fireworksTimer.stop();
+    regenerateParticles = 0;
+    closeTimer.start(5000);
+}
+
+
+void
 RaceWidget::onTimeToClose() {
     closeTimer.stop();
+    bRacing = false;
+    bFireWorks = false;
     emit raceDone();
 }
 
 
 void
 RaceWidget::timerEvent(QTimerEvent*) {
-    float xCurrent = teamMoving ? pTeam1->getPos().x() : pTeam0->getPos().x();
-    if(xCurrent >= xTarget) {
-        indexScore++;
-        if(indexScore > score[iCurrentSet].count()-2) {
-            timer.stop();
-            pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
-            pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
-            // Start Fireworks...
-            closeTimer.start(3000);
-            update();
-            return;
+    if(bRacing) {
+        float xCurrent = teamMoving ? pTeam1->getPos().x() : pTeam0->getPos().x();
+        if(xCurrent >= xTarget) {
+            indexScore++;
+            if(indexScore > score[iCurrentSet].count()-2) {
+                QVector3D origin = teamMoving ? pTeam1->getPos() : pTeam0->getPos();
+                pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
+                pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
+                pParticles->init(origin);
+                bRacing = false;
+                bFireWorks = true;
+                // Start Fireworks...
+                regenerateParticles = 2;
+                fireworksTimer.start(5000);
+                update();
+                return;
+            }
+            if(score[iCurrentSet].at(indexScore+1).x() >
+               score[iCurrentSet].at(indexScore).x()) {
+                teamMoving = 0;
+                pTeam0->setSpeed(QVector3D(speed, 0.0f, 0.0f));
+                pTeam1->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
+                xTarget = score[iCurrentSet].at(indexScore+1).x()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;
+            }
+            else {
+                teamMoving = 1;
+                pTeam0->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
+                pTeam1->setSpeed(QVector3D(speed, 0.0f, 0.0f));
+                xTarget = score[iCurrentSet].at(indexScore+1).y()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;
+            }
+            emit newScore(score[iCurrentSet].at(indexScore+1).x(),
+                          score[iCurrentSet].at(indexScore+1).y());
         }
-        if(score[iCurrentSet].at(indexScore+1).x() >
-           score[iCurrentSet].at(indexScore).x()) {
-            teamMoving = 0;
-            pTeam0->setSpeed(QVector3D(speed, 0.0f, 0.0f));
-            pTeam1->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
-            xTarget = score[iCurrentSet].at(indexScore+1).x()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;
-        }
-        else {
-            teamMoving = 1;
-            pTeam0->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
-            pTeam1->setSpeed(QVector3D(speed, 0.0f, 0.0f));
-            xTarget = score[iCurrentSet].at(indexScore+1).y()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;
-        }
-        emit newScore(score[iCurrentSet].at(indexScore+1).x(),
-                      score[iCurrentSet].at(indexScore+1).y());
     }
     t1 = QTime::currentTime().msecsSinceStartOfDay();
     float dt = (t1-t0)/1000.0;
     for(int i=0; i<gameObjects.count(); i++) {
         gameObjects.at(i)->updateStatus(dt);
     }
-    pParticles->Update(dt, *pTeam0, 2, QVector3D(ballRadius, ballRadius, ballRadius));
+    if(bFireWorks)
+        pParticles->Update(dt, regenerateParticles, QVector3D(0.0f, ballRadius, 0.0f));
     t0 = t1;
     update();
 }

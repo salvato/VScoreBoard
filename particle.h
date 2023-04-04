@@ -1,12 +1,12 @@
 #pragma once
 
-#include "object.h"
+#include "pole.h"
 
-#include <QOpenGLFunctions_3_3_Core>
+
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
-class Particle : public Object, protected QOpenGLFunctions_3_3_Core
+class Particle : public Pole
 {
 public:
     Particle(QVector4D       _color    = QVector4D(1.0f, 1.0f, 1.0f, 1.0f),
@@ -20,9 +20,6 @@ public:
     ~Particle();
 
 public:
-    void draw(QOpenGLShaderProgram* pProgram) override;
-
-public:
     QVector4D color;
     float life;
 
@@ -31,6 +28,4 @@ private:
 
 private:
     QSizeF size;
-    QOpenGLBuffer arrayBuf;
-    QOpenGLBuffer indexBuf;
 };

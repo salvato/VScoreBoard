@@ -59,6 +59,7 @@ public:
 
 public slots:
     void closeEvent(QCloseEvent*) override;
+    void onStopFireworks();
     void onTimeToClose();
 
 signals:
@@ -82,6 +83,7 @@ private:
 
     QBasicTimer timer;
     QTimer closeTimer;
+    QTimer fireworksTimer;
 
     QOpenGLShaderProgram* pGameProgram = nullptr;
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
@@ -155,6 +157,8 @@ private:
     int teamMoving;
 
     ParticleGenerator* pParticles;
-
+    int regenerateParticles;
+    bool bRacing;
+    bool bFireWorks;
 };
 

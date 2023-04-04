@@ -1,59 +1,86 @@
 
 #include "particlegenerator.h"
 
+#define rnd (rand()/double(RAND_MAX)) // [0.0 - 1.0]
 
 ParticleGenerator::ParticleGenerator(QOpenGLTexture* pTexture, uint amount)
-    : amount(amount)
-    , pTexture(pTexture)
+    : pTexture(pTexture)
+    , amount(amount)
+    , life(3.0f)
 {
     initializeOpenGLFunctions();
-    init();
+}
+
+
+/*
+    Choose three points u, v, w ∈ [0,1] uniformly at random.
+    A uniform, random quaternion is given by the simple expression:
+
+    q = (sqrt(1-u)*sin(2πv), sqrt(1-u)*cos(2πv), sqrt(u)*sin(2πw), sqrt(u)*cos(2πw))
+
+    oppure:
+
+    QQuaternion random_quaternion() {
+        double x,y,z, u,v,w, s;
+        do { x = random(-1,1); y = random(-1,1); z = x*x + y*y; } while (z > 1);
+        do { u = random(-1,1); v = random(-1,1); w = u*u + v*v; } while (w > 1);
+        s = sqrt((1-z) / w);
+        return QQuaternion(x, y, s*u, s*v);
+    }
+*/
+
+
+void
+ParticleGenerator::init(QVector3D _origin) {
+    particles.clear();
+    origin = _origin;
+    QQuaternion q;
+    for(uint i=0; i<amount; ++i) {
+        QVector3D random = QVector3D(((rand() % 100) - 50) / 100.0f,
+                                     ((rand() % 100) - 50) / 100.0f,
+                                     ((rand() % 100) - 50) / 100.0f);
+        QVector3D velocity = QVector3D(((rand() % 100) - 50) / 20.0f,
+                                        (rand() % 100)       /  7.0f,
+                                       ((rand() % 100) - 50) / 20.0f);
+        float u = rnd;
+        float v = rnd;
+        float w = rnd;
+        q = QQuaternion(sqrt(1.0-u) * sin(2.0*M_PI*v),
+                        sqrt(1.0-u) * cos(2.0*M_PI*v),
+                        sqrt(u)     * sin(2.0*M_PI*w),
+                        sqrt(u)     *  cos(2.0*M_PI*w));
+
+        particles.push_back(new Particle(QVector4D(1.0f, 1.0f, 1.0f, 1.0f), // color
+                                         life,                              // life
+                                         QSizeF(0.07f, 0.07f),              // size
+                                         pTexture,                          // texture
+                                         origin + random,                   // position
+                                         q,                                 // rotation
+                                         QVector3D(1.0f, 1.0f, 1.0f),       // scale
+                                         velocity)                          // speed
+                            );
+    }
 }
 
 
 void
-ParticleGenerator::init() {
-    // set up mesh and attribute properties
-    float particle_quad[] = {
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f
-    };
-    glGenVertexArrays(1, &VAO);
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
-    // fill mesh buffer
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_quad), particle_quad, GL_STATIC_DRAW);
-    // set mesh attributes
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-    glBindVertexArray(0);
-
-    // create amount default particle instances
-    for(uint i=0; i<amount; ++i)
-        particles.push_back(new Particle());
-}
-
-
-void
-ParticleGenerator::Update(float dt, Object& object, uint newParticles, QVector3D offset) {
+ParticleGenerator::Update(float dt, uint newParticles, QVector3D offset) {
     // add new particles
-    for (unsigned int i = 0; i < newParticles; ++i) {
+    for(uint i=0; i<newParticles; ++i) {
         int unusedParticle = firstUnusedParticle();
-        respawnParticle(particles[unusedParticle], object, offset);
+        respawnParticle(particles[unusedParticle], offset);
     }
     // update all particles
-    for (unsigned int i = 0; i < amount; ++i) {
-        particles.at(i)->life -= dt; // reduce life
-        if (particles.at(i)->life > 0.0f) {	// particle is alive, thus update
-            particles.at(i)->setPos(particles.at(i)->getPos() - particles.at(i)->getSpeed() * dt);
-            particles.at(i)->color.setW(particles.at(i)->color.w() - dt*2.5f);
+    for(uint i=0; i<amount; ++i) {
+        Particle* pParticle = particles.at(i);
+        pParticle->life -= dt; // reduce life
+        if (pParticle->life > 0.0f) {	// particle is alive, thus update
+            pParticle->setPos(pParticle->getPos() +
+                              pParticle->getSpeed() * dt);
+            if(pParticle->getPos().y() < 0.0f)
+                pParticle->life = 0.0f;
+            pParticle->color.setW(pParticle->color.w() - dt*2.5f);
+            pParticle->setSpeed(pParticle->getSpeed()-gravity*dt);
         }
     }
 }
@@ -62,56 +89,49 @@ ParticleGenerator::Update(float dt, Object& object, uint newParticles, QVector3D
 // render all particles
 void
 ParticleGenerator::draw(QOpenGLShaderProgram* pShader) {
-    // use additive blending to give it a 'glow' effect
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     pShader->bind();
     for(int i=0; i< particles.count(); i++) {
         if(particles.at(i)->life > 0.0f) {
-            pShader->setUniformValue("offset", particles.at(i)->getPos());
-            pShader->setUniformValue("color", particles.at(i)->color);
-            pTexture->bind();
-            glBindVertexArray(VAO);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            glBindVertexArray(0);
+            particles.at(i)->draw(pShader);
         }
     }
-    // don't forget to reset to default blending mode
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 
-// stores the index of the last particle used (for quick access to next dead particle)
-uint lastUsedParticle = 0;
-uint ParticleGenerator::firstUnusedParticle() {
-    // first search from last used particle, this will usually return almost instantly
+uint
+ParticleGenerator::firstUnusedParticle() {
     for(uint i=lastUsedParticle; i<amount; ++i) {
         if(particles.at(i)->life <= 0.0f){
             lastUsedParticle = i;
             return i;
         }
     }
-    // otherwise, do a linear search
     for(uint i=0; i<lastUsedParticle; ++i){
         if(particles.at(i)->life <= 0.0f){
             lastUsedParticle = i;
             return i;
         }
     }
-    // all particles are taken, override the first one (note that if it repeatedly hits this case, more particles should be reserved)
     lastUsedParticle = 0;
     return 0;
 }
 
 
 void
-ParticleGenerator::respawnParticle(Particle *pParticle, Object object, QVector3D offset) {
-    QVector3D random = QVector3D(((rand() % 100) - 50) / 10.0f,
-                                 ((rand() % 100) - 50) / 10.0f,
-                                 ((rand() % 100) - 50) / 10.0f);
+ParticleGenerator::respawnParticle(Particle *pParticle, QVector3D offset) {
+    QVector3D random = QVector3D(((rand() % 100) - 50) / 100.0f,
+                                 ((rand() % 100) - 50) / 100.0f,
+                                 ((rand() % 100) - 50) / 100.0f);
     float rColor = 0.5f + ((rand() % 100) / 100.0f);
-    pParticle->setPos(object.getPos() + random + offset);
+    pParticle->setPos(origin + random + offset);
     pParticle->color = QVector4D(rColor, rColor, rColor, 1.0f);
-    pParticle->life = 1.0f;
-    pParticle->setSpeed(object.getSpeed() * 0.1f);
+    pParticle->life = life;
+    QVector3D velocity = QVector3D(((rand() % 100) - 50) / 20.0f,
+                                   (rand() % 100)        /  7.0f,
+                                   ((rand() % 100) - 50) / 20.0f);
+
+    pParticle->setSpeed(velocity);
 }
 

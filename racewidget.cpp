@@ -61,7 +61,7 @@ RaceWidget::RaceWidget()
 
     lightColor  = QVector3D(1.0f, 1.0f, 1.0f);
 
-    scanTime  = 30; // Tempo in secondi per l'intera "Corsa"
+    scanTime  = 10; // Tempo in secondi per l'intera "Corsa"
     closeTime = 7000;
     speed     = 2.0f*xField/float(scanTime);
 
@@ -86,6 +86,10 @@ RaceWidget::RaceWidget()
     cameraViewMatrix.lookAt(cameraPosition, // Eye
                             cameraCenter,   // Center
                             cameraUp);      // Up
+
+    zNear = 0.01f;
+    zFar  = 30.0f;
+    fov   = 50.0;
 
     lightPosition = QVector3D(-2.0f, 4.0f, -1.0f);
 
@@ -209,10 +213,7 @@ void
 RaceWidget::resizeGL(int w, int h) {
     cameraProjectionMatrix.setToIdentity();
     // Calculate aspect ratio
-    qreal aspect = qreal(w) / qreal(h ? h : 1);
-    const qreal zNear = 0.01f;
-    const qreal zFar  = 30.0f;
-    const qreal fov   = 50.0;
+    aspect = qreal(w) / qreal(h ? h : 1);
     cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
 }
 
@@ -626,6 +627,9 @@ RaceWidget::timerEvent(QTimerEvent*) {
         cameraViewMatrix.lookAt(cameraPosition, // Eye
                                 cameraCenter,   // Center
                                 cameraUp);      // Up
+        fov  *= 0.999;
+        cameraProjectionMatrix.setToIdentity();
+        cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
     }
     t0 = t1;
     update();

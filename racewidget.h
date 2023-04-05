@@ -133,8 +133,8 @@ private:
     Avatar*    pTeam0;
     Avatar*    pTeam1;
 
-    const float z0Start =  2.0;
-    const float z1Start = -2.0;
+    const float z0Start = -2.0;
+    const float z1Start =  2.0;
     const float xField  =  9.0;
     const float zField  =  4.5;
     const uint SHADOW_WIDTH  = 1024;
@@ -172,5 +172,9 @@ private:
     bool bRacing;
     bool bFireWorks;
     QVector3D origin;
+    qreal zNear;
+    qreal zFar;
+    qreal fov;
+    qreal aspect;
 };
 

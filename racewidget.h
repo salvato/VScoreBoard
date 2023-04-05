@@ -80,6 +80,7 @@ protected:
     void initShadowBuffer();
     void initTextures();
     void initGameObjects();
+    void restoreStatus();
 
 private:
 
@@ -169,8 +170,12 @@ private:
 
     ParticleGenerator* pParticles;
     int regenerateParticles;
+
     bool bRacing;
-    bool bFireWorks;
+    bool bFiring;
+    bool bClosing;
+
+    int fireworkTime;
     QVector3D origin;
     qreal zNear;
     qreal zFar;

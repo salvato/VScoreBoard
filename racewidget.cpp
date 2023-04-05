@@ -45,7 +45,7 @@ RaceWidget::RaceWidget()
     , pTeam1(nullptr)
     , ballRadius(0.1066f * 4.0f)
     , scanTime(10) // Tempo in secondi per l'intera "Corsa"
-    , closeTime(7000)
+    , closeTime(3000)
     , speed(2.0f*xField/float(scanTime))
     , bRacing(false)
     , bFiring(false)
@@ -202,6 +202,7 @@ RaceWidget::resizeGL(int w, int h) {
 
 void
 RaceWidget::initGameObjects() {
+    QQuaternion q;
     gameObjects.clear();
     pFloor       = new Floor(QSizeF(50.0f, 50.0f),
                        ResourceManager::GetTexture("floor"));
@@ -212,6 +213,71 @@ RaceWidget::initGameObjects() {
                                ResourceManager::GetTexture("field"),
                                QVector3D(0.0f, 0.01f, 0.0f));
     gameObjects.append(pPlayField);
+
+    // Loghi nel campo
+    q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, -1.0f, 0.0f), 90.0f);
+    Floor* pLogo = new Floor(QSizeF(1.0f, 1.0f),
+                       ResourceManager::GetTexture("logo0"),
+                       QVector3D(-xField+3.0f, 0.02f, 0.0f),
+                       q,
+                       QVector3D(2.0f, 1.0f, 2.0f));
+    gameObjects.append(pLogo);
+
+    q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 90.0f);
+    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
+                       ResourceManager::GetTexture("logo0"),
+                       QVector3D(xField-3.0f, 0.02f, 0.0f),
+                       q,
+                       QVector3D(2.0f, 1.0f, 2.0f));
+    gameObjects.append(pLogo);
+
+    // Loghi esterni al campo
+    q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f,-1.0f, 0.0f), 90.0f);
+    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
+                      ResourceManager::GetTexture("logo1"),
+                      QVector3D(-xField-2.0f, 0.02f, -2.5f),
+                      q,
+                      QVector3D(1.0f, 1.0f, 1.0f));
+    gameObjects.append(pLogo);
+
+    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
+                      ResourceManager::GetTexture("logo1"),
+                      QVector3D(-xField-2.0f, 0.02f, 2.5f),
+                      q,
+                      QVector3D(1.0f, 1.0f, 1.0f));
+    gameObjects.append(pLogo);
+
+    q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 90.0f);
+    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
+                      ResourceManager::GetTexture("logo1"),
+                      QVector3D( xField+2.0f, 0.02f, -2.5f),
+                      q,
+                      QVector3D(1.0f, 1.0f, 1.0f));
+    gameObjects.append(pLogo);
+
+    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
+                      ResourceManager::GetTexture("logo1"),
+                      QVector3D( xField+2.0f, 0.02f, 2.5f),
+                      q,
+                      QVector3D(1.0f, 1.0f, 1.0f));
+    gameObjects.append(pLogo);
+
+    // Loghi Esterni
+    q = QQuaternion();//::fromAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 90.0f);
+    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
+                      ResourceManager::GetTexture("logo1"),
+                      QVector3D(-5.0f, 0.02f, -zField-3.0f),
+                      q,
+                      QVector3D(2.0f, 1.0f, 2.0f));
+    gameObjects.append(pLogo);
+
+    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
+                      ResourceManager::GetTexture("logo1"),
+                      QVector3D( 5.0f, 0.02f, -zField-3.0f),
+                      q,
+                      QVector3D(2.0f, 1.0f, 2.0f));
+    gameObjects.append(pLogo);
+
 
     // Slightltly higer than PlayField
     pLeftLine    = new WhiteLine(QSizeF(0.05f, zField),
@@ -254,7 +320,7 @@ RaceWidget::initGameObjects() {
     gameObjects.append(pTopPole);
 
     // Net White Bands
-    QQuaternion q = QQuaternion::fromAxisAndAngle(QVector3D(-1.0f, 0.0f, 0.0f), 90.0f);
+    q = QQuaternion::fromAxisAndAngle(QVector3D(-1.0f, 0.0f, 0.0f), 90.0f);
     pNetBandTop  = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
                            ResourceManager::GetTexture("line"),
                            QVector3D(0.0f, 2.43f+0.02f, 0.0f),
@@ -351,13 +417,15 @@ RaceWidget::initShaders() {
 
 void
 RaceWidget::initTextures() {
-    ResourceManager::LoadTexture(":/VolleyBall_0.png", "team0");
-    ResourceManager::LoadTexture(":/VolleyBall_1.png", "team1");
-    ResourceManager::LoadTexture(":/blue-carpet.jpg",  "field");
-    ResourceManager::LoadTexture(":/wood.png",         "floor");
-    ResourceManager::LoadTexture(":/white-carpet.jpg", "line");
-    ResourceManager::LoadTexture(":/corda_nera.jpg",   "corda");
-    ResourceManager::LoadTexture(":/white-carpet.jpg", "particle");
+    ResourceManager::LoadTexture(":/VolleyBall_0.png",   "team0");
+    ResourceManager::LoadTexture(":/VolleyBall_1.png",   "team1");
+    ResourceManager::LoadTexture(":/blue-carpet.jpg",    "field");
+    ResourceManager::LoadTexture(":/wood.png",           "floor");
+    ResourceManager::LoadTexture(":/white-carpet.jpg",   "line");
+    ResourceManager::LoadTexture(":/corda_nera.jpg",     "corda");
+    ResourceManager::LoadTexture(":/white-carpet.jpg",   "particle");
+    ResourceManager::LoadTexture(":/Logo_UniMe.png",     "logo0");
+    ResourceManager::LoadTexture(":/Logo_SSD_UniMe.png", "logo1");
 }
 
 
@@ -399,6 +467,8 @@ RaceWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc (GL_LESS);
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     refreshTime = 15; // in ms
     timer.start(refreshTime, this);
@@ -632,7 +702,7 @@ RaceWidget::timerEvent(QTimerEvent*) {
     }
     if(bClosing) {
         fov  *= 0.999;
-        lightColor *= 0.99f;
+        lightColor *= 0.97f;
         cameraProjectionMatrix.setToIdentity();
         cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
     }

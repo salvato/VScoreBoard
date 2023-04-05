@@ -115,6 +115,7 @@ private:
     QVector<Object*> gameObjects;
 
     Floor*     pFloor;
+//    Floor*     pLogo0;
     PlayField* pPlayField;
     WhiteLine* pLeftLine;
     WhiteLine* pLeft3mLine;

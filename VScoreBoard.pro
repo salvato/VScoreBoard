@@ -37,7 +37,6 @@ SOURCES += \
     object.cpp \
     particle.cpp \
     particlegenerator.cpp \
-    playfield.cpp \
     pole.cpp \
     racewidget.cpp \
     racewindow.cpp \
@@ -66,7 +65,6 @@ HEADERS += \
     panelorientation.h \
     particle.h \
     particlegenerator.h \
-    playfield.h \
     pole.h \
     racewidget.h \
     racewindow.h \

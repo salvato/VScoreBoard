@@ -118,6 +118,7 @@ private:
     const float z1Start =  2.0;
     const float xField  =  9.0; // Half Width of the Play Field
     const float zField  =  4.5; // Half Height of the Play Field
+
     const uint SHADOW_WIDTH  = 1024;
     const uint SHADOW_HEIGHT = 1024;
 

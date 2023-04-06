@@ -56,5 +56,8 @@
         <file>ball0.png</file>
         <file>ball1.png</file>
         <file>particle.png</file>
+        <file>brick-wall.jpg</file>
+        <file>Logo_SSD.png</file>
+        <file>Rete.png</file>
     </qresource>
 </RCC>

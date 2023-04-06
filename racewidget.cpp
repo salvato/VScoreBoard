@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "racewidget.h"
 #include "floor.h"
-#include "playfield.h"
 #include "whiteline.h"
 #include "pole.h"
 #include "avatar.h"
@@ -40,10 +39,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 RaceWidget::RaceWidget()
     : QOpenGLWidget()
     , lightColor(QVector3D(1.0f, 1.0f, 1.0f))
-    , lightPosition(QVector3D(-2.0f, 4.0f, -1.0f)) // 4 times bigger than real
+    , lightPosition(QVector3D(0.5f, 4.0f, -3.0f))
     , pTeam0(nullptr)
     , pTeam1(nullptr)
-    , ballRadius(0.1066f * 4.0f)
+    , ballRadius(0.1066f * 4.0f) // 4 times bigger than real
     , scanTime(10) // Tempo in secondi per l'intera "Corsa"
     , closeTime(3000)
     , speed(2.0f*xField/float(scanTime))
@@ -68,9 +67,9 @@ RaceWidget::RaceWidget()
     sTeamName[1] = "Ospiti";
 /*
     cameraPosition = QVector4D(0.0f, 5.0f, 0.0f, 1.0f);
-    cameraViewMatrix.lookAt(cameraPosition.toVector3D(),  // Eye
-                            QVector3D(xField, 0.0f, 0.0f),  // Center
-                            QVector3D(0.0f, 1.0f, 0.0f)); // Up
+    cameraViewMatrix.lookAt(cameraPosition.toVector3D(),   // Eye
+                            QVector3D(xField, 0.0f, 0.0f), // Center
+                            QVector3D(0.0f, 1.0f, 0.0f));  // Up
 */
     cameraPosition0 = QVector3D(-3.0, 10.0f, 10.0f);
     cameraCenter0   = QVector3D(cameraPosition0.x(), 0.0f, 0.25*zField);
@@ -201,18 +200,45 @@ RaceWidget::resizeGL(int w, int h) {
 
 void
 RaceWidget::initGameObjects() {
-    QQuaternion q;
+    QQuaternion q = QQuaternion();
     gameObjects.clear();
 
+    // Wall
+    q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 90.0f);
+    gameObjects.append(new Floor(QSizeF(25.0f, 2.5f),
+                                 ResourceManager::GetTexture("brickwall"),
+                                 QVector3D(0.0f, 2.5f, -10.0f),
+                                 q)
+                       );
+    q  = QQuaternion::fromAxisAndAngle(QVector3D( 0.0f, 1.0f, 0.0f), 90.0f);
+    q *= QQuaternion::fromAxisAndAngle(QVector3D(-1.0f, 0.0f, 0.0f), 90.0f);
+    gameObjects.append(new Floor(QSizeF(25.0f, 2.5f),
+                                 ResourceManager::GetTexture("brickwall"),
+                                 QVector3D(25.0f, 2.5f, 0.0f),
+                                 q)
+                       );
+
     // Wooden Floor
-    gameObjects.append(new Floor(QSizeF(50.0f, 50.0f),
+    gameObjects.append(new Floor(QSizeF(25.0f, 10.0f),
                                  ResourceManager::GetTexture("floor"))
                       );
     // Play Field (Slightltly higer than Floor)
-    gameObjects.append(new PlayField(QSizeF(xField, zField),
-                                     ResourceManager::GetTexture("field"),
-                                     QVector3D(0.0f, 0.01f, 0.0f))
-                      );
+    gameObjects.append(new Floor(QSizeF(xField, zField),
+                                 ResourceManager::GetTexture("field"),
+                                 QVector3D(0.0f, 0.01f, 0.0f))
+                       );
+
+    // Logo SSD
+    q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f);
+    QOpenGLTexture* p = ResourceManager::GetTexture("ssd");
+    float ratio = float(p->height())/float(p->width());
+    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetTexture("ssd"),
+                                 QVector3D(0.0f, 1.01f, -zField-3.0f),
+                                 q,
+                                 QVector3D(xField*0.5, 1.0f, 0.5*xField*ratio))
+                       );
+
     // Loghi nel campo
     q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, -1.0f, 0.0f), 90.0f);
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
@@ -228,6 +254,8 @@ RaceWidget::initGameObjects() {
                                  q,
                                  QVector3D(2.0f, 1.0f, 2.0f))
                       );
+
+
 
 /*
     // Loghi esterni al campo
@@ -345,7 +373,7 @@ RaceWidget::initGameObjects() {
                                                   QVector3D(1.0f, 1.0f, 1.0f))
                           );
     }
-    // Verticalal wires
+    // Vertical wires
     for(int i=0; i<int(zField*10.0)-1; i++) {
         gameObjects.append(new Pole(QSizeF(0.9f, 0.01f),
                                     ResourceManager::GetTexture("corda"),
@@ -418,6 +446,8 @@ RaceWidget::initTextures() {
     ResourceManager::LoadTexture(":/white-carpet.jpg",   "particle");
     ResourceManager::LoadTexture(":/Logo_UniMe.png",     "logo0");
     ResourceManager::LoadTexture(":/Logo_SSD_UniMe.png", "logo1");
+    ResourceManager::LoadTexture(":/brick-wall.jpg",     "brickwall");
+    ResourceManager::LoadTexture(":/Logo_SSD.png",       "ssd");
 }
 
 

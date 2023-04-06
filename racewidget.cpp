@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTime>
 
 
-//#define SHOW_DEPTH
+#define SHOW_DEPTH
 
 
 RaceWidget::RaceWidget()
@@ -103,6 +103,7 @@ RaceWidget::RaceWidget()
              this, SLOT(onStopFireworks()));
     connect(&closeTimer, SIGNAL(timeout()),
             this, SLOT(onTimeToClose()));
+
 }
 
 
@@ -428,7 +429,7 @@ RaceWidget::initShaders() {
                                 "particle");
 #ifdef SHOW_DEPTH
     ResourceManager::LoadShader(":/Shaders/vDebug_quad.glsl",
-                                ":/Shaders/vDebug_quad.glsl",
+                                ":/Shaders/fDebug_quad.glsl",
                                 QString(),
                                 "debug");
 #endif

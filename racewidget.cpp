@@ -66,7 +66,6 @@ RaceWidget::RaceWidget()
 
     sTeamName[0] = "Locali";
     sTeamName[1] = "Ospiti";
-
 /*
     cameraPosition = QVector4D(0.0f, 5.0f, 0.0f, 1.0f);
     cameraViewMatrix.lookAt(cameraPosition.toVector3D(),  // Eye
@@ -109,7 +108,7 @@ RaceWidget::RaceWidget()
 
 
 RaceWidget::~RaceWidget() {
-    timer.stop();
+    timerUpdate.stop();
     fireworksTimer.stop();
     closeTimer.stop();
     emit raceDone();
@@ -120,7 +119,7 @@ RaceWidget::~RaceWidget() {
 
 void
 RaceWidget::closeEvent(QCloseEvent* event) {
-    timer.stop();
+    timerUpdate.stop();
     fireworksTimer.stop();
     closeTimer.stop();
     emit raceDone();
@@ -132,7 +131,7 @@ RaceWidget::closeEvent(QCloseEvent* event) {
 
 void
 RaceWidget::hideEvent(QHideEvent *event) {
-    timer.stop();
+    timerUpdate.stop();
     fireworksTimer.stop();
     closeTimer.stop();
     emit raceDone();
@@ -148,8 +147,8 @@ RaceWidget::resetInitialStatus() {
         pTeam1->setPos(QVector3D(-xField, ballRadius, z1Start));
         pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
         pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
-        if(!timer.isActive()) {
-            timer.start(refreshTime, this);
+        if(!timerUpdate.isActive()) {
+            timerUpdate.start(refreshTime, this);
             t0 = QTime::currentTime().msecsSinceStartOfDay();
         }
     }
@@ -204,181 +203,173 @@ void
 RaceWidget::initGameObjects() {
     QQuaternion q;
     gameObjects.clear();
-    pFloor       = new Floor(QSizeF(50.0f, 50.0f),
-                       ResourceManager::GetTexture("floor"));
-    gameObjects.append(pFloor);
 
-    // Slightltly higer than Floor
-    pPlayField   = new PlayField(QSizeF(xField, zField),
-                               ResourceManager::GetTexture("field"),
-                               QVector3D(0.0f, 0.01f, 0.0f));
-    gameObjects.append(pPlayField);
-
+    // Wooden Floor
+    gameObjects.append(new Floor(QSizeF(50.0f, 50.0f),
+                                 ResourceManager::GetTexture("floor"))
+                      );
+    // Play Field (Slightltly higer than Floor)
+    gameObjects.append(new PlayField(QSizeF(xField, zField),
+                                     ResourceManager::GetTexture("field"),
+                                     QVector3D(0.0f, 0.01f, 0.0f))
+                      );
     // Loghi nel campo
     q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, -1.0f, 0.0f), 90.0f);
-    Floor* pLogo = new Floor(QSizeF(1.0f, 1.0f),
-                       ResourceManager::GetTexture("logo0"),
-                       QVector3D(-xField+3.0f, 0.02f, 0.0f),
-                       q,
-                       QVector3D(2.0f, 1.0f, 2.0f));
-    gameObjects.append(pLogo);
-
+    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetTexture("logo0"),
+                                 QVector3D(-xField+3.0f, 0.02f, 0.0f),
+                                 q,
+                                 QVector3D(2.0f, 1.0f, 2.0f))
+                      );
     q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 90.0f);
-    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
-                       ResourceManager::GetTexture("logo0"),
-                       QVector3D(xField-3.0f, 0.02f, 0.0f),
-                       q,
-                       QVector3D(2.0f, 1.0f, 2.0f));
-    gameObjects.append(pLogo);
+    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetTexture("logo0"),
+                                 QVector3D(xField-3.0f, 0.02f, 0.0f),
+                                 q,
+                                 QVector3D(2.0f, 1.0f, 2.0f))
+                      );
 
+/*
     // Loghi esterni al campo
     q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f,-1.0f, 0.0f), 90.0f);
-    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
-                      ResourceManager::GetTexture("logo1"),
-                      QVector3D(-xField-2.0f, 0.02f, -2.5f),
-                      q,
-                      QVector3D(1.0f, 1.0f, 1.0f));
-    gameObjects.append(pLogo);
-
-    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
-                      ResourceManager::GetTexture("logo1"),
-                      QVector3D(-xField-2.0f, 0.02f, 2.5f),
-                      q,
-                      QVector3D(1.0f, 1.0f, 1.0f));
-    gameObjects.append(pLogo);
-
+    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                             ResourceManager::GetTexture("logo1"),
+                             QVector3D(-xField-2.0f, 0.02f, -2.5f),
+                             q,
+                             QVector3D(1.0f, 1.0f, 1.0f))
+                      );
+    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetTexture("logo1"),
+                                 QVector3D(-xField-2.0f, 0.02f, 2.5f),
+                                 q,
+                                 QVector3D(1.0f, 1.0f, 1.0f))
+                      );
     q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 90.0f);
-    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
-                      ResourceManager::GetTexture("logo1"),
-                      QVector3D( xField+2.0f, 0.02f, -2.5f),
-                      q,
-                      QVector3D(1.0f, 1.0f, 1.0f));
-    gameObjects.append(pLogo);
+    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetTexture("logo1"),
+                                 QVector3D( xField+2.0f, 0.02f, -2.5f),
+                                 q,
+                                 QVector3D(1.0f, 1.0f, 1.0f))
+                      );
+    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetTexture("logo1"),
+                                 QVector3D( xField+2.0f, 0.02f, 2.5f),
+                                 q,
+                                 QVector3D(1.0f, 1.0f, 1.0f))
+                      );
+    q = QQuaternion();
+    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetTexture("logo1"),
+                                 QVector3D(-5.0f, 0.02f, -zField-3.0f),
+                                 q,
+                                 QVector3D(2.0f, 1.0f, 2.0f)));
+    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetTexture("logo1"),
+                                 QVector3D( 5.0f, 0.02f, -zField-3.0f),
+                                 q,
+                                 QVector3D(2.0f, 1.0f, 2.0f))
+                      );
+*/
 
-    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
-                      ResourceManager::GetTexture("logo1"),
-                      QVector3D( xField+2.0f, 0.02f, 2.5f),
-                      q,
-                      QVector3D(1.0f, 1.0f, 1.0f));
-    gameObjects.append(pLogo);
-
-    // Loghi Esterni
-    q = QQuaternion();//::fromAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 90.0f);
-    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
-                      ResourceManager::GetTexture("logo1"),
-                      QVector3D(-5.0f, 0.02f, -zField-3.0f),
-                      q,
-                      QVector3D(2.0f, 1.0f, 2.0f));
-    gameObjects.append(pLogo);
-
-    pLogo        = new Floor(QSizeF(1.0f, 1.0f),
-                      ResourceManager::GetTexture("logo1"),
-                      QVector3D( 5.0f, 0.02f, -zField-3.0f),
-                      q,
-                      QVector3D(2.0f, 1.0f, 2.0f));
-    gameObjects.append(pLogo);
-
-
-    // Slightltly higer than PlayField
-    pLeftLine    = new WhiteLine(QSizeF(0.05f, zField),
-                              ResourceManager::GetTexture("line"),
-                              QVector3D(-xField+0.05f, 0.02f, 0.0f));
-    gameObjects.append(pLeftLine);
-
-    pLeft3mLine  = new WhiteLine(QSizeF(0.05f, zField),
+    // Lines (Slightly higer than PlayField)
+    gameObjects.append(new WhiteLine(QSizeF(0.05f, zField),
+                                     ResourceManager::GetTexture("line"),
+                                     QVector3D(-xField+0.05f, 0.02f, 0.0f))
+                      );
+    gameObjects.append(new WhiteLine(QSizeF(0.05f, zField),
+                                     ResourceManager::GetTexture("line"),
+                                     QVector3D(-3.0f+0.05f, 0.02f, 0.0f))
+                      );
+    gameObjects.append(new WhiteLine(QSizeF(0.05f, zField),
+                                     ResourceManager::GetTexture("line"),
+                                     QVector3D(0.0f, 0.02f, 0.0f))
+                      );
+    gameObjects.append(new WhiteLine(QSizeF(0.05f, zField),
+                                     ResourceManager::GetTexture("line"),
+                                     QVector3D(3.0f-0.05f, 0.02f, 0.0f))
+                      );
+    gameObjects.append(new WhiteLine(QSizeF(0.05f, zField),
+                                     ResourceManager::GetTexture("line"),
+                                     QVector3D(xField-0.05f, 0.02f, 0.0f))
+                      );
+    gameObjects.append(new WhiteLine(QSizeF(xField, 0.05f),
+                                     ResourceManager::GetTexture("line"),
+                                     QVector3D(0.0f, 0.02f,  zField-0.05f))
+                      );
+    gameObjects.append(new WhiteLine(QSizeF(xField, 0.05f),
+                                     ResourceManager::GetTexture("line"),
+                                     QVector3D(0.0f, 0.02f, -zField+0.05f))
+                      );
+    // Pali
+    gameObjects.append(new Pole(QSizeF(2.43f, 0.2f),
                                 ResourceManager::GetTexture("line"),
-                                QVector3D(-3.0f+0.05f, 0.02f, 0.0f));
-    gameObjects.append(pLeft3mLine);
-
-    pCentralLine = new WhiteLine(QSizeF(0.05f, zField),
-                                 ResourceManager::GetTexture("line"),
-                                 QVector3D(0.0f, 0.02f, 0.0f));
-    gameObjects.append(pCentralLine);
-    pRight3mLine = new WhiteLine(QSizeF(0.05f, zField),
-                                 ResourceManager::GetTexture("line"),
-                                 QVector3D(3.0f-0.05f, 0.02f, 0.0f));
-    gameObjects.append(pRight3mLine);
-    pRightLine   = new WhiteLine(QSizeF(0.05f, zField),
-                               ResourceManager::GetTexture("line"),
-                               QVector3D(xField-0.05f, 0.02f, 0.0f));
-    gameObjects.append(pRightLine);
-    pBottomLine  = new WhiteLine(QSizeF(xField, 0.05f),
+                                QVector3D(0.0f, 2.43f*0.5f+0.02f,  zField+0.5f))
+                      );
+    gameObjects.append(new Pole(QSizeF(2.43f, 0.2f),
                                 ResourceManager::GetTexture("line"),
-                                QVector3D(0.0f, 0.02f,  zField-0.05f));
-    gameObjects.append(pBottomLine);
-    pTopLine     = new WhiteLine(QSizeF(xField, 0.05f),
-                             ResourceManager::GetTexture("line"),
-                             QVector3D(0.0f, 0.02f, -zField+0.05f));
-    gameObjects.append(pTopLine);
-    pBottomPole  = new Pole(QSizeF(2.43f, 0.2f),
-                           ResourceManager::GetTexture("line"),
-                           QVector3D(0.0f, 2.43f*0.5f+0.02f,  zField+0.5f));
-    gameObjects.append(pBottomPole);
-    pTopPole     = new Pole(QSizeF(2.43f, 0.2f),
-                        ResourceManager::GetTexture("line"),
-                        QVector3D(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f));
-    gameObjects.append(pTopPole);
+                                QVector3D(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f))
+                      );
 
     // Net White Bands
     q = QQuaternion::fromAxisAndAngle(QVector3D(-1.0f, 0.0f, 0.0f), 90.0f);
-    pNetBandTop  = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
-                           ResourceManager::GetTexture("line"),
-                           QVector3D(0.0f, 2.43f+0.02f, 0.0f),
-                           q,
-                           QVector3D(0.2f, 1.0f, 1.0f));
-    gameObjects.append(pNetBandTop);
-    pNetBandBottom = new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
-                              ResourceManager::GetTexture("line"),
-                              QVector3D(0.0f, 1.43f+0.02f, 0.0f),
-                              q,
-                              QVector3D(0.2f, 1.0f, 1.0f));
-    gameObjects.append(pNetBandBottom);
-    pNetBandLeft = new Pole(QSizeF(1.0f, 0.05f),
-                            ResourceManager::GetTexture("line"),
-                            QVector3D(0.0f, 1.93f+0.02f, -zField),
-                            QQuaternion(),
-                            QVector3D(0.2f, 1.0f, 1.0f));
-    gameObjects.append(pNetBandLeft);
-    pNetBandRight = new Pole(QSizeF(1.0f, 0.05f),
-                             ResourceManager::GetTexture("line"),
-                             QVector3D(0.0f, 1.93f+0.02f, zField),
-                             QQuaternion(),
-                             QVector3D(0.2f, 1.0f, 1.0f));
-    gameObjects.append(pNetBandRight);
+    gameObjects.append(new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+                                ResourceManager::GetTexture("line"),
+                                QVector3D(0.0f, 2.43f+0.02f, 0.0f),
+                                q,
+                                QVector3D(0.2f, 1.0f, 1.0f))
+                      );
+    gameObjects.append(new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+                                ResourceManager::GetTexture("line"),
+                                QVector3D(0.0f, 1.43f+0.02f, 0.0f),
+                                q,
+                                QVector3D(0.2f, 1.0f, 1.0f))
+                      );
+    gameObjects.append(new Pole(QSizeF(1.0f, 0.05f),
+                                ResourceManager::GetTexture("line"),
+                                QVector3D(0.0f, 1.93f+0.02f, -zField),
+                                QQuaternion(),
+                                QVector3D(0.2f, 1.0f, 1.0f))
+                      );
+    gameObjects.append(new Pole(QSizeF(1.0f, 0.05f),
+                                ResourceManager::GetTexture("line"),
+                                QVector3D(0.0f, 1.93f+0.02f, zField),
+                                QQuaternion(),
+                                QVector3D(0.2f, 1.0f, 1.0f))
+                      );
     // Horizontal wires
     for(int i=0; i<8; i++) {
-        hRopes.append(new Pole(QSizeF(2.0f*zField, 0.01f),
-                               ResourceManager::GetTexture("corda"),
-                               QVector3D(0.0f, 2.43f-0.03f-((i+1)*0.1f), 0.0f),
-                               q,
-                               QVector3D(1.0f, 1.0f, 1.0f)));
-        gameObjects.append(hRopes.last());
+        gameObjects.append(new Pole(QSizeF(2.0f*zField, 0.01f),
+                                                  ResourceManager::GetTexture("corda"),
+                                                  QVector3D(0.0f, 2.43f-0.03f-((i+1)*0.1f), 0.0f),
+                                                  q,
+                                                  QVector3D(1.0f, 1.0f, 1.0f))
+                          );
     }
     // Verticalal wires
     for(int i=0; i<int(zField*10.0)-1; i++) {
-        vRopes.append(new Pole(QSizeF(0.9f, 0.01f),
-                               ResourceManager::GetTexture("corda"),
-                               QVector3D(0.0f, 1.93f+0.02f, (i+1)*0.1f),
-                               QQuaternion(),
-                               QVector3D(1.0f, 1.0f, 1.0f)));
-        gameObjects.append(vRopes.last());
+        gameObjects.append(new Pole(QSizeF(0.9f, 0.01f),
+                                    ResourceManager::GetTexture("corda"),
+                                    QVector3D(0.0f, 1.93f+0.02f, (i+1)*0.1f),
+                                    QQuaternion(),
+                                    QVector3D(1.0f, 1.0f, 1.0f))
+                          );
     }
     for(int i=0; i<int(zField*10.0)-1; i++) {
-        vRopes.append(new Pole(QSizeF(0.9f, 0.01f),
-                               ResourceManager::GetTexture("corda"),
-                               QVector3D(0.0f, 1.93f+0.02f, -(i+1)*0.1f),
-                               QQuaternion(),
-                               QVector3D(1.0f, 1.0f, 1.0f)));
-        gameObjects.append(vRopes.last());
+        gameObjects.append(new Pole(QSizeF(0.9f, 0.01f),
+                                    ResourceManager::GetTexture("corda"),
+                                    QVector3D(0.0f, 1.93f+0.02f, -(i+1)*0.1f),
+                                    QQuaternion(),
+                                    QVector3D(1.0f, 1.0f, 1.0f))
+                          );
     }
-    vRopes.append(new Pole(QSizeF(0.9f, 0.01f),
-                           ResourceManager::GetTexture("corda"),
-                           QVector3D(0.0f, 1.93f+0.02f, 0.0f),
-                           QQuaternion(),
-                           QVector3D(1.0f, 1.0f, 1.0f)));
-    gameObjects.append(vRopes.last());
+    gameObjects.append(new Pole(QSizeF(0.9f, 0.01f),
+                                 ResourceManager::GetTexture("corda"),
+                                 QVector3D(0.0f, 1.93f+0.02f, 0.0f),
+                                 QQuaternion(),
+                                 QVector3D(1.0f, 1.0f, 1.0f))
+                      );
 
-    // Now the Team Avatars
+    // Now the Team Avatars...
     pTeam0       = new Avatar(ballRadius,
                         ResourceManager::GetTexture("team0"),
                         QVector3D(-xField, ballRadius, z0Start));
@@ -388,6 +379,7 @@ RaceWidget::initGameObjects() {
                         QVector3D(-xField, ballRadius, z1Start));
     gameObjects.append(pTeam1);
 
+    // ...and then the Particles
     pParticles = new ParticleGenerator(ResourceManager::GetTexture("particle"), 500);
 }
 
@@ -471,7 +463,7 @@ RaceWidget::initializeGL() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     refreshTime = 15; // in ms
-    timer.start(refreshTime, this);
+    timerUpdate.start(refreshTime, this);
     t0 = QTime::currentTime().msecsSinceStartOfDay();
 }
 
@@ -499,8 +491,8 @@ RaceWidget::startRace(int iSet) {
     xTarget = (2.0*xField)/float(maxScore[iCurrentSet]) - xField;
     emit newScore(score[iCurrentSet].at(indexScore+1).x(),
                   score[iCurrentSet].at(indexScore+1).y());
-    if(!timer.isActive()) {
-        timer.start(refreshTime, this);
+    if(!timerUpdate.isActive()) {
+        timerUpdate.start(refreshTime, this);
         t0 = QTime::currentTime().msecsSinceStartOfDay();
     }
 }

@@ -83,8 +83,7 @@ protected:
     void restoreStatus();
 
 private:
-
-    QBasicTimer timer;
+    QBasicTimer timerUpdate;
     QTimer closeTimer;
     QTimer fireworksTimer;
 
@@ -100,7 +99,6 @@ private:
     QMatrix4x4 lightSpaceMatrix;
 
     QVector3D lightColor;
-
     QVector3D lightPosition;
 
     QVector3D cameraPosition0;
@@ -113,32 +111,13 @@ private:
     QVector3D cameraSpeed;
 
     QVector<Object*> gameObjects;
-
-    Floor*     pFloor;
-//    Floor*     pLogo0;
-    PlayField* pPlayField;
-    WhiteLine* pLeftLine;
-    WhiteLine* pLeft3mLine;
-    WhiteLine* pCentralLine;
-    WhiteLine* pRight3mLine;
-    WhiteLine* pRightLine;
-    WhiteLine* pBottomLine;
-    WhiteLine* pTopLine;
-    Pole*      pBottomPole;
-    Pole*      pTopPole;
-    Pole*      pNetBandTop;
-    Pole*      pNetBandBottom;
-    Pole*      pNetBandLeft;
-    Pole*      pNetBandRight;
-    QVector<Pole*> hRopes;
-    QVector<Pole*> vRopes;
-    Avatar*    pTeam0;
-    Avatar*    pTeam1;
+    Avatar* pTeam0;
+    Avatar* pTeam1;
 
     const float z0Start = -2.0;
     const float z1Start =  2.0;
-    const float xField  =  9.0;
-    const float zField  =  4.5;
+    const float xField  =  9.0; // Half Width of the Play Field
+    const float zField  =  4.5; // Half Height of the Play Field
     const uint SHADOW_WIDTH  = 1024;
     const uint SHADOW_HEIGHT = 1024;
 

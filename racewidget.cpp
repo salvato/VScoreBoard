@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTime>
 
 
-#define SHOW_DEPTH
+//#define SHOW_DEPTH
 
 
 RaceWidget::RaceWidget()
@@ -571,12 +571,13 @@ RaceWidget::paintGL() {
 #ifdef SHOW_DEPTH
 // render Depth map to quad for visual debugging
 // ---------------------------------------------
+    pDebugDepthQuad = ResourceManager::GetShader("debug");
     pDebugDepthQuad->bind();
     pDebugDepthQuad->setUniformValue("near_plane", near_plane);
     pDebugDepthQuad->setUniformValue("far_plane",  far_plane);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, depthMap);
-    renderQuad();
+    renderQuad(pDebugDepthQuad);
 #endif
 }
 
@@ -593,10 +594,11 @@ RaceWidget::renderScene(QOpenGLShaderProgram* pProgram) {
 
 
 void
-RaceWidget::renderQuad() {
-// renderQuad() renders a 1x1 XY quad in NDC
-// -----------------------------------------
-    if (quadVAO == 0)     {
+RaceWidget::renderQuad(QOpenGLShaderProgram* pProgram) {
+    (void)pProgram;
+#ifdef SHOW_DEPTH
+    if(pQuadBuf == nullptr) {
+        pQuadBuf = new QOpenGLBuffer();
         float quadVertices[] = {
             // positions        // texture Coords
             -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
@@ -604,21 +606,22 @@ RaceWidget::renderQuad() {
              1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
              1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
         };
-        // setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    } // if (quadVAO == 0)
+        pQuadBuf->create();
+        pQuadBuf->bind();
+        pQuadBuf->allocate(quadVertices, sizeof(quadVertices));
+        pQuadBuf->release();
+    } // if(pQuadBuf == nullptr)
 
-    glBindVertexArray(quadVAO);
+    pQuadBuf->bind();
+    quintptr offset = 0;
+    pProgram->enableAttributeArray("vPosition");
+    pProgram->setAttributeBuffer("vPosition", GL_FLOAT, offset, 3, 5*sizeof(float));
+    offset += 3*sizeof(float);
+    pProgram->enableAttributeArray("vTexture");
+    pProgram->setAttributeBuffer("vTexture", GL_FLOAT, offset, 2, 5*sizeof(float));
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
+    pQuadBuf->release();
+#endif
 }
 
 

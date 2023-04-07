@@ -74,7 +74,7 @@ protected:
     void resizeGL(int w, int h) override;
     void paintGL() override;
     void renderScene(QOpenGLShaderProgram *pProgram);
-    void renderQuad();
+    void renderQuad(QOpenGLShaderProgram *pProgram);
 
     void initShaders();
     void initShadowBuffer();
@@ -89,7 +89,7 @@ private:
 
     QOpenGLShaderProgram* pGameProgram = nullptr;
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
-    QOpenGLShaderProgram* pDebugDepthQuad;
+    QOpenGLShaderProgram* pDebugDepthQuad = nullptr;
 
     QMatrix4x4 cameraViewMatrix;
     QMatrix4x4 cameraProjectionMatrix;
@@ -140,6 +140,8 @@ private:
     int refreshTime;
     unsigned int depthMapFBO;
     unsigned int depthMap;
+    QOpenGLBuffer* pQuadBuf = nullptr;
+
     unsigned int quadVAO = 0;
     unsigned int quadVBO = 0;
     float speed;

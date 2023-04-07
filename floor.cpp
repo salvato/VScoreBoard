@@ -55,21 +55,18 @@ Floor::draw(QOpenGLShaderProgram* pProgram) {
 
     // Offset for position
     quintptr offset = 0;
-    int vertexLocation = pProgram->attributeLocation("vPosition");
-    pProgram->enableAttributeArray(vertexLocation);
-    pProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, 8*sizeof(float));
+    pProgram->enableAttributeArray("vPosition");
+    pProgram->setAttributeBuffer("vPosition", GL_FLOAT, offset, 3, 8*sizeof(float));
 
     // Offset for normal coordinate
     offset += 3*sizeof(float);
-    int normalLocation = pProgram->attributeLocation("vNormal");
-    pProgram->enableAttributeArray(normalLocation);
-    pProgram->setAttributeBuffer(normalLocation, GL_FLOAT, offset, 3, 8*sizeof(float));
+    pProgram->enableAttributeArray("vNormal");
+    pProgram->setAttributeBuffer("vNormal", GL_FLOAT, offset, 3, 8*sizeof(float));
 
     // Offset for texture coordinate
     offset += 3*sizeof(float);
-    int texcoordLocation = pProgram->attributeLocation("vTexture");
-    pProgram->enableAttributeArray(texcoordLocation);
-    pProgram->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, 8*sizeof(float));
+    pProgram->enableAttributeArray("vTexture");
+    pProgram->setAttributeBuffer("vTexture", GL_FLOAT, offset, 2, 8*sizeof(float));
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     floorBuf.release();

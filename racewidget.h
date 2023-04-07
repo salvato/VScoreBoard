@@ -81,6 +81,9 @@ protected:
     void initTextures();
     void initGameObjects();
     void restoreStatus();
+    void createWall();
+    void createFloor();
+    void createNet();
 
 private:
     QBasicTimer timerUpdate;

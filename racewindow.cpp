@@ -56,6 +56,7 @@ RaceWindow::RaceWindow(QWidget *parent)
     pixmap0 = pixmap0.scaledToWidth(iFontSize);
     QPixmap pixmap1(":/ball1.png");
     pixmap1 = pixmap1.scaledToWidth(iFontSize);
+
     pRaceWidget = new RaceWidget();
     connect(pRaceWidget, SIGNAL(raceDone()),
             this, SIGNAL(raceDone()));

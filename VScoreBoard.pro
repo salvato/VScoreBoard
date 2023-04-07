@@ -95,6 +95,7 @@ RESOURCES += \
     shaders.qrc
 
 DISTFILES += \
+    Logo_UniMe2.png \
     fAngular.glsl \
     fBookFlip.glsl \
     fshader.glsl \

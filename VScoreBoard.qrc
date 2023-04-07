@@ -59,5 +59,8 @@
         <file>brick-wall.jpg</file>
         <file>Logo_SSD.png</file>
         <file>Rete.png</file>
+        <file>gate0.png</file>
+        <file>Logo_UniMe2.png</file>
+        <file>dark-blue-carpet.jpg</file>
     </qresource>
 </RCC>

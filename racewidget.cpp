@@ -491,6 +491,7 @@ RaceWidget::initializeGL() {
 void
 RaceWidget::startRace(int iSet) {
     if(maxScore[iSet] == 0) {
+        emit raceDone();
         return;
     }
     bRacing     = true;

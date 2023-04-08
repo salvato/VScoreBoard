@@ -76,11 +76,14 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     prepareScoreFile();
 
     pVolleyPanel->showFullScreen();
+
     pCharts = new ChartWindow();
     pCharts->updateLabel(0, gsArgs.sTeam[0]);
     pCharts->updateLabel(1, gsArgs.sTeam[1]);
 
     pRaceWindow = new RaceWindow();
+    pRaceWindow->updateLabel(0, gsArgs.sTeam[0]);
+    pRaceWindow->updateLabel(1, gsArgs.sTeam[1]);
 
     setEventHandlers();
 }
@@ -171,8 +174,10 @@ VolleyController::logScore() {
 
 void
 VolleyController::updateChart() {
-    if(!pCharts) return;
-    pCharts->updateScore(iScore[0], iScore[1], iSet[0]+iSet[1]);
+    if(pCharts)
+        pCharts->updateScore(iScore[0], iScore[1], iSet[0]+iSet[1]);
+    if(pRaceWindow)
+        pRaceWindow->updateScore(iScore[0], iScore[1], iSet[0]+iSet[1]);
 }
 
 
@@ -744,6 +749,7 @@ VolleyController::onTeamTextChanged(QString sText, int iTeam) {
     sText = QString("team%1/name").arg(iTeam+1, 1);
     pSettings->setValue(sText, gsArgs.sTeam[iTeam]);
     pCharts->updateLabel(iTeam, gsArgs.sTeam[iTeam]);
+    pRaceWindow->updateLabel(iTeam, gsArgs.sTeam[iTeam]);
 }
 
 
@@ -916,15 +922,13 @@ VolleyController::onButtonNewGameClicked() {
     pService[iServizio ? 0 : 1]->setChecked(false);
     sendAll();
     pCharts->resetAll();
+    pRaceWindow->resetAll();
     SaveStatus();
 }
 
 
 void
 VolleyController::onButtonStatisticsClicked() {
-    int iScore0 = 0;
-    int iScore1 = 0;
-    bool bEnd   = false;
     QPixmap* pPixmap = new QPixmap();
     QSize iconSize = QSize(48,48);
     if(pRaceWindow->isVisible()) {
@@ -933,12 +937,13 @@ VolleyController::onButtonStatisticsClicked() {
     }
     else {
         if(setSelectionDialog.exec() == QDialog::Accepted) {
-            pRaceWindow->resetAll();
-//            pRaceWindow->show();
-//            pRaceWindow->showMaximized();
             pRaceWindow->showFullScreen();
             if(pRaceWindow->isVisible()) {
                 pPixmap->load(":/buttonIcons/sign_stop.png");
+/*
+                int iScore0 = 0;
+                int iScore1 = 0;
+                bool bEnd   = false;
                 while(!bEnd) {
                     if(rand() & 1) iScore0++;
                     else iScore1++;
@@ -946,6 +951,7 @@ VolleyController::onButtonStatisticsClicked() {
                     bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
                            std::abs(iScore0-iScore1) > 1;
                 }
+*/
                 pRaceWindow->startRace(setSelectionDialog.iSelectedSet);
             }
             else {

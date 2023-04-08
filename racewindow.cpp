@@ -104,6 +104,10 @@ RaceWindow::closeEvent(QCloseEvent* event) {
 
 void
 RaceWindow::updateLabel(int iTeam, QString sLabel) {
+    if(iTeam == 0)
+        labelTeam0.setText(sLabel);
+    else
+        labelTeam1.setText(sLabel);
     pRaceWidget->updateLabel(iTeam, sLabel);
 }
 

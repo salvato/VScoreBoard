@@ -157,7 +157,17 @@ RaceWidget::updateLabel(int iTeam, QString sLabel) {
 void
 RaceWidget::updateScore(int team0Score, int team1Score, int iSet) {
     if((iSet < 0) || (iSet > 4)) return;
+     // Rimuoviamo eventuali punteggi sbagliati...
+    int tScore = team0Score+team1Score;
+    while((tScore <= score[iSet].last().x()+score[iSet].last().y()) &&
+           !score[iSet].isEmpty())
+    {
+        score[iSet].removeLast();
+    }
     score[iSet].append(QVector2D(team0Score, team1Score));
+//    for(int i=0; i<score[iSet].count(); i++) {
+//        qCritical() << score[iSet].at(i).x() << score[iSet].at(i).y();
+//    }
     maxScore[iSet] = std::max(team0Score, team1Score);
 }
 

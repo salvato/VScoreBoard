@@ -26,7 +26,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "resourcemanager.h"
 
 
-#include <QApplication>
 #include <QSurfaceFormat>
 #include <QScreen>
 #include <QIcon>
@@ -55,13 +54,6 @@ RaceWidget::RaceWidget()
     , fov(50.0f)
 {
     setWindowIcon(QIcon(":/buttonIcons/plot.png"));
-    QList<QScreen*> screens = QApplication::screens();
-    QRect screenres = screens.at(0)->geometry();
-    if(screens.count() > 1) {
-        screenres = screens.at(1)->geometry();
-        QPoint point = QPoint(screenres.x(), screenres.y());
-        move(point);
-    }
 
     sTeamName[0] = "Locali";
     sTeamName[1] = "Ospiti";

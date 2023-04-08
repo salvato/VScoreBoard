@@ -4,12 +4,21 @@
 #include <QIcon>
 #include <QGridLayout>
 #include <QLabel>
+#include <QApplication>
 
 RaceWindow::RaceWindow(QWidget *parent)
     : QWidget{parent}
 {
     setWindowIcon(QIcon(":/buttonIcons/plot.png"));
     setWindowTitle("RaceWindow");
+
+    QList<QScreen*> screens = QApplication::screens();
+    QRect screenres = screens.at(0)->geometry();
+    if(screens.count() > 1) {
+        screenres = screens.at(1)->geometry();
+        QPoint point = QPoint(screenres.x(), screenres.y());
+        move(point);
+    }
 
     panelPalette = QWidget::palette();
     panelGradient = QLinearGradient(0.0, 0.0, 0.0, height());

@@ -36,13 +36,13 @@ TimeoutWindow::TimeoutWindow(QWidget *parent)
 {
     Q_UNUSED(parent);
     setMinimumSize(QSize(320, 240));
-// TODO: Remove
+
     QList<QScreen*> screens = QApplication::screens();
     QRect screenGeometry = screens.at(0)->geometry();
-//    if(screens.count() > 1) {
-//        screenGeometry = screens.at(1)->geometry();
-//    // Move the Panel on the Secondary Display
-//    }
+    if(screens.count() > 1) {
+        screenGeometry = screens.at(1)->geometry();
+    // Move the Panel on the Secondary Display
+    }
     QPoint point = QPoint(screenGeometry.x(),
                           screenGeometry.y());
     move(point);

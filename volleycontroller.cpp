@@ -121,7 +121,7 @@ VolleyController::resizeEvent(QResizeEvent *event) {
 bool
 VolleyController::prepareScoreFile() {
     QString sPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/";
-    QString sScoreFileName = "Volley_" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm");
+    sScoreFileName = "Volley_" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm");
     sScoreFileName = sPath + sScoreFileName + ".txt";
     QFileInfo checkFile(sScoreFileName);
     if(checkFile.exists() && checkFile.isFile()) {
@@ -500,7 +500,7 @@ VolleyController::buildControls() {
         if(iSet[iTeam] == gsArgs.maxSet)
             pSetsIncrement[iTeam]->setEnabled(false);
         // Service
-        QPixmap pixmap(":/buttonIcons/ball.png");
+        QPixmap pixmap(QString(":/ball%1.png").arg(iTeam));
         QIcon ButtonIcon(pixmap);
         pService[iTeam] = new Button("", iTeam);
         pService[iTeam]->setIcon(ButtonIcon);
@@ -508,7 +508,7 @@ VolleyController::buildControls() {
         auto const height = rec.height();
         pService[iTeam]->setIconSize(QSize(height/16,height/16));
         pService[iTeam]->setCheckable(true);
-        pService[iTeam]->setStyleSheet("QPushButton:checked { background-color: rgb(0, 0, 196) }");
+        pService[iTeam]->setStyleSheet("QPushButton:checked { background-color: rgb(128, 128, 255); border:none }");
         // Score
         pScoreLabel = new QLabel(tr("Punti"));
         pScoreLabel->setAlignment(Qt::AlignRight|Qt::AlignHCenter);

@@ -114,6 +114,7 @@ private:
     QLinearGradient panelGradient;
     QBrush          panelBrush;
     ChartWindow*    pCharts;
+    QString         sScoreFileName;
     QFile*          pScoreFile;
     SetSelectionDialog setSelectionDialog;
     RaceWindow*     pRaceWindow;

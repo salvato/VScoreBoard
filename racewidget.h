@@ -89,6 +89,9 @@ private:
     QBasicTimer timerUpdate;
     QTimer closeTimer;
     QTimer fireworksTimer;
+    int scanTime;
+    int closeTime;
+    int refreshTime;
 
     QOpenGLShaderProgram* pGameProgram = nullptr;
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
@@ -96,7 +99,7 @@ private:
 
     QMatrix4x4 cameraViewMatrix;
     QMatrix4x4 cameraProjectionMatrix;
-    QMatrix4x4 translateMatrix;
+
     QMatrix4x4 lightProjectionMatrix;
     QMatrix4x4 lightViewMatrix;
     QMatrix4x4 lightSpaceMatrix;
@@ -138,15 +141,10 @@ private:
     int maxScore[5];
     int indexScore;
     int iCurrentSet;
-    int scanTime;
-    int closeTime;
-    int refreshTime;
     unsigned int depthMapFBO;
     unsigned int depthMap;
     QOpenGLBuffer* pQuadBuf = nullptr;
 
-    unsigned int quadVAO = 0;
-    unsigned int quadVBO = 0;
     float speed;
     QVector3D speed0;
     QVector3D speed1;
@@ -160,6 +158,7 @@ private:
     bool bRacing;
     bool bFiring;
     bool bClosing;
+    bool bFadeIn;
 
     int fireworkTime;
     QVector3D origin;

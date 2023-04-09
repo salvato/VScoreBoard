@@ -173,7 +173,7 @@ VolleyController::logScore() {
 
 
 void
-VolleyController::updateChart() {
+VolleyController::updateStatistics() {
     if(pCharts)
         pCharts->updateScore(iScore[0], iScore[1], iSet[0]+iSet[1]);
     if(pRaceWindow)
@@ -585,29 +585,31 @@ VolleyController::setEventHandlers() {
             this, SLOT(onStatisticsDone()));
     connect(pRaceWindow, SIGNAL(raceDone()),
             this, SLOT(onRaceDone()));
-
-// Keypress Sound
-//    for(int iTeam=0; iTeam <2; iTeam++) {//        connect(pTimeoutIncrement[iTeam], SIGNAL(clicked()),
-//                pButtonClick, SLOT(play()));
-//        connect(pTimeoutDecrement[iTeam], SIGNAL(clicked()),
-//                pButtonClick, SLOT(play()));
-//        connect(pSetsIncrement[iTeam], SIGNAL(clicked()),
-//                pButtonClick, SLOT(play()));
-//        connect(pSetsDecrement[iTeam], SIGNAL(clicked()),
-//                pButtonClick, SLOT(play()));
-//        connect(pService[iTeam], SIGNAL(clicked()),
-//                pButtonClick, SLOT(play()));
-//        connect(pScoreIncrement[iTeam], SIGNAL(clicked()),
-//                pButtonClick, SLOT(play()));
-//        connect(pScoreDecrement[iTeam], SIGNAL(clicked()),
-//                pButtonClick, SLOT(play()));
-//    }
-//    connect(pNewSetButton, SIGNAL(clicked()),
-//            pButtonClick, SLOT(play()));
-//    connect(pNewGameButton, SIGNAL(clicked()),
-//            pButtonClick, SLOT(play()));
-//    connect(changeFieldButton, SIGNAL(clicked()),
-//            pButtonClick, SLOT(play()));
+/*
+ Keypress Sound
+    for(int iTeam=0; iTeam <2; iTeam++) {
+        connect(pTimeoutIncrement[iTeam], SIGNAL(clicked()),
+                pButtonClick, SLOT(play()));
+        connect(pTimeoutDecrement[iTeam], SIGNAL(clicked()),
+                pButtonClick, SLOT(play()));
+        connect(pSetsIncrement[iTeam], SIGNAL(clicked()),
+                pButtonClick, SLOT(play()));
+        connect(pSetsDecrement[iTeam], SIGNAL(clicked()),
+                pButtonClick, SLOT(play()));
+        connect(pService[iTeam], SIGNAL(clicked()),
+                pButtonClick, SLOT(play()));
+        connect(pScoreIncrement[iTeam], SIGNAL(clicked()),
+                pButtonClick, SLOT(play()));
+        connect(pScoreDecrement[iTeam], SIGNAL(clicked()),
+                pButtonClick, SLOT(play()));
+    }
+    connect(pNewSetButton, SIGNAL(clicked()),
+            pButtonClick, SLOT(play()));
+    connect(pNewGameButton, SIGNAL(clicked()),
+            pButtonClick, SLOT(play()));
+    connect(changeFieldButton, SIGNAL(clicked()),
+            pButtonClick, SLOT(play()));
+*/
 }
 
 
@@ -716,7 +718,16 @@ VolleyController::onScoreIncrement(int iTeam) {
     sText = QString("team%1/score").arg(iTeam+1, 1);
     pSettings->setValue(sText, iScore[iTeam]);
     logScore();
-    updateChart();
+    updateStatistics();
+//    bool bEndSet;
+//    if(iSet[0]+iSet[1] > 4)
+//        bEndSet = ((iScore[0] > 14) || (iScore[1] > 14)) &&
+//                  (std::abs(iScore[0]-iScore[1]) > 1);
+//    else
+//        bEndSet = ((iScore[0] > 24) || (iScore[1] > 24)) &&
+//                  (std::abs(iScore[0]-iScore[1]) > 1);
+//    if(bEndSet) {
+//    }
 }
 
 
@@ -738,7 +749,7 @@ VolleyController::onScoreDecrement(int iTeam) {
     sText = QString("team%1/score").arg(iTeam+1, 1);
     pSettings->setValue(sText, iScore[iTeam]);
     logScore();
-    updateChart();
+    updateStatistics();
 }
 
 
@@ -893,6 +904,7 @@ VolleyController::onButtonNewGameClicked() {
                                      QMessageBox::Yes | QMessageBox::No,
                                      QMessageBox::No);
     if(iRes != QMessageBox::Yes) return;
+
     prepareScoreFile();
     gsArgs.sTeam[0]    = tr("Locali");
     gsArgs.sTeam[1]    = tr("Ospiti");
@@ -940,18 +952,6 @@ VolleyController::onButtonStatisticsClicked() {
             pRaceWindow->showFullScreen();
             if(pRaceWindow->isVisible()) {
                 pPixmap->load(":/buttonIcons/sign_stop.png");
-/*
-                int iScore0 = 0;
-                int iScore1 = 0;
-                bool bEnd   = false;
-                while(!bEnd) {
-                    if(rand() & 1) iScore0++;
-                    else iScore1++;
-                    pRaceWindow->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
-                    bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
-                           std::abs(iScore0-iScore1) > 1;
-                }
-*/
                 pRaceWindow->startRace(setSelectionDialog.iSelectedSet);
             }
             else {

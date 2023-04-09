@@ -36,16 +36,13 @@ ScorePanel::ScorePanel(QFile *myLogFile, QWidget *parent)
 {
     (void)START_GRADIENT; // Just to Silent a Warning
     QList<QScreen*> screens = QApplication::screens();
-    if(screens.count() < 2) {
-        QMessageBox::critical(nullptr,
-                              QObject::tr("Secondo Monitor non connesso"),
-                              QObject::tr("Connettilo e Riesegui il Programma"),
-                              QMessageBox::Abort);
-        exit(EXIT_FAILURE);
+    QPoint point = QPoint(screens.at(0)->geometry().x(),
+                          screens.at(0)->geometry().y());
+    if(screens.count() > 1) {
+        point = QPoint(screens.at(1)->geometry().x(),
+                       screens.at(1)->geometry().y());
     }
-    // Move the Panel on the Secondary Display
-    QPoint point = QPoint(screens.at(1)->geometry().x(),
-                          screens.at(1)->geometry().y());
+    // Move the Panel on the Secondary Display (if connected)
     move(point);
 
     setWindowTitle("Score Panel");

@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "panelorientation.h"
 #include "setselectiondialog.h"
 
+#include <QTimer>
+
 
 QT_FORWARD_DECLARE_CLASS(QSettings)
 QT_FORWARD_DECLARE_CLASS(Edit)
@@ -78,7 +80,7 @@ private:
     void          sendAll();
     void          logScore();
     bool          prepareScoreFile();
-    void          updateChart();
+    void          updateStatistics();
 
 
 private:

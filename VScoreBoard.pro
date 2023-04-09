@@ -96,6 +96,7 @@ RESOURCES += \
 
 DISTFILES += \
     Logo_UniMe2.png \
+    Note.txt \
     fAngular.glsl \
     fBookFlip.glsl \
     fshader.glsl \

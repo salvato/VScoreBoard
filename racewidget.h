@@ -104,6 +104,7 @@ private:
     QMatrix4x4 lightViewMatrix;
     QMatrix4x4 lightSpaceMatrix;
 
+    QVector3D light;
     QVector3D lightColor;
     QVector3D lightPosition;
 

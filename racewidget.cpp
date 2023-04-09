@@ -37,13 +37,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 RaceWidget::RaceWidget()
     : QOpenGLWidget()
+    , scanTime(10)
+    , closeTime(3000)
     , lightColor(QVector3D(1.0f, 1.0f, 1.0f))
     , lightPosition(QVector3D(0.5f, 4.0f, -3.0f))
     , pTeam0(nullptr)
-    , pTeam1(nullptr)
+    , pTeam1(nullptr) // Tempo in secondi per l'intera "Corsa"
     , ballRadius(0.1066f * 4.0f) // 4 times bigger than real
-    , scanTime(10) // Tempo in secondi per l'intera "Corsa"
-    , closeTime(3000)
     , speed(2.0f*xField/float(scanTime))
     , bRacing(false)
     , bFiring(false)
@@ -134,6 +134,7 @@ void
 RaceWidget::resetInitialStatus() {
     restoreStatus();
     if(pTeam0) {
+        bFadeIn = true;
         pTeam0->setPos(QVector3D(-xField, ballRadius, z0Start));
         pTeam1->setPos(QVector3D(-xField, ballRadius, z1Start));
         pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
@@ -504,6 +505,7 @@ RaceWidget::startRace(int iSet) {
         emit raceDone();
         return;
     }
+    bFadeIn     = false;
     bRacing     = true;
     iCurrentSet = iSet;
     pTeam0->setPos(QVector3D(-xField, ballRadius, z0Start));
@@ -557,7 +559,7 @@ RaceWidget::paintGL() {
     pGameProgram->setUniformValue("camera",            cameraViewMatrix);
     pGameProgram->setUniformValue("viewPos",           cameraPosition);
     pGameProgram->setUniformValue("lightPos",          lightPosition);
-    pGameProgram->setUniformValue("lightColor",        lightColor);
+    pGameProgram->setUniformValue("lightColor",        light);
     pGameProgram->setUniformValue("lightSpaceMatrix",  lightSpaceMatrix);
     pGameProgram->setUniformValue("diffuseTexture",    0);
     pGameProgram->setUniformValue("shadowMap",         1);
@@ -643,11 +645,12 @@ RaceWidget::onTimeToClose() {
 void
 RaceWidget::restoreStatus() {
     emit newScore(0, 0);
-    bRacing    = false;
-    bFiring    = false;
-    bClosing   = false;
-    lightColor = QVector3D(1.0f, 1.0f, 1.0f);
-    fov        = 50;
+    bFadeIn  = true;
+    bRacing  = false;
+    bFiring  = false;
+    bClosing = false;
+    light    = QVector3D(0.0f, 0.0f, 0.0f);
+    fov      = 50;
     cameraProjectionMatrix.setToIdentity();
     cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
     cameraPosition = cameraPosition0;
@@ -725,10 +728,13 @@ RaceWidget::timerEvent(QTimerEvent*) {
                                 cameraUp);      // Up
     }
     if(bClosing) {
-        fov  *= 0.999;
-        lightColor *= 0.97f;
+        fov   *= 0.999;
+        light *= 0.97f;
         cameraProjectionMatrix.setToIdentity();
         cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
+    }
+    if(bFadeIn) {
+        light += lightColor*dt/3.3f;
     }
     t0 = t1;
     update();

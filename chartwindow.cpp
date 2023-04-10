@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
+#include <QCategoryAxis>
 
 #include "chartwindow.h"
 #include "utility.h"
@@ -78,30 +79,33 @@ QChart*
 ChartWindow::createLineChart() {
     QChart* pChart = new QChart();
     pChart->setTheme(QChart::ChartThemeBlueCerulean);
+    pChart->setBackgroundVisible(false);
     QFont font = pChart->titleFont();
     font.setPointSize(3*font.pointSize());
     font.setBold(true);
     pChart->setTitleFont(font);
     pChart->setFont(font);
     pChart->legend()->setFont(font);
+    pChart->legend()->setMarkerShape(QLegend::MarkerShapeCircle);
 
-    QValueAxis* pAxisX = new QValueAxis();
-    pAxisX->setRange(0, maxX);
-    pAxisX->setTickCount(2);
+    QCategoryAxis* pAxisX = new QCategoryAxis();
+    pAxisX->setMin(0);
+    pAxisX->setMax(maxX);
     font = pAxisX->labelsFont();
     font.setPointSize(3*font.pointSize());
     font.setBold(true);
     pAxisX->setLabelsFont(font);
     pAxisX->setLabelFormat("%d");
 
-    // Add space to label to add space between labels and vertical axis
-    QValueAxis* pAxisY = new QValueAxis();
-    pAxisY->setRange(0, maxY);
-    pAxisY->setTickCount(2);
+    QValueAxis* pAxisY = new QCategoryAxis();
+    pAxisY->setMin(0);
+    pAxisY->setMax(maxY);
     font = pAxisY->labelsFont();
     font.setPointSize(3*font.pointSize());
     font.setBold(true);
     pAxisY->setLabelsFont(font);
+    // Add a "blank" to the label to add space
+    // between labels and the vertical axis
     pAxisY->setLabelFormat("%d  ");
 
     pChart->addAxis(pAxisX, Qt::AlignBottom);
@@ -139,10 +143,12 @@ ChartWindow::updateScore(int team0Score, int team1Score, int iSet) {
     if((iSet < 0) || (iSet > 4)) return;
     int tScore = team0Score+team1Score;
     if(!score[iSet].isEmpty()) {
-        while((tScore <= score[iSet].last().x()+score[iSet].last().y()) &&
-               !score[iSet].isEmpty())
-        {
+        while(tScore <= score[iSet].last().x()+score[iSet].last().y()) {
             score[iSet].removeLast();
+            if(score[iSet].isEmpty()) {
+                score[iSet].append(QVector2D(0, 0));
+                break;
+            }
         }
     }
     score[iSet].append(QVector2D(team0Score, team1Score));
@@ -175,12 +181,44 @@ ChartWindow::startChartAnimation(int iSet) {
     indexScore = 0;
     int maxX = score[iSet].last().x()+score[iSet].last().y();
     QChart* pChart = pChartView->chart();
-    pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxX);
-    pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxScore[iCurrentSet]);
+    pChart->setTitle(QString("Set %1").arg(iSet+1));
+
+    QCategoryAxis* pAxisX;
+    pAxisX = reinterpret_cast<QCategoryAxis*>(pChart->axes(Qt::Horizontal).constFirst());
+    QStringList categoriesLabels = pAxisX->categoriesLabels();
+    for(int i=0; i<categoriesLabels.count(); i++)
+        pAxisX->remove(categoriesLabels.at(i));
+    pAxisX->setMin(0);
+    pAxisX->setMax(maxX);
+    pAxisX->setLabelsPosition(QCategoryAxis::AxisLabelsPositionOnValue);
+    for(int i=0; i<=maxX; i+=5) {
+        pAxisX->append(QString("%1").arg(i), i);
+    }
+    if(maxX % 5)
+        pAxisX->append(QString("%1").arg(maxX), maxX);
+
+    QCategoryAxis* pAxisY;
+    pAxisY = reinterpret_cast<QCategoryAxis*>(pChart->axes(Qt::Vertical).constFirst());
+    categoriesLabels = pAxisY->categoriesLabels();
+    for(int i=0; i<categoriesLabels.count(); i++)
+        pAxisY->remove(categoriesLabels.at(i));
+    pAxisY->setMin(0);
+    pAxisY->setMax(maxScore[iCurrentSet]);
+    pAxisY->setLabelsPosition(QCategoryAxis::AxisLabelsPositionOnValue);
+    for(int i=0; i<=maxScore[iCurrentSet]; i+=5) {
+        pAxisY->append(QString("%1").arg(i), i);
+    }
+    if(maxScore[iCurrentSet] % 5)
+        pAxisY->append(QString("%1").arg(maxScore[iCurrentSet]), maxScore[iCurrentSet]);
+
     QLineSeries* pScoreSequence;
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
+    pScoreSequence->clear();
+    pScoreSequence->append(0,0);
     pScoreSequence->setName(sTeamName[0]);
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
+    pScoreSequence->clear();
+    pScoreSequence->append(0,0);
     pScoreSequence->setName(sTeamName[1]);
     animateTimer.start(1000);
 }
@@ -188,6 +226,8 @@ ChartWindow::startChartAnimation(int iSet) {
 
 void
 ChartWindow::hide() {
+    animateTimer.stop();
+    closeTimer.stop();
     QWidget::hide();
 }
 
@@ -202,9 +242,10 @@ ChartWindow::onTimeToAnimate() {
     pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
     pScoreSequence->append(x, score[iCurrentSet].at(indexScore).y());
     indexScore++;
-    if(indexScore >= score[iCurrentSet].count())
+    if(indexScore >= score[iCurrentSet].count()) {
         animateTimer.stop();
-    closeTimer.start(3000);
+        closeTimer.start(5000);
+    }
     update();
 }
 
@@ -212,5 +253,7 @@ ChartWindow::onTimeToAnimate() {
 void
 ChartWindow::onTimeToClose() {
     emit done();
+    animateTimer.stop();
+    closeTimer.stop();
     close();
 }

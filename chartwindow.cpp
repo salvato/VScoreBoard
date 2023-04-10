@@ -59,18 +59,18 @@ ChartWindow::ChartWindow(QWidget *parent)
     panelPalette.setColor(QPalette::BrightText,    Qt::white);
     setPalette(panelPalette);
 
-    // TODO:
-    // Create charts for each Game Set (should be parametrized ?)
-    for(int i=0; i<5; i++) {
-        QChart* pChart = createLineChart();
-        pChart->setTitle(tr("Andamento Set %1").arg(i+1));
-        // The ownership of the chart is passed to the QChartView()
-        QChartView* pChartView = new QChartView(pChart);
-        pChartViews.append(pChartView);
-    }
+    QChart* pChart = createLineChart();
+    // The ownership of the chart is passed to pChartView
+    pChartView = new QChartView(pChart);
     auto* pLayout = new QGridLayout();
-    pLayout->addWidget(pChartViews.at(0), 0, 0, 1, 1);
+    pLayout->addWidget(pChartView, 0, 0, 1, 1);
     setLayout(pLayout);
+
+    closeTimer.setSingleShot(true);
+    connect(&animateTimer, SIGNAL(timeout()),
+            this, SLOT(onTimeToAnimate()));
+    connect(&closeTimer, SIGNAL(timeout()),
+            this, SLOT(onTimeToClose()));
 }
 
 
@@ -129,11 +129,7 @@ ChartWindow::createLineChart() {
 void
 ChartWindow::updateLabel(int iTeam, QString sLabel) {
     if((iTeam < 0) || (iTeam > 1)) return;
-    for(int i=0; i<5; i++) {
-        QChart* pChart = pChartViews.at(i)->chart();
-        QLineSeries* pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(iTeam));
-        pScoreSequence->setName(sLabel);
-    }
+    sTeamName[iTeam] = sLabel;
     update();
 }
 
@@ -141,92 +137,80 @@ ChartWindow::updateLabel(int iTeam, QString sLabel) {
 void
 ChartWindow::updateScore(int team0Score, int team1Score, int iSet) {
     if((iSet < 0) || (iSet > 4)) return;
-    int yMax = std::max(team0Score, team1Score);
-    int xMax = team0Score+team1Score;
-    QLineSeries* pScoreSequence;
-    QChart* pChart = pChartViews.at(iSet)->chart();
-    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
-    pScoreSequence->append(xMax, team0Score);
-    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
-    pScoreSequence->append(xMax, team1Score);
-    if(xMax > maxX) {
-        maxX = xMax;
-        pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxX);
+    int tScore = team0Score+team1Score;
+    if(!score[iSet].isEmpty()) {
+        while((tScore <= score[iSet].last().x()+score[iSet].last().y()) &&
+               !score[iSet].isEmpty())
+        {
+            score[iSet].removeLast();
+        }
     }
-    if(yMax > maxY) {
-        maxY = yMax;
-        pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxY);
-    }
-    update();
+    score[iSet].append(QVector2D(team0Score, team1Score));
+    maxScore[iSet] = std::max(team0Score, team1Score);
 }
 
 
 void
 ChartWindow::resetScore(int iSet) {
     if((iSet < 0) || (iSet > 4)) return;
-    maxX = maxY = 25;
-    QChart* pChart = pChartViews.at(iSet)->chart();
-    QLineSeries* pScoreSequence;
-
-    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
-    pScoreSequence->clear();
-    pScoreSequence->append(0, 0);
-
-    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
-    pScoreSequence->clear();
-    pScoreSequence->append(0, 0);
-
-    pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxX);
-    pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxY);
-    update();
+    score[iSet].clear();
+    score[iSet].append(QVector2D(0, 0));
+    maxScore[iSet] = 0;
 }
 
 
 void
 ChartWindow::resetAll() {
-    maxX = maxY = 25;
-    for(int i=0; i<pChartViews.count(); i++) {
-        resetScore(i);
+    for(int i=0; i<5; i++) {
+        score[i].clear();
+        score[i].append(QVector2D(0, 0));
+        maxScore[i] = 0;
     }
-    update();
 }
 
 
 void
-ChartWindow::show(int iSet) {
-    QChartView* pChartView = pChartViews.at(iSet);
-    auto* pLayout = reinterpret_cast<QGridLayout*>(layout());
-    pLayout->invalidate();
-    pLayout->addWidget(pChartView, 0, 0, 1, 1);
-    setLayout(pLayout);
-    QWidget::show();
-}
-
-
-void
-ChartWindow::showMaximized(int iSet) {
-    QChartView* pChartView = pChartViews.at(iSet);
-    auto* pLayout = reinterpret_cast<QGridLayout*>(layout());
-    pLayout->invalidate();
-    pLayout->addWidget(pChartView, 0, 0, 1, 1);
-    setLayout(pLayout);
-    QWidget::showMaximized();
-}
-
-
-void
-ChartWindow::showFullScreen(int iSet) {
-    QChartView* pChartView = pChartViews.at(iSet);
-    pChartView->chart()->legend()->setReverseMarkers(iSet % 2);
-    auto* pLayout = reinterpret_cast<QGridLayout*>(layout());
-    pLayout->invalidate();
-    pLayout->addWidget(pChartView, 0, 0, 1, 1);
-    setLayout(pLayout);
-    QWidget::showFullScreen();
+ChartWindow::startChartAnimation(int iSet) {
+    iCurrentSet = iSet;
+    indexScore = 0;
+    int maxX = score[iSet].last().x()+score[iSet].last().y();
+    QChart* pChart = pChartView->chart();
+    pChart->axes(Qt::Horizontal).constFirst()->setRange(0, maxX);
+    pChart->axes(Qt::Vertical).constFirst()->setRange(0, maxScore[iCurrentSet]);
+    QLineSeries* pScoreSequence;
+    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
+    pScoreSequence->setName(sTeamName[0]);
+    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
+    pScoreSequence->setName(sTeamName[1]);
+    animateTimer.start(1000);
 }
 
 
 void
 ChartWindow::hide() {
     QWidget::hide();
+}
+
+
+void
+ChartWindow::onTimeToAnimate() {
+    QChart* pChart = pChartView->chart();
+    int x = score[iCurrentSet].at(indexScore).x()+score[iCurrentSet].at(indexScore).y();
+    QLineSeries* pScoreSequence;
+    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(0));
+    pScoreSequence->append(x, score[iCurrentSet].at(indexScore).x());
+    pScoreSequence = reinterpret_cast<QLineSeries*>(pChart->series().at(1));
+    pScoreSequence->append(x, score[iCurrentSet].at(indexScore).y());
+    indexScore++;
+    if(indexScore >= score[iCurrentSet].count())
+        animateTimer.stop();
+    closeTimer.start(3000);
+    update();
+}
+
+
+void
+ChartWindow::onTimeToClose() {
+    emit done();
+    close();
 }

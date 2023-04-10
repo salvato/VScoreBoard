@@ -947,12 +947,34 @@ VolleyController::onButtonStatisticsClicked() {
         pRaceWindow->hide();
         pPixmap->load(":/buttonIcons/plot.png");
     }
+    else if(pCharts->isVisible()) {
+        pCharts->hide();
+        pPixmap->load(":/buttonIcons/plot.png");
+    }
     else {
         if(setSelectionDialog.exec() == QDialog::Accepted) {
-            pRaceWindow->showFullScreen();
+/* TODO: Parte da rimuovere... serve solo per debug.*/
+            int iScore0 = 0;
+            int iScore1 = 0;
+            bool bEnd   = false;
+            while(!bEnd) {
+                if(rand() & 1) iScore0++;
+                else iScore1++;
+                pCharts->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
+                pRaceWindow->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
+                bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
+                       std::abs(iScore0-iScore1) > 1;
+            }
+/* Fine parte da rimuovere */
+//            pRaceWindow->showFullScreen();
+            pCharts->showFullScreen();
             if(pRaceWindow->isVisible()) {
                 pPixmap->load(":/buttonIcons/sign_stop.png");
                 pRaceWindow->startRace(setSelectionDialog.iSelectedSet);
+            }
+            else if(pCharts->isVisible()) {
+                pPixmap->load(":/buttonIcons/sign_stop.png");
+                pCharts->startChartAnimation(setSelectionDialog.iSelectedSet);
             }
             else {
                 pPixmap->load(":/buttonIcons/plot.png");

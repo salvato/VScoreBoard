@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDialog>
 #include <QRadioButton>
+#include <QCheckBox>
 #include <QDialogButtonBox>
 
 
@@ -28,6 +29,7 @@ class SetSelectionDialog : public QDialog
     Q_OBJECT
 public:
     SetSelectionDialog();
+    bool isPlotSelected();
 
 public slots:
     void onSetSelected(bool);
@@ -39,6 +41,7 @@ public:
 
 private:
     QRadioButton setSelected[5];
+    QCheckBox buttonPlot;
     QDialogButtonBox* pButtonBox;
 };
 

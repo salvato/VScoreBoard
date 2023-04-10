@@ -40,7 +40,9 @@ SetSelectionDialog::SetSelectionDialog()
                 this, SLOT(onSetSelected(bool)));
         pLayout->addWidget(&setSelected[i], i, 0, 1, 1);
     }
-    pLayout->addWidget(pButtonBox, 5, 0, 1, 3);
+    buttonPlot.setText("Grafico");
+    pLayout->addWidget(&buttonPlot, 4, 2, 1, 1);
+    pLayout->addWidget(pButtonBox,  5, 0, 1, 3);
     setLayout(pLayout);
     setSelected[iSelectedSet].setChecked(true);
 }
@@ -67,4 +69,10 @@ SetSelectionDialog::onOk() {
 void
 SetSelectionDialog::onCancel() {
     reject();
+}
+
+
+bool
+SetSelectionDialog::isPlotSelected() {
+    return buttonPlot.isChecked();
 }

@@ -177,6 +177,10 @@ ChartWindow::resetAll() {
 
 void
 ChartWindow::startChartAnimation(int iSet) {
+    if(score[iSet].isEmpty()) {
+        closeTimer.start(500);
+        return;
+    }
     iCurrentSet = iSet;
     indexScore = 0;
     int maxX = score[iSet].last().x()+score[iSet].last().y();

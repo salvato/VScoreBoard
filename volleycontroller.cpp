@@ -953,7 +953,7 @@ VolleyController::onButtonStatisticsClicked() {
     }
     else {
         if(setSelectionDialog.exec() == QDialog::Accepted) {
-/* TODO: Parte da rimuovere... serve solo per debug.
+/* TODO: Parte da rimuovere... serve solo per debug. */
             int iScore0 = 0;
             int iScore1 = 0;
             bool bEnd   = false;
@@ -965,7 +965,7 @@ VolleyController::onButtonStatisticsClicked() {
                 bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
                        std::abs(iScore0-iScore1) > 1;
             }
- Fine parte da rimuovere */
+/* Fine parte da rimuovere */
             if(setSelectionDialog.isPlotSelected())
                 pCharts->showFullScreen();
             else

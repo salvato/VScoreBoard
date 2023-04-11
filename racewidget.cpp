@@ -624,8 +624,14 @@ RaceWidget::paintGL() {
     glBindTexture(GL_TEXTURE_2D, depthMap);
 
     pTextProgram = ResourceManager::GetShader("text");
-    renderText(pTextProgram, "This is sample text", 25.0f, 25.0f, 1.0f, QVector3D(0.5f, 0.8f, 0.2f));
-    renderText(pTextProgram, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, QVector3D(0.3f, 0.7f, 0.9f));
+    renderText(pTextProgram,
+               "This is sample text",
+               25.0f, 25.0f, 1.0f,
+               QVector3D(0.5f, 0.8f, 0.2f));
+    renderText(pTextProgram,
+               "(C) LearnOpenGL.com",
+               540.0f, 570.0f, 0.5f,
+               QVector3D(0.3f, 0.7f, 0.9f));
 
     pGameProgram->setUniformValue("view",              cameraProjectionMatrix);
     pGameProgram->setUniformValue("camera",            cameraViewMatrix);

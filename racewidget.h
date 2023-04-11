@@ -83,6 +83,7 @@ protected:
     void initShadowBuffer();
     void initTextures();
     void initGameObjects();
+    void initChars();
     void restoreStatus();
     void createWall();
     void createFloor();
@@ -173,6 +174,12 @@ private:
     qreal aspect;
     FT_Library ft;
     FT_Face face;
-
+    struct Character {
+        uint      TextureID;  // ID handle of the glyph texture
+        QVector2D Size;       // Size of glyph
+        QVector2D Bearing;    // Offset from baseline to left/top of glyph
+        uint      Advance;    // Offset to advance to next glyph
+    };
+    QMap<char, Character> Characters;
 };
 

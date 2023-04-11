@@ -203,10 +203,12 @@ RaceWidget::resetAll() {
 
 void
 RaceWidget::resizeGL(int w, int h) {
-    cameraProjectionMatrix.setToIdentity();
     // Calculate aspect ratio
     aspect = qreal(w) / qreal(h ? h : 1);
+    cameraProjectionMatrix.setToIdentity();
     cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
+    textProjectionMatrix.setToIdentity();
+    textProjectionMatrix.ortho(QRect(0, 0, w, h));
 }
 
 void
@@ -428,6 +430,8 @@ RaceWidget::initChars() {
         };
         Characters.insert(c, character);
     }
+    FT_Done_Face(face);
+    FT_Done_FreeType(ft);
 }
 
 
@@ -530,6 +534,7 @@ void
 RaceWidget::initializeGL() {
     initializeOpenGLFunctions();
 
+    initChars();
     initShaders();
     initTextures();
     initShadowBuffer();

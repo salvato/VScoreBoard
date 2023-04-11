@@ -105,6 +105,8 @@ private:
     QMatrix4x4 cameraViewMatrix;
     QMatrix4x4 cameraProjectionMatrix;
 
+    QMatrix4x4 textProjectionMatrix;
+
     QMatrix4x4 lightProjectionMatrix;
     QMatrix4x4 lightViewMatrix;
     QMatrix4x4 lightSpaceMatrix;

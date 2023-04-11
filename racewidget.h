@@ -18,6 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 
+#include "ft2build.h"
+#include FT_FREETYPE_H
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLTexture>
@@ -95,6 +98,7 @@ private:
 
     QOpenGLShaderProgram* pGameProgram = nullptr;
     QOpenGLShaderProgram* pComputeDepthProgram = nullptr;
+    QOpenGLShaderProgram* pTextProgram = nullptr;
     QOpenGLShaderProgram* pDebugDepthQuad = nullptr;
 
     QMatrix4x4 cameraViewMatrix;
@@ -167,5 +171,8 @@ private:
     qreal zFar;
     qreal fov;
     qreal aspect;
+    FT_Library ft;
+    FT_Face face;
+
 };
 

@@ -55,6 +55,18 @@ RaceWidget::RaceWidget()
 {
     setWindowIcon(QIcon(":/buttonIcons/plot.png"));
 
+    if (FT_Init_FreeType(&ft))
+    {
+        qCritical() << "ERROR::FREETYPE: Could not init FreeType Library";
+        exit(EXIT_FAILURE);
+    }
+    if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face))
+    {
+        qCritical() << "ERROR::FREETYPE: Failed to load font";
+        exit(EXIT_FAILURE);
+    }
+    FT_Set_Pixel_Sizes(face, 0, 48);
+
     sTeamName[0] = "Locali";
     sTeamName[1] = "Ospiti";
 /*
@@ -562,6 +574,9 @@ RaceWidget::paintGL() {
     pGameProgram->setUniformValue("shadowMap",         1);
 
 #ifndef SHOW_DEPTH
+    pTextProgram = ResourceManager::GetShader("text");
+    renderText(pTextProgram, "This is sample text", 25.0f, 25.0f, 1.0f, QVector3D(0.5, 0.8f, 0.2f));
+    renderText(pTextProgram, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, QVector3D(0.3, 0.7f, 0.9f));
     renderScene(pGameProgram);
 #endif
 

@@ -59,6 +59,8 @@ HEADERS += \
     chartwindow.h \
     edit.h \
     floor.h \
+    freetype/freetype.h \
+    ft2build.h \
     ft2build.h \
     generalsetuparguments.h \
     generalsetupdialog.h \

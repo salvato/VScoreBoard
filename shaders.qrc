@@ -38,5 +38,7 @@
         <file>Shaders/vDebug_quad.glsl</file>
         <file>Shaders/fParticle.glsl</file>
         <file>Shaders/vParticle.glsl</file>
+        <file>Shaders/fGlyphs.glsl</file>
+        <file>Shaders/vGlyphs.glsl</file>
     </qresource>
 </RCC>

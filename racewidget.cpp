@@ -55,13 +55,11 @@ RaceWidget::RaceWidget()
 {
     setWindowIcon(QIcon(":/buttonIcons/plot.png"));
 
-    if (FT_Init_FreeType(&ft))
-    {
+    if (FT_Init_FreeType(&ft)) {
         qCritical() << "ERROR::FREETYPE: Could not init FreeType Library";
         exit(EXIT_FAILURE);
     }
-    if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face))
-    {
+    if (FT_New_Face(ft, "C:/Users/gabriele/Documents/qtprojects/VScoreBoard/arial.ttf", 0, &face)) {
         qCritical() << "ERROR::FREETYPE: Failed to load font";
         exit(EXIT_FAILURE);
     }
@@ -489,6 +487,10 @@ RaceWidget::initShaders() {
                                 ":/Shaders/fParticle.glsl",
                                 QString(),
                                 "particle");
+    ResourceManager::LoadShader(":/Shaders/vGlyphs.glsl",
+                                ":/Shaders/fGlyphs.glsl",
+                                QString(),
+                                "text");
 #ifdef SHOW_DEPTH
     ResourceManager::LoadShader(":/Shaders/vDebug_quad.glsl",
                                 ":/Shaders/fDebug_quad.glsl",
@@ -621,6 +623,10 @@ RaceWidget::paintGL() {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, depthMap);
 
+    pTextProgram = ResourceManager::GetShader("text");
+    renderText(pTextProgram, "This is sample text", 25.0f, 25.0f, 1.0f, QVector3D(0.5f, 0.8f, 0.2f));
+    renderText(pTextProgram, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, QVector3D(0.3f, 0.7f, 0.9f));
+
     pGameProgram->setUniformValue("view",              cameraProjectionMatrix);
     pGameProgram->setUniformValue("camera",            cameraViewMatrix);
     pGameProgram->setUniformValue("viewPos",           cameraPosition);
@@ -631,9 +637,6 @@ RaceWidget::paintGL() {
     pGameProgram->setUniformValue("shadowMap",         1);
 
 #ifndef SHOW_DEPTH
-    pTextProgram = ResourceManager::GetShader("text");
-    renderText(pTextProgram, "This is sample text", 25.0f, 25.0f, 1.0f, QVector3D(0.5, 0.8f, 0.2f));
-    renderText(pTextProgram, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, QVector3D(0.3, 0.7f, 0.9f));
     renderScene(pGameProgram);
 #endif
 

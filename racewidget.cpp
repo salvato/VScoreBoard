@@ -55,15 +55,18 @@ RaceWidget::RaceWidget()
 {
     setWindowIcon(QIcon(":/buttonIcons/plot.png"));
 
-    if (FT_Init_FreeType(&ft)) {
+    if(FT_Init_FreeType(&ft)) {
         qCritical() << "ERROR::FREETYPE: Could not init FreeType Library";
         exit(EXIT_FAILURE);
     }
-    if (FT_New_Face(ft, "C:/Users/gabriele/Documents/qtprojects/VScoreBoard/arial.ttf", 0, &face)) {
+    if(FT_New_Face(ft, "C:/Users/gabriele/Documents/qtprojects/VScoreBoard/arial.ttf", 0, &face)) {
         qCritical() << "ERROR::FREETYPE: Failed to load font";
         exit(EXIT_FAILURE);
     }
-    FT_Set_Pixel_Sizes(face, 0, 48);
+    if(FT_Set_Pixel_Sizes(face, 0, 48)) {
+        qCritical() << "ERROR::FREETYPE: Failed to set font size";
+        exit(EXIT_FAILURE);
+    }
 
     sTeamName[0] = "Locali";
     sTeamName[1] = "Ospiti";
@@ -206,7 +209,7 @@ RaceWidget::resizeGL(int w, int h) {
     cameraProjectionMatrix.setToIdentity();
     cameraProjectionMatrix.perspective(fov, aspect, zNear, zFar);
     textProjectionMatrix.setToIdentity();
-    textProjectionMatrix.ortho(QRect(0, 0, w, h));
+    textProjectionMatrix.ortho(0.0, float(w), 0, float(h), near_plane, far_plane);
 }
 
 
@@ -429,8 +432,11 @@ RaceWidget::initChars() {
         };
         Characters.insert(c, character);
     }
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
+
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
@@ -619,20 +625,10 @@ RaceWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     pGameProgram = ResourceManager::GetShader("race");
-    pGameProgram->bind();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, depthMap);
 
-    pTextProgram = ResourceManager::GetShader("text");
-    renderText(pTextProgram,
-               "This is sample text",
-               25.0f, 25.0f, 1.0f,
-               QVector3D(0.5f, 0.8f, 0.2f));
-    renderText(pTextProgram,
-               "(C) LearnOpenGL.com",
-               540.0f, 570.0f, 0.5f,
-               QVector3D(0.3f, 0.7f, 0.9f));
-
+    pGameProgram->bind();
     pGameProgram->setUniformValue("view",              cameraProjectionMatrix);
     pGameProgram->setUniformValue("camera",            cameraViewMatrix);
     pGameProgram->setUniformValue("viewPos",           cameraPosition);
@@ -645,6 +641,16 @@ RaceWidget::paintGL() {
 #ifndef SHOW_DEPTH
     renderScene(pGameProgram);
 #endif
+
+    pTextProgram = ResourceManager::GetShader("text");
+    renderText(pTextProgram,
+               "This is sample text",
+               25.0f, 25.0f, 1.0f,
+               QVector3D(0.5f, 0.8f, 0.2f));
+    renderText(pTextProgram,
+               "(C) LearnOpenGL.com",
+               540.0f, 570.0f, 0.5f,
+               QVector3D(0.3f, 0.7f, 0.9f));
 
 #ifdef SHOW_DEPTH
 // render Depth map to quad for visual debugging
@@ -664,20 +670,19 @@ void
 RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString text,
                        float x, float y, float scale, QVector3D color)
 {
-    // activate corresponding render state
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     pProgram->bind();
+    pProgram->setUniformValue("projection", textProjectionMatrix);
     pProgram->setUniformValue("textColor", color);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
     // iterate through all characters
     for (int i=0; i< text.count(); i++) {
-
         Character ch = Characters[text.at(i).toLatin1()];
-
         float xpos = x + ch.Bearing.x() * scale;
         float ypos = y - (ch.Size.y() - ch.Bearing.y()) * scale;
-
         float w = ch.Size.x() * scale;
         float h = ch.Size.y() * scale;
         // update VBO for each character

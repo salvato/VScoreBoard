@@ -76,6 +76,7 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
+    void renderText(QOpenGLShaderProgram* pProgram, QString text, float x, float y, float scale, QVector3D color);
     void renderScene(QOpenGLShaderProgram *pProgram);
     void renderQuad(QOpenGLShaderProgram *pProgram);
 
@@ -183,5 +184,6 @@ private:
         uint      Advance;    // Offset to advance to next glyph
     };
     QMap<char, Character> Characters;
+    unsigned int VAO, VBO;
 };
 

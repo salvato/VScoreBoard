@@ -59,6 +59,7 @@ HEADERS += \
     chartwindow.h \
     edit.h \
     floor.h \
+    ft2build.h \
     generalsetuparguments.h \
     generalsetupdialog.h \
     object.h \
@@ -80,6 +81,8 @@ HEADERS += \
     volleycontroller.h \
     volleypanel.h \
     whiteline.h
+
+LIBS += -l"C:\Users\gabriele\Documents\qtprojects\VScoreBoard\freetype_d"
 
 TRANSLATIONS += VScoreBoard_en_US.ts
 CONFIG += lrelease

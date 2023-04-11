@@ -62,5 +62,6 @@
         <file>gate0.png</file>
         <file>Logo_UniMe2.png</file>
         <file>dark-blue-carpet.jpg</file>
+        <file>arial.ttf</file>
     </qresource>
 </RCC>

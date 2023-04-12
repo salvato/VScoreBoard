@@ -396,43 +396,40 @@ RaceWidget::createNet() {
 void
 RaceWidget::initChars() {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
-
-    for(unsigned char c=0; c<128; c++) {
+    QOpenGLTexture* pTexture;
+    QImage* pGlyph;
+    for(uchar c=0; c<128; c++) {
         // load character glyph
         if(FT_Load_Char(face, c, FT_LOAD_RENDER)) {
             qCritical() << "ERROR::FREETYTPE: Failed to load Glyph";
             continue;
         }
         // generate texture
-        unsigned int texture;
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RED,
-            face->glyph->bitmap.width,
-            face->glyph->bitmap.rows,
-            0,
-            GL_RED,
-            GL_UNSIGNED_BYTE,
-            face->glyph->bitmap.buffer
-        );
-        // set texture options
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        if(face->glyph->bitmap.width*face->glyph->bitmap.rows != 0) {
+            pGlyph = new QImage(face->glyph->bitmap.buffer,
+                                face->glyph->bitmap.width,
+                                face->glyph->bitmap.rows,
+                                face->glyph->bitmap.width,
+                                QImage::Format_Grayscale8);
+        }
+        else {
+            pGlyph = new QImage(1, 1, QImage::Format_Grayscale8);
+            pGlyph->fill(0);
+        }
+        pTexture = new QOpenGLTexture(*pGlyph);
+        pTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+        pTexture->setMinificationFilter(QOpenGLTexture::Linear);
+        pTexture->setWrapMode(QOpenGLTexture::ClampToEdge);
         // now store character for later use
         Character character = {
-            texture,
+            pTexture,
             QVector2D(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-            QVector2D(face->glyph->bitmap_left, face->glyph->bitmap_top),
+            QVector2D(face->glyph->bitmap_left,  face->glyph->bitmap_top),
             static_cast<uint>(face->glyph->advance.x)
         };
         Characters.insert(c, character);
     }
-    glBindTexture(GL_TEXTURE_2D, 0);
+    pTexture->release();
 
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
@@ -441,9 +438,9 @@ RaceWidget::initChars() {
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*6*4, NULL, GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
@@ -645,11 +642,13 @@ RaceWidget::paintGL() {
     pTextProgram = ResourceManager::GetShader("text");
     renderText(pTextProgram,
                "This is sample text",
-               25.0f, 25.0f, 1.0f,
+               QVector3D(25.0f, 25.0f, 10.0f),
+               1.0f,
                QVector3D(0.5f, 0.8f, 0.2f));
     renderText(pTextProgram,
                "(C) LearnOpenGL.com",
-               540.0f, 570.0f, 0.5f,
+               QVector3D(540.0f, 570.0f, 10.0),
+               0.5f,
                QVector3D(0.3f, 0.7f, 0.9f));
 
 #ifdef SHOW_DEPTH
@@ -667,8 +666,8 @@ RaceWidget::paintGL() {
 
 
 void
-RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString text,
-                       float x, float y, float scale, QVector3D color)
+RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString sText,
+                       QVector3D position, float scale, QVector3D color)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -678,25 +677,36 @@ RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString text,
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
-    // iterate through all characters
-    for (int i=0; i< text.count(); i++) {
-        Character ch = Characters[text.at(i).toLatin1()];
+    float x = position.x();
+    float y = position.y();
+//    float z = position.z();
+
+    for (int i=0; i< sText.count(); i++) {//  iterate through all characters
+        Character ch = Characters[sText.at(i).toLatin1()];
         float xpos = x + ch.Bearing.x() * scale;
         float ypos = y - (ch.Size.y() - ch.Bearing.y()) * scale;
         float w = ch.Size.x() * scale;
         float h = ch.Size.y() * scale;
         // update VBO for each character
         float vertices[6][4] = {
-            { xpos,     ypos + h,   0.0f, 0.0f },
-            { xpos,     ypos,       0.0f, 1.0f },
-            { xpos + w, ypos,       1.0f, 1.0f },
+            { xpos,     ypos + h, 0.0f, 0.0f },
+            { xpos,     ypos,     0.0f, 1.0f },
+            { xpos + w, ypos,     1.0f, 1.0f },
 
-            { xpos,     ypos + h,   0.0f, 0.0f },
-            { xpos + w, ypos,       1.0f, 1.0f },
-            { xpos + w, ypos + h,   1.0f, 0.0f }
+            { xpos,     ypos + h, 0.0f, 0.0f },
+            { xpos + w, ypos,     1.0f, 1.0f },
+            { xpos + w, ypos + h, 1.0f, 0.0f }
+//            { xpos,     ypos + h, z, 0.0f, 0.0f },
+//            { xpos,     ypos,     z, 0.0f, 1.0f },
+//            { xpos + w, ypos,     z, 1.0f, 1.0f },
+
+//            { xpos,     ypos + h, z, 0.0f, 0.0f },
+//            { xpos + w, ypos,     z, 1.0f, 1.0f },
+//            { xpos + w, ypos + h, z, 1.0f, 0.0f }
         };
         // render glyph texture over quad
-        glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+        ch.pTexture->bind();
+//        glBindTexture(GL_TEXTURE_2D, ch.TextureID);
         // update content of VBO memory
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);

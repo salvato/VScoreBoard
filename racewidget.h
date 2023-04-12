@@ -76,7 +76,8 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
-    void renderText(QOpenGLShaderProgram* pProgram, QString text, float x, float y, float scale, QVector3D color);
+    void renderText(QOpenGLShaderProgram* pProgram, QString sText,
+                    QVector3D position, float scale, QVector3D color);
     void renderScene(QOpenGLShaderProgram *pProgram);
     void renderQuad(QOpenGLShaderProgram *pProgram);
 
@@ -178,10 +179,10 @@ private:
     FT_Library ft;
     FT_Face face;
     struct Character {
-        uint      TextureID;  // ID handle of the glyph texture
-        QVector2D Size;       // Size of glyph
-        QVector2D Bearing;    // Offset from baseline to left/top of glyph
-        uint      Advance;    // Offset to advance to next glyph
+        QOpenGLTexture* pTexture; // ID handle of the glyph texture
+        QVector2D       Size;     // Size of glyph
+        QVector2D       Bearing;  // Offset from baseline to left/top of glyph
+        uint            Advance;  // Offset to advance to next glyph
     };
     QMap<char, Character> Characters;
     unsigned int VAO, VBO;

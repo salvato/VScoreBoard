@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include "ft2build.h"
-#include FT_FREETYPE_H
+#include <freetype/freetype.h>
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
@@ -185,6 +185,6 @@ private:
         uint            Advance;  // Offset to advance to next glyph
     };
     QMap<char, Character> Characters;
-    unsigned int VAO, VBO;
+    QOpenGLBuffer charBuf;
 };
 

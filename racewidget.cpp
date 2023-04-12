@@ -24,6 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "avatar.h"
 #include "particlegenerator.h"
 #include "resourcemanager.h"
+#include "ft2build.h"
+#include FT_FREETYPE_H
 
 
 #include <QSurfaceFormat>
@@ -434,15 +436,10 @@ RaceWidget::initChars() {
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*6*4, NULL, GL_DYNAMIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    charBuf.create();
+    charBuf.bind();
+    charBuf.allocate(0, sizeof(float)*6*4);
+    charBuf.release();
 }
 
 
@@ -675,13 +672,13 @@ RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString sText,
     pProgram->setUniformValue("projection", textProjectionMatrix);
     pProgram->setUniformValue("textColor", color);
     glActiveTexture(GL_TEXTURE0);
-    glBindVertexArray(VAO);
+//    glBindVertexArray(VAO);
 
     float x = position.x();
     float y = position.y();
 //    float z = position.z();
 
-    for (int i=0; i< sText.count(); i++) {//  iterate through all characters
+    for(int i=0; i< sText.count(); i++) {//  iterate through all characters
         Character ch = Characters[sText.at(i).toLatin1()];
         float xpos = x + ch.Bearing.x() * scale;
         float ypos = y - (ch.Size.y() - ch.Bearing.y()) * scale;
@@ -706,18 +703,16 @@ RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString sText,
         };
         // render glyph texture over quad
         ch.pTexture->bind();
-//        glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-        // update content of VBO memory
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        charBuf.bind();
+        charBuf.write(0, vertices, sizeof(vertices));
+        pProgram->enableAttributeArray("vertex");
+        pProgram->setAttributeBuffer("vertex", GL_FLOAT, 0, 4, 4*sizeof(float));
         // render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
         x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+        charBuf.release();
     }
-    glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 

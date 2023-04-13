@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ft2build.h"
 #include <freetype/freetype.h>
+#include "text3d.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
@@ -186,5 +187,6 @@ private:
     };
     QMap<char, Character> Characters;
     QOpenGLBuffer charBuf;
+    Text3D* pText;
 };
 

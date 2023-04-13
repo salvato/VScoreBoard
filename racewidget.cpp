@@ -24,8 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "avatar.h"
 #include "particlegenerator.h"
 #include "resourcemanager.h"
-#include "ft2build.h"
-#include FT_FREETYPE_H
 
 
 #include <QSurfaceFormat>
@@ -447,6 +445,7 @@ void
 RaceWidget::initGameObjects() {
     QQuaternion q = QQuaternion();
     gameObjects.clear();
+
     createWall();
     createFloor();
     // Pali
@@ -457,6 +456,12 @@ RaceWidget::initGameObjects() {
                                 ResourceManager::GetTexture("line"),
                                 QVector3D(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f)));
     createNet();
+
+    pText = new Text3D(QString("0123456789"),
+                       ResourceManager::GetTexture("team0"),
+                       QSizeF(0.01f, 0.01f),
+                       QVector3D(0.0, 0.05f, 0.0));
+    gameObjects.append(pText);
 
     // Now the Team Avatars...
     pTeam0       = new Avatar(ballRadius,
@@ -636,17 +641,17 @@ RaceWidget::paintGL() {
     renderScene(pGameProgram);
 #endif
 
-    pTextProgram = ResourceManager::GetShader("text");
-    renderText(pTextProgram,
-               "This is sample text",
-               QVector3D(25.0f, 25.0f, 10.0f),
-               1.0f,
-               QVector3D(0.5f, 0.8f, 0.2f));
-    renderText(pTextProgram,
-               "(C) LearnOpenGL.com",
-               QVector3D(540.0f, 570.0f, 10.0),
-               0.5f,
-               QVector3D(0.3f, 0.7f, 0.9f));
+//    pTextProgram = ResourceManager::GetShader("text");
+//    renderText(pTextProgram,
+//               "This is sample text",
+//               QVector3D(25.0f, 25.0f, 10.0f),
+//               1.0f,
+//               QVector3D(0.5f, 0.8f, 0.2f));
+//    renderText(pTextProgram,
+//               "(C) LearnOpenGL.com",
+//               QVector3D(540.0f, 570.0f, 10.0),
+//               0.5f,
+//               QVector3D(0.3f, 0.7f, 0.9f));
 
 #ifdef SHOW_DEPTH
 // render Depth map to quad for visual debugging
@@ -672,11 +677,9 @@ RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString sText,
     pProgram->setUniformValue("projection", textProjectionMatrix);
     pProgram->setUniformValue("textColor", color);
     glActiveTexture(GL_TEXTURE0);
-//    glBindVertexArray(VAO);
 
     float x = position.x();
     float y = position.y();
-//    float z = position.z();
 
     for(int i=0; i< sText.count(); i++) {//  iterate through all characters
         Character ch = Characters[sText.at(i).toLatin1()];
@@ -693,13 +696,6 @@ RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString sText,
             { xpos,     ypos + h, 0.0f, 0.0f },
             { xpos + w, ypos,     1.0f, 1.0f },
             { xpos + w, ypos + h, 1.0f, 0.0f }
-//            { xpos,     ypos + h, z, 0.0f, 0.0f },
-//            { xpos,     ypos,     z, 0.0f, 1.0f },
-//            { xpos + w, ypos,     z, 1.0f, 1.0f },
-
-//            { xpos,     ypos + h, z, 0.0f, 0.0f },
-//            { xpos + w, ypos,     z, 1.0f, 1.0f },
-//            { xpos + w, ypos + h, z, 1.0f, 0.0f }
         };
         // render glyph texture over quad
         ch.pTexture->bind();

@@ -23,7 +23,7 @@ Floor::Floor(QSizeF          _size,
 
     QVector<float>  vertices;
     vertices <<
-        // positions                 // normals               // texcoords
+        // positions                   // normals              // texcoords
         -xFloor << 0.0f <<  zFloor <<  0.0f << 1.0f << 0.0f <<   0.0f <<   0.0f <<
          xFloor << 0.0f <<  zFloor <<  0.0f << 1.0f << 0.0f << xFloor <<   0.0f <<
         -xFloor << 0.0f << -zFloor <<  0.0f << 1.0f << 0.0f <<   0.0f << zFloor <<

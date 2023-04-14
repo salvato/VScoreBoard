@@ -34,9 +34,13 @@ SOURCES += \
     generalsetuparguments.cpp \
     generalsetupdialog.cpp \
     main.cpp \
+    model3d.cpp \
+    model3dex.cpp \
+    model_creator.cpp \
     object.cpp \
     particle.cpp \
     particlegenerator.cpp \
+    pixeldata.cpp \
     pole.cpp \
     racewidget.cpp \
     racewindow.cpp \
@@ -65,10 +69,14 @@ HEADERS += \
     ft2build.h \
     generalsetuparguments.h \
     generalsetupdialog.h \
+    model3d.h \
+    model3dex.h \
+    model_creator.h \
     object.h \
     panelorientation.h \
     particle.h \
     particlegenerator.h \
+    pixeldata.h \
     pole.h \
     racewidget.h \
     racewindow.h \

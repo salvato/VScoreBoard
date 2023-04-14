@@ -22,6 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <freetype/freetype.h>
 #include "text3d.h"
 
+#include "model3d.h"
+#include "model3dex.h"
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLTexture>
@@ -91,6 +94,10 @@ protected:
     void createWall();
     void createFloor();
     void createNet();
+    void createTextModel();
+    float* generateVertexBuffer(const Model3D& model);
+    void generateNormalsBuffer(const Model3D& model, float* coords);
+    void create2DImage(const QString& sText, const QFont& font, ushort height);
 
 private:
     QBasicTimer timerUpdate;
@@ -188,5 +195,10 @@ private:
     QMap<char, Character> Characters;
     QOpenGLBuffer charBuf;
     Text3D* pText;
+
+    QOpenGLBuffer vertexTextBuf;
+    QOpenGLBuffer normalTextBuf;
+    Model3DEx     textModel;
+    QImage*       pTextImage = nullptr;
 };
 

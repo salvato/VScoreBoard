@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 
-#include "ft2build.h"
-#include <freetype/freetype.h>
-#include "text3d.h"
+//#include "ft2build.h"
+//#include <freetype/freetype.h>
+//#include "text3d.h"
 
 #include "model3d.h"
 #include "model3dex.h"
@@ -80,8 +80,8 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
-    void renderText(QOpenGLShaderProgram* pProgram, QString sText,
-                    QVector3D position, float scale, QVector3D color);
+//    void renderText(QOpenGLShaderProgram* pProgram, QString sText,
+//                    QVector3D position, float scale, QVector3D color);
     void renderScene(QOpenGLShaderProgram *pProgram);
     void renderQuad(QOpenGLShaderProgram *pProgram);
 
@@ -89,7 +89,7 @@ protected:
     void initShadowBuffer();
     void initTextures();
     void initGameObjects();
-    void initChars();
+//    void initChars();
     void restoreStatus();
     void createWall();
     void createFloor();
@@ -184,17 +184,17 @@ private:
     qreal zFar;
     qreal fov;
     qreal aspect;
-    FT_Library ft;
-    FT_Face face;
-    struct Character {
-        QOpenGLTexture* pTexture; // ID handle of the glyph texture
-        QVector2D       Size;     // Size of glyph
-        QVector2D       Bearing;  // Offset from baseline to left/top of glyph
-        uint            Advance;  // Offset to advance to next glyph
-    };
-    QMap<char, Character> Characters;
-    QOpenGLBuffer charBuf;
-    Text3D* pText;
+//    FT_Library ft;
+//    FT_Face face;
+//    struct Character {
+//        QOpenGLTexture* pTexture; // ID handle of the glyph texture
+//        QVector2D       Size;     // Size of glyph
+//        QVector2D       Bearing;  // Offset from baseline to left/top of glyph
+//        uint            Advance;  // Offset to advance to next glyph
+//    };
+//    QMap<char, Character> Characters;
+//    QOpenGLBuffer charBuf;
+//    Text3D* pText;
 
     QOpenGLBuffer vertexTextBuf;
     QOpenGLBuffer normalTextBuf;

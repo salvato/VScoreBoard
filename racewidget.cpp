@@ -57,18 +57,18 @@ RaceWidget::RaceWidget()
 {
     setWindowIcon(QIcon(":/buttonIcons/plot.png"));
 
-    if(FT_Init_FreeType(&ft)) {
-        qCritical() << "ERROR::FREETYPE: Could not init FreeType Library";
-        exit(EXIT_FAILURE);
-    }
-    if(FT_New_Face(ft, "C:/Users/gabriele/Documents/qtprojects/VScoreBoard/arial.ttf", 0, &face)) {
-        qCritical() << "ERROR::FREETYPE: Failed to load font";
-        exit(EXIT_FAILURE);
-    }
-    if(FT_Set_Pixel_Sizes(face, 0, 48)) {
-        qCritical() << "ERROR::FREETYPE: Failed to set font size";
-        exit(EXIT_FAILURE);
-    }
+//    if(FT_Init_FreeType(&ft)) {
+//        qCritical() << "ERROR::FREETYPE: Could not init FreeType Library";
+//        exit(EXIT_FAILURE);
+//    }
+//    if(FT_New_Face(ft, "C:/Users/gabriele/Documents/qtprojects/VScoreBoard/arial.ttf", 0, &face)) {
+//        qCritical() << "ERROR::FREETYPE: Failed to load font";
+//        exit(EXIT_FAILURE);
+//    }
+//    if(FT_Set_Pixel_Sizes(face, 0, 48)) {
+//        qCritical() << "ERROR::FREETYPE: Failed to set font size";
+//        exit(EXIT_FAILURE);
+//    }
 
     sTeamName[0] = "Locali";
     sTeamName[1] = "Ospiti";
@@ -504,52 +504,52 @@ RaceWidget::createTextModel() {
 }
 
 
-void
-RaceWidget::initChars() {
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
-    QOpenGLTexture* pTexture;
-    QImage* pGlyph;
-    for(uchar c=0; c<128; c++) {
-        // load character glyph
-        if(FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-            qCritical() << "ERROR::FREETYTPE: Failed to load Glyph";
-            continue;
-        }
-        // generate texture
-        if(face->glyph->bitmap.width*face->glyph->bitmap.rows != 0) {
-            pGlyph = new QImage(face->glyph->bitmap.buffer,
-                                face->glyph->bitmap.width,
-                                face->glyph->bitmap.rows,
-                                face->glyph->bitmap.width,
-                                QImage::Format_Mono);
-        }
-        else {
-            pGlyph = new QImage(1, 1, QImage::Format_Mono);
-            pGlyph->fill(0);
-        }
-        pTexture = new QOpenGLTexture(*pGlyph);
-        pTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-        pTexture->setMinificationFilter(QOpenGLTexture::Linear);
-        pTexture->setWrapMode(QOpenGLTexture::ClampToEdge);
-        // now store character for later use
-        Character character = {
-            pTexture,
-            QVector2D(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-            QVector2D(face->glyph->bitmap_left,  face->glyph->bitmap_top),
-            static_cast<uint>(face->glyph->advance.x)
-        };
-        Characters.insert(c, character);
-    }
-    pTexture->release();
+//void
+//RaceWidget::initChars() {
+//    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
+//    QOpenGLTexture* pTexture;
+//    QImage* pGlyph;
+//    for(uchar c=0; c<128; c++) {
+//        // load character glyph
+//        if(FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+//            qCritical() << "ERROR::FREETYTPE: Failed to load Glyph";
+//            continue;
+//        }
+//        // generate texture
+//        if(face->glyph->bitmap.width*face->glyph->bitmap.rows != 0) {
+//            pGlyph = new QImage(face->glyph->bitmap.buffer,
+//                                face->glyph->bitmap.width,
+//                                face->glyph->bitmap.rows,
+//                                face->glyph->bitmap.width,
+//                                QImage::Format_Mono);
+//        }
+//        else {
+//            pGlyph = new QImage(1, 1, QImage::Format_Mono);
+//            pGlyph->fill(0);
+//        }
+//        pTexture = new QOpenGLTexture(*pGlyph);
+//        pTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+//        pTexture->setMinificationFilter(QOpenGLTexture::Linear);
+//        pTexture->setWrapMode(QOpenGLTexture::ClampToEdge);
+//        // now store character for later use
+//        Character character = {
+//            pTexture,
+//            QVector2D(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+//            QVector2D(face->glyph->bitmap_left,  face->glyph->bitmap_top),
+//            static_cast<uint>(face->glyph->advance.x)
+//        };
+//        Characters.insert(c, character);
+//    }
+//    pTexture->release();
 
-    FT_Done_Face(face);
-    FT_Done_FreeType(ft);
+//    FT_Done_Face(face);
+//    FT_Done_FreeType(ft);
 
-    charBuf.create();
-    charBuf.bind();
-    charBuf.allocate(0, sizeof(float)*6*4);
-    charBuf.release();
-}
+//    charBuf.create();
+//    charBuf.bind();
+//    charBuf.allocate(0, sizeof(float)*6*4);
+//    charBuf.release();
+//}
 
 
 void
@@ -581,11 +581,11 @@ RaceWidget::initGameObjects() {
     // ...and then the Particles
     pParticles = new ParticleGenerator(ResourceManager::GetTexture("particle"), 500);
 
-    pText = new Text3D(QString("8"),
-                       ResourceManager::GetTexture("floor"),
-                       QSizeF(1.0f, 1.0f),
-                       QVector3D(-3.0, 1.5f, 0.0));
-    gameObjects.append(pText);
+//    pText = new Text3D(QString("8"),
+//                       ResourceManager::GetTexture("floor"),
+//                       QSizeF(1.0f, 1.0f),
+//                       QVector3D(-3.0, 1.5f, 0.0));
+//    gameObjects.append(pText);
 }
 
 
@@ -662,7 +662,7 @@ void
 RaceWidget::initializeGL() {
     initializeOpenGLFunctions();
 
-    initChars();
+//    initChars();
     initShaders();
     initTextures();
     initShadowBuffer();
@@ -791,49 +791,49 @@ RaceWidget::paintGL() {
 }
 
 
-void
-RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString sText,
-                       QVector3D position, float scale, QVector3D color)
-{
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    pProgram->bind();
-    pProgram->setUniformValue("projection", textProjectionMatrix);
-    pProgram->setUniformValue("textColor", color);
-    glActiveTexture(GL_TEXTURE0);
+//void
+//RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString sText,
+//                       QVector3D position, float scale, QVector3D color)
+//{
+//    glEnable(GL_BLEND);
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    pProgram->bind();
+//    pProgram->setUniformValue("projection", textProjectionMatrix);
+//    pProgram->setUniformValue("textColor", color);
+//    glActiveTexture(GL_TEXTURE0);
 
-    float x = position.x();
-    float y = position.y();
+//    float x = position.x();
+//    float y = position.y();
 
-    for(int i=0; i< sText.count(); i++) {//  iterate through all characters
-        Character ch = Characters[sText.at(i).toLatin1()];
-        float xpos = x + ch.Bearing.x() * scale;
-        float ypos = y - (ch.Size.y() - ch.Bearing.y()) * scale;
-        float w = ch.Size.x() * scale;
-        float h = ch.Size.y() * scale;
-        // update VBO for each character
-        float vertices[6][4] = {
-            { xpos,     ypos + h, 0.0f, 0.0f },
-            { xpos,     ypos,     0.0f, 1.0f },
-            { xpos + w, ypos,     1.0f, 1.0f },
+//    for(int i=0; i< sText.count(); i++) {//  iterate through all characters
+//        Character ch = Characters[sText.at(i).toLatin1()];
+//        float xpos = x + ch.Bearing.x() * scale;
+//        float ypos = y - (ch.Size.y() - ch.Bearing.y()) * scale;
+//        float w = ch.Size.x() * scale;
+//        float h = ch.Size.y() * scale;
+//        // update VBO for each character
+//        float vertices[6][4] = {
+//            { xpos,     ypos + h, 0.0f, 0.0f },
+//            { xpos,     ypos,     0.0f, 1.0f },
+//            { xpos + w, ypos,     1.0f, 1.0f },
 
-            { xpos,     ypos + h, 0.0f, 0.0f },
-            { xpos + w, ypos,     1.0f, 1.0f },
-            { xpos + w, ypos + h, 1.0f, 0.0f }
-        };
-        // render glyph texture over quad
-        ch.pTexture->bind();
-        charBuf.bind();
-        charBuf.write(0, vertices, sizeof(vertices));
-        pProgram->enableAttributeArray("vertex");
-        pProgram->setAttributeBuffer("vertex", GL_FLOAT, 0, 4, 4*sizeof(float));
-        // render quad
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
-        charBuf.release();
-    }
-}
+//            { xpos,     ypos + h, 0.0f, 0.0f },
+//            { xpos + w, ypos,     1.0f, 1.0f },
+//            { xpos + w, ypos + h, 1.0f, 0.0f }
+//        };
+//        // render glyph texture over quad
+//        ch.pTexture->bind();
+//        charBuf.bind();
+//        charBuf.write(0, vertices, sizeof(vertices));
+//        pProgram->enableAttributeArray("vertex");
+//        pProgram->setAttributeBuffer("vertex", GL_FLOAT, 0, 4, 4*sizeof(float));
+//        // render quad
+//        glDrawArrays(GL_TRIANGLES, 0, 6);
+//        // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+//        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+//        charBuf.release();
+//    }
+//}
 
 
 void

@@ -457,12 +457,6 @@ RaceWidget::initGameObjects() {
                                 QVector3D(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f)));
     createNet();
 
-    pText = new Text3D(QString("0123456789"),
-                       ResourceManager::GetTexture("team0"),
-                       QSizeF(0.01f, 0.01f),
-                       QVector3D(0.0, 0.05f, 0.0));
-    gameObjects.append(pText);
-
     // Now the Team Avatars...
     pTeam0       = new Avatar(ballRadius,
                         ResourceManager::GetTexture("team0"),
@@ -475,6 +469,12 @@ RaceWidget::initGameObjects() {
 
     // ...and then the Particles
     pParticles = new ParticleGenerator(ResourceManager::GetTexture("particle"), 500);
+
+    pText = new Text3D(QString("8"),
+                       ResourceManager::GetTexture("floor"),
+                       QSizeF(1.0f, 1.0f),
+                       QVector3D(-3.0, 1.5f, 0.0));
+    gameObjects.append(pText);
 }
 
 
@@ -615,6 +615,8 @@ RaceWidget::paintGL() {
     glActiveTexture(GL_TEXTURE0);
     glCullFace(GL_FRONT); // To fix peter panning
     glActiveTexture(GL_TEXTURE0);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     renderScene(pComputeDepthProgram);
     pComputeDepthProgram->release();
     glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());

@@ -24,8 +24,12 @@ public:
 public:
     void draw(QOpenGLShaderProgram* pProgram) override;
 
+protected:
+    void initGeometry(float height, float depth, float width);
+
 private:
-    QOpenGLBuffer charBuf;
+    QOpenGLBuffer arrayBuf;
+    QOpenGLBuffer indexBuf;
     QString sText;
     FT_Library ft;
     FT_Face face;

@@ -3,12 +3,14 @@
 #include<QOpenGLShaderProgram>
 
 
-Object::Object(QOpenGLTexture *_pTexture,
-               QVector3D       _position,
-               QQuaternion     _rotation,
-               QVector3D       _scale,
-               QVector3D       _speed)
-    : pTexture(_pTexture)
+Object::Object(QOpenGLShaderProgram* _pProgram,
+               QOpenGLTexture*       _pTexture,
+               QVector3D             _position,
+               QQuaternion           _rotation,
+               QVector3D             _scale,
+               QVector3D             _speed)
+    : pProgram(_pProgram)
+    , pTexture(_pTexture)
     , position(_position)
     , rotation(_rotation)
     , scale(_scale)
@@ -72,8 +74,13 @@ Object::getScale() {
 
 
 void
-Object::draw(QOpenGLShaderProgram* pProgram) {
-    (void) pProgram;
+Object::draw() {
+    draw(pProgram);
+}
+
+
+void
+Object::draw(QOpenGLShaderProgram *pOtherProgram) {
 }
 
 

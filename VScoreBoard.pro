@@ -50,7 +50,6 @@ SOURCES += \
     setselectiondialog.cpp \
     slidewidget.cpp \
     sphere.cpp \
-    text3d.cpp \
     timeoutwindow.cpp \
     utility.cpp \
     volleyapplication.cpp \
@@ -64,7 +63,6 @@ HEADERS += \
     chartwindow.h \
     edit.h \
     floor.h \
-    freetype/freetype.h \
     ft2build.h \
     ft2build.h \
     generalsetuparguments.h \
@@ -86,7 +84,6 @@ HEADERS += \
     setselectiondialog.h \
     slidewidget.h \
     sphere.h \
-    text3d.h \
     timeoutwindow.h \
     utility.h \
     volleyapplication.h \
@@ -94,7 +91,6 @@ HEADERS += \
     volleypanel.h \
     whiteline.h
 
-LIBS += -l"C:\Users\gabriele\Documents\qtprojects\VScoreBoard\freetype_d"
 
 TRANSLATIONS += VScoreBoard_en_US.ts
 CONFIG += lrelease

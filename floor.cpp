@@ -4,13 +4,15 @@
 #include <QOpenglTexture>
 
 
-Floor::Floor(QSizeF          _size,
-             QOpenGLTexture* _pTexture,
-             QVector3D       _position,
-             QQuaternion     _rotation,
-             QVector3D       _scale,
-             QVector3D       _speed)
-    : Object(_pTexture,
+Floor::Floor(QSizeF                _size,
+             QOpenGLShaderProgram* _pProgram,
+             QOpenGLTexture*       _pTexture,
+             QVector3D             _position,
+             QQuaternion           _rotation,
+             QVector3D             _scale,
+             QVector3D             _speed)
+    : Object(_pProgram,
+             _pTexture,
              _position,
              _rotation,
              _scale,
@@ -46,27 +48,35 @@ Floor::~Floor() {
 
 
 void
-Floor::draw(QOpenGLShaderProgram* pProgram) {
+Floor::draw() {
+    draw(pProgram);
+}
+
+
+void
+Floor::draw(QOpenGLShaderProgram* pOtherProgram)
+{
+    pOtherProgram->bind();
     if(pTexture)
         pTexture->bind();
-    pProgram->setUniformValue("model", modelMatrix());
+    pOtherProgram->setUniformValue("model", modelMatrix());
 
     floorBuf.bind();
 
     // Offset for position
     quintptr offset = 0;
-    pProgram->enableAttributeArray("vPosition");
-    pProgram->setAttributeBuffer("vPosition", GL_FLOAT, offset, 3, 8*sizeof(float));
+    pOtherProgram->enableAttributeArray("vPosition");
+    pOtherProgram->setAttributeBuffer("vPosition", GL_FLOAT, offset, 3, 8*sizeof(float));
 
     // Offset for normal coordinate
     offset += 3*sizeof(float);
-    pProgram->enableAttributeArray("vNormal");
-    pProgram->setAttributeBuffer("vNormal", GL_FLOAT, offset, 3, 8*sizeof(float));
+    pOtherProgram->enableAttributeArray("vNormal");
+    pOtherProgram->setAttributeBuffer("vNormal", GL_FLOAT, offset, 3, 8*sizeof(float));
 
     // Offset for texture coordinate
     offset += 3*sizeof(float);
-    pProgram->enableAttributeArray("vTexture");
-    pProgram->setAttributeBuffer("vTexture", GL_FLOAT, offset, 2, 8*sizeof(float));
+    pOtherProgram->enableAttributeArray("vTexture");
+    pOtherProgram->setAttributeBuffer("vTexture", GL_FLOAT, offset, 2, 8*sizeof(float));
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     floorBuf.release();

@@ -11,14 +11,15 @@
 class ParticleGenerator : protected QOpenGLFunctions_3_3_Core
 {
 public:
-    ParticleGenerator(QOpenGLTexture* pTexture, uint amount);
+    ParticleGenerator(QOpenGLShaderProgram *pProgram, QOpenGLTexture* pTexture, uint amount);
 
 public:
     void Update(float dt,
                 uint newParticles,
                 QVector3D offset=QVector3D(0.0f, 0.0f, 0.0f));
     void init(QVector3D origin);
-    void draw(QOpenGLShaderProgram* pShader);
+    void draw();
+    void draw(QOpenGLShaderProgram *pOtherProgram);
 
 private:
     uint firstUnusedParticle();
@@ -26,6 +27,7 @@ private:
                          QVector3D offset=QVector3D(0.0f, 0.0f, 0.0f));
 
 private:
+    QOpenGLShaderProgram* pProgram;
     QOpenGLTexture* pTexture;
     QVector<Particle*> particles;
     QVector3D origin;

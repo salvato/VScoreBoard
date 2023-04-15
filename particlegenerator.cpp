@@ -3,8 +3,11 @@
 
 #define rnd (rand()/double(RAND_MAX)) // [0.0 - 1.0]
 
-ParticleGenerator::ParticleGenerator(QOpenGLTexture* pTexture, uint amount)
-    : pTexture(pTexture)
+ParticleGenerator::ParticleGenerator(QOpenGLShaderProgram* pProgram,
+                                     QOpenGLTexture* pTexture,
+                                     uint amount)
+    : pProgram(pProgram)
+    , pTexture(pTexture)
     , amount(amount)
     , life(3.0f)
 {
@@ -53,6 +56,7 @@ ParticleGenerator::init(QVector3D _origin) {
         particles.push_back(new Particle(QVector4D(1.0f, 1.0f, 1.0f, 1.0f), // color
                                          life,                              // life
                                          QSizeF(0.07f, 0.07f),              // size
+                                         pProgram,
                                          pTexture,                          // texture
                                          origin + random,                   // position
                                          q,                                 // rotation
@@ -88,12 +92,18 @@ ParticleGenerator::Update(float dt, uint newParticles, QVector3D offset) {
 
 // render all particles
 void
-ParticleGenerator::draw(QOpenGLShaderProgram* pShader) {
+ParticleGenerator::draw() {
+    draw(pProgram);
+}
+
+
+void
+ParticleGenerator::draw(QOpenGLShaderProgram *pOtherProgram) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    pShader->bind();
+    pOtherProgram->bind();
     for(int i=0; i< particles.count(); i++) {
         if(particles.at(i)->life > 0.0f) {
-            particles.at(i)->draw(pShader);
+            particles.at(i)->draw();
         }
     }
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

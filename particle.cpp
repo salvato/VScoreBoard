@@ -3,15 +3,17 @@
 #include <QOpenglTexture>
 
 
-Particle::Particle(QVector4D       _color,
-                   float           _life,
-                   QSizeF          _size,
-                   QOpenGLTexture* _pTexture,
-                   QVector3D       _position,
-                   QQuaternion     _rotation,
-                   QVector3D       _scale,
-                   QVector3D       _speed)
+Particle::Particle(QVector4D             _color,
+                   float                 _life,
+                   QSizeF                _size,
+                   QOpenGLShaderProgram* _pProgram,
+                   QOpenGLTexture*       _pTexture,
+                   QVector3D             _position,
+                   QQuaternion           _rotation,
+                   QVector3D             _scale,
+                   QVector3D             _speed)
     : Pole(_size,
+           _pProgram,
            _pTexture,
            _position,
            _rotation,

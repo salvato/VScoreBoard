@@ -3,13 +3,15 @@
 #include <QOpenglTexture>
 
 
-Avatar::Avatar(float           _radius,
-               QOpenGLTexture* _pTexture,
-               QVector3D       _position,
-               QQuaternion     _rotation,
-               QVector3D       _scale,
-               QVector3D       _speed)
-    : Object(_pTexture,
+Avatar::Avatar(float                 _radius,
+               QOpenGLShaderProgram* _pProgram,
+               QOpenGLTexture*       _pTexture,
+               QVector3D             _position,
+               QQuaternion           _rotation,
+               QVector3D             _scale,
+               QVector3D             _speed)
+    : Object(_pProgram,
+             _pTexture,
              _position,
              _rotation,
              _scale,
@@ -20,11 +22,22 @@ Avatar::Avatar(float           _radius,
 
 
 void
-Avatar::draw(QOpenGLShaderProgram* pProgram) {
+Avatar::draw() {
+    pProgram->bind();
     if(pTexture)
         pTexture->bind();
     pProgram->setUniformValue("model", modelMatrix());
     Sphere::draw(pProgram);
+}
+
+
+void
+Avatar::draw(QOpenGLShaderProgram *pOtherProgram) {
+    pOtherProgram->bind();
+    if(pTexture)
+        pTexture->bind();
+    pOtherProgram->setUniformValue("model", modelMatrix());
+    Sphere::draw(pOtherProgram);
 }
 
 

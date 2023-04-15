@@ -12,13 +12,15 @@ struct VertexData
 };
 
 
-Pole::Pole(QSizeF          _size,
-           QOpenGLTexture* _pTexture,
-           QVector3D       _position,
-           QQuaternion     _rotation,
-           QVector3D       _scale,
-           QVector3D       _speed)
-    : Object(_pTexture,
+Pole::Pole(QSizeF                _size,
+           QOpenGLShaderProgram* _pProgram,
+           QOpenGLTexture*       _pTexture,
+           QVector3D             _position,
+           QQuaternion           _rotation,
+           QVector3D             _scale,
+           QVector3D            _speed)
+    : Object(_pProgram,
+             _pTexture,
              _position,
              _rotation,
              _scale,
@@ -110,10 +112,17 @@ Pole::initGeometry(float height, float diameter) {
 
 
 void
-Pole::draw(QOpenGLShaderProgram* pProgram) {
+Pole::draw() {
+    draw(pProgram);
+}
+
+
+void
+Pole::draw(QOpenGLShaderProgram* pOtherProgram) {
+    pOtherProgram->bind();
     if(pTexture)
         pTexture->bind();
-    pProgram->setUniformValue("model", modelMatrix());
+    pOtherProgram->setUniformValue("model", modelMatrix());
 
     arrayBuf.bind();
     indexBuf.bind();
@@ -121,16 +130,16 @@ Pole::draw(QOpenGLShaderProgram* pProgram) {
     // Offset for position
     quintptr offset = 0;
 
-    pProgram->enableAttributeArray("vPosition");
-    pProgram->setAttributeBuffer("vPosition", GL_FLOAT, offset, 3, sizeof(VertexData));
+    pOtherProgram->enableAttributeArray("vPosition");
+    pOtherProgram->setAttributeBuffer("vPosition", GL_FLOAT, offset, 3, sizeof(VertexData));
 
     offset += sizeof(QVector3D);
-    pProgram->enableAttributeArray("vTexture");
-    pProgram->setAttributeBuffer("vTexture", GL_FLOAT, offset, 2, sizeof(VertexData));
+    pOtherProgram->enableAttributeArray("vTexture");
+    pOtherProgram->setAttributeBuffer("vTexture", GL_FLOAT, offset, 2, sizeof(VertexData));
 
     offset += sizeof(QVector2D);
-    pProgram->enableAttributeArray("vNormal");
-    pProgram->setAttributeBuffer("vNormal", GL_FLOAT, offset, 3, sizeof(VertexData));
+    pOtherProgram->enableAttributeArray("vNormal");
+    pOtherProgram->setAttributeBuffer("vNormal", GL_FLOAT, offset, 3, sizeof(VertexData));
 
     glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, nullptr);
 }

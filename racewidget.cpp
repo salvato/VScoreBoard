@@ -57,19 +57,6 @@ RaceWidget::RaceWidget()
 {
     setWindowIcon(QIcon(":/buttonIcons/plot.png"));
 
-//    if(FT_Init_FreeType(&ft)) {
-//        qCritical() << "ERROR::FREETYPE: Could not init FreeType Library";
-//        exit(EXIT_FAILURE);
-//    }
-//    if(FT_New_Face(ft, "C:/Users/gabriele/Documents/qtprojects/VScoreBoard/arial.ttf", 0, &face)) {
-//        qCritical() << "ERROR::FREETYPE: Failed to load font";
-//        exit(EXIT_FAILURE);
-//    }
-//    if(FT_Set_Pixel_Sizes(face, 0, 48)) {
-//        qCritical() << "ERROR::FREETYPE: Failed to set font size";
-//        exit(EXIT_FAILURE);
-//    }
-
     sTeamName[0] = "Locali";
     sTeamName[1] = "Ospiti";
 /*
@@ -220,27 +207,32 @@ RaceWidget::createWall() {
     QQuaternion q = QQuaternion();
     q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 90.0f);
     gameObjects.append(new Floor(QSizeF(25.0f, 2.5f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("brickwall"),
                                  QVector3D(0.0f, 2.5f, -10.0f),
                                  q));
     q  = QQuaternion::fromAxisAndAngle(QVector3D( 0.0f,-1.0f, 0.0f), 90.0f);
     q *= QQuaternion::fromAxisAndAngle(QVector3D( 1.0f, 0.0f, 0.0f), 90.0f);
     gameObjects.append(new Floor(QSizeF(25.0f, 2.5f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("brickwall"),
                                  QVector3D(25.0f, 2.5f, 0.0f),
                                  q));
 
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoSSD"),
                                  QVector3D(24.9f, 1.5f,-4.0f),
                                  q,
                                  QVector3D(1.0f, 1.0f, 1.0f)));
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoSSD"),
                                  QVector3D(24.9f, 1.5f, 0.0f),
                                  q,
                                  QVector3D(1.0f, 1.0f, 1.0f)));
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoSSD"),
                                  QVector3D(24.9f, 1.5f, 4.0f),
                                  q,
@@ -253,23 +245,28 @@ RaceWidget::createFloor(){
     QQuaternion q = QQuaternion();
     // Wooden Floor
     gameObjects.append(new Floor(QSizeF(25.0f, 10.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("floor")));
     // Play Field (Slightltly higer than Floor)
     gameObjects.append(new Floor(QSizeF(xField, zField),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("field"),
                                  QVector3D(0.0f, 0.01f, 0.0f)));
     gameObjects.append(new Floor(QSizeF(xField+5.0, zField+3.0),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("field-ex"),
                                  QVector3D(0.0f, 0.005f, 0.0f)));
 
     // Loghi SSD
     q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 90.0f);
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoSSD"),
                                  QVector3D(-4.0f, 1.5f, -9.9f),
                                  q,
                                  QVector3D(1.0f, 1.0f, 1.0f)));
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoSSD"),
                                  QVector3D( 4.0f, 1.5f, -9.9f),
                                  q,
@@ -278,12 +275,14 @@ RaceWidget::createFloor(){
     // Loghi nel campo
     q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, -1.0f, 0.0f), 90.0f);
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoUnime"),
                                  QVector3D(-xField+3.0f, 0.02f, 0.0f),
                                  q,
                                  QVector3D(1.5f, 1.0f, 1.5f)));
     q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 90.0f);
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoUnime"),
                                  QVector3D(xField-3.0f, 0.02f, 0.0f),
                                  q,
@@ -292,11 +291,13 @@ RaceWidget::createFloor(){
     // Loghi esterni al campo
     q = QQuaternion();
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoSSD"),
                                  QVector3D(-5.0f, 0.02f, zField+1.5f),
                                  q,
                                  QVector3D(1.0f, 1.0f, 1.0f)));
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoUnime2"),
                                  QVector3D( 5.0f, 0.02f, zField+1.5f),
                                  q,
@@ -304,11 +305,13 @@ RaceWidget::createFloor(){
 
     q = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 180.0f);
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoUnime2"),
                                  QVector3D(-5.0f, 0.02f,-zField-1.5f),
                                  q,
                                  QVector3D(1.0f, 1.0f, 1.0f)));
     gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
                                  ResourceManager::GetTexture("logoSSD"),
                                  QVector3D( 5.0f, 0.02f,-zField-1.5f),
                                  q,
@@ -316,24 +319,31 @@ RaceWidget::createFloor(){
 
     // Lines (Slightly higer than PlayField)
     gameObjects.append(new WhiteLine(QSizeF(0.05f, zField),
+                                     ResourceManager::GetShader("race"),
                                      ResourceManager::GetTexture("line"),
                                      QVector3D(-xField+0.05f, 0.02f, 0.0f)));
     gameObjects.append(new WhiteLine(QSizeF(0.05f, zField),
+                                     ResourceManager::GetShader("race"),
                                      ResourceManager::GetTexture("line"),
                                      QVector3D(-3.0f+0.05f, 0.02f, 0.0f)));
     gameObjects.append(new WhiteLine(QSizeF(0.05f, zField),
+                                     ResourceManager::GetShader("race"),
                                      ResourceManager::GetTexture("line"),
                                      QVector3D(0.0f, 0.02f, 0.0f)));
     gameObjects.append(new WhiteLine(QSizeF(0.05f, zField),
+                                     ResourceManager::GetShader("race"),
                                      ResourceManager::GetTexture("line"),
                                      QVector3D(3.0f-0.05f, 0.02f, 0.0f)));
     gameObjects.append(new WhiteLine(QSizeF(0.05f, zField),
+                                     ResourceManager::GetShader("race"),
                                      ResourceManager::GetTexture("line"),
                                      QVector3D(xField-0.05f, 0.02f, 0.0f)));
     gameObjects.append(new WhiteLine(QSizeF(xField, 0.05f),
+                                     ResourceManager::GetShader("race"),
                                      ResourceManager::GetTexture("line"),
                                      QVector3D(0.0f, 0.02f,  zField-0.05f)));
     gameObjects.append(new WhiteLine(QSizeF(xField, 0.05f),
+                                     ResourceManager::GetShader("race"),
                                      ResourceManager::GetTexture("line"),
                                      QVector3D(0.0f, 0.02f, -zField+0.05f)));
 }
@@ -345,21 +355,25 @@ RaceWidget::createNet() {
     // Net White Bands
     q = QQuaternion::fromAxisAndAngle(QVector3D(-1.0f, 0.0f, 0.0f), 90.0f);
     gameObjects.append(new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+                                ResourceManager::GetShader("race"),
                                 ResourceManager::GetTexture("line"),
                                 QVector3D(0.0f, 2.43f+0.02f, 0.0f),
                                 q,
                                 QVector3D(0.2f, 1.0f, 1.0f)));
     gameObjects.append(new Pole(QSizeF(2.0f*zField+1.0f, 0.05f),
+                                ResourceManager::GetShader("race"),
                                 ResourceManager::GetTexture("line"),
                                 QVector3D(0.0f, 1.43f+0.02f, 0.0f),
                                 q,
                                 QVector3D(0.2f, 1.0f, 1.0f)));
     gameObjects.append(new Pole(QSizeF(1.0f, 0.05f),
+                                ResourceManager::GetShader("race"),
                                 ResourceManager::GetTexture("line"),
                                 QVector3D(0.0f, 1.93f+0.02f, -zField),
                                 QQuaternion(),
                                 QVector3D(0.2f, 1.0f, 1.0f)));
     gameObjects.append(new Pole(QSizeF(1.0f, 0.05f),
+                                ResourceManager::GetShader("race"),
                                 ResourceManager::GetTexture("line"),
                                 QVector3D(0.0f, 1.93f+0.02f, zField),
                                 QQuaternion(),
@@ -367,6 +381,7 @@ RaceWidget::createNet() {
     // Horizontal wires
     for(int i=0; i<8; i++) {
         gameObjects.append(new Pole(QSizeF(2.0f*zField, 0.01f),
+                                    ResourceManager::GetShader("race"),
                                     ResourceManager::GetTexture("corda"),
                                     QVector3D(0.0f, 2.43f-0.03f-((i+1)*0.1f), 0.0f),
                                     q,
@@ -375,6 +390,7 @@ RaceWidget::createNet() {
     // Vertical wires
     for(int i=0; i<int(zField*10.0)-1; i++) {
         gameObjects.append(new Pole(QSizeF(0.9f, 0.01f),
+                                    ResourceManager::GetShader("race"),
                                     ResourceManager::GetTexture("corda"),
                                     QVector3D(0.0f, 1.93f+0.02f, (i+1)*0.1f),
                                     QQuaternion(),
@@ -382,12 +398,14 @@ RaceWidget::createNet() {
     }
     for(int i=0; i<int(zField*10.0)-1; i++) {
         gameObjects.append(new Pole(QSizeF(0.9f, 0.01f),
+                                    ResourceManager::GetShader("race"),
                                     ResourceManager::GetTexture("corda"),
                                     QVector3D(0.0f, 1.93f+0.02f, -(i+1)*0.1f),
                                     QQuaternion(),
                                     QVector3D(1.0f, 1.0f, 1.0f)));
     }
     gameObjects.append(new Pole(QSizeF(0.9f, 0.01f),
+                                ResourceManager::GetShader("race"),
                                 ResourceManager::GetTexture("corda"),
                                 QVector3D(0.0f, 1.93f+0.02f, 0.0f),
                                 QQuaternion(),
@@ -504,54 +522,6 @@ RaceWidget::createTextModel() {
 }
 
 
-//void
-//RaceWidget::initChars() {
-//    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
-//    QOpenGLTexture* pTexture;
-//    QImage* pGlyph;
-//    for(uchar c=0; c<128; c++) {
-//        // load character glyph
-//        if(FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-//            qCritical() << "ERROR::FREETYTPE: Failed to load Glyph";
-//            continue;
-//        }
-//        // generate texture
-//        if(face->glyph->bitmap.width*face->glyph->bitmap.rows != 0) {
-//            pGlyph = new QImage(face->glyph->bitmap.buffer,
-//                                face->glyph->bitmap.width,
-//                                face->glyph->bitmap.rows,
-//                                face->glyph->bitmap.width,
-//                                QImage::Format_Mono);
-//        }
-//        else {
-//            pGlyph = new QImage(1, 1, QImage::Format_Mono);
-//            pGlyph->fill(0);
-//        }
-//        pTexture = new QOpenGLTexture(*pGlyph);
-//        pTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-//        pTexture->setMinificationFilter(QOpenGLTexture::Linear);
-//        pTexture->setWrapMode(QOpenGLTexture::ClampToEdge);
-//        // now store character for later use
-//        Character character = {
-//            pTexture,
-//            QVector2D(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-//            QVector2D(face->glyph->bitmap_left,  face->glyph->bitmap_top),
-//            static_cast<uint>(face->glyph->advance.x)
-//        };
-//        Characters.insert(c, character);
-//    }
-//    pTexture->release();
-
-//    FT_Done_Face(face);
-//    FT_Done_FreeType(ft);
-
-//    charBuf.create();
-//    charBuf.bind();
-//    charBuf.allocate(0, sizeof(float)*6*4);
-//    charBuf.release();
-//}
-
-
 void
 RaceWidget::initGameObjects() {
     QQuaternion q = QQuaternion();
@@ -561,31 +531,32 @@ RaceWidget::initGameObjects() {
     createFloor();
     // Pali
     gameObjects.append(new Pole(QSizeF(2.43f, 0.2f),
+                                ResourceManager::GetShader("race"),
                                 ResourceManager::GetTexture("line"),
                                 QVector3D(0.0f, 2.43f*0.5f+0.02f,  zField+0.5f)));
     gameObjects.append(new Pole(QSizeF(2.43f, 0.2f),
+                                ResourceManager::GetShader("race"),
                                 ResourceManager::GetTexture("line"),
                                 QVector3D(0.0f, 2.43f*0.5f+0.02f, -zField-0.5f)));
     createNet();
 
     // Now the Team Avatars...
     pTeam0       = new Avatar(ballRadius,
+                        ResourceManager::GetShader("race"),
                         ResourceManager::GetTexture("team0"),
                         QVector3D(-xField, ballRadius, z0Start));
     gameObjects.append(pTeam0);
     pTeam1       = new Avatar(ballRadius,
+                        ResourceManager::GetShader("race"),
                         ResourceManager::GetTexture("team1"),
                         QVector3D(-xField, ballRadius, z1Start));
     gameObjects.append(pTeam1);
 
     // ...and then the Particles
-    pParticles = new ParticleGenerator(ResourceManager::GetTexture("particle"), 500);
+    pParticles = new ParticleGenerator(ResourceManager::GetShader("race"),
+                                       ResourceManager::GetTexture("particle"),
+                                       500);
 
-//    pText = new Text3D(QString("8"),
-//                       ResourceManager::GetTexture("floor"),
-//                       QSizeF(1.0f, 1.0f),
-//                       QVector3D(-3.0, 1.5f, 0.0));
-//    gameObjects.append(pText);
 }
 
 
@@ -662,7 +633,6 @@ void
 RaceWidget::initializeGL() {
     initializeOpenGLFunctions();
 
-//    initChars();
     initShaders();
     initTextures();
     initShadowBuffer();
@@ -765,17 +735,6 @@ RaceWidget::paintGL() {
     renderScene(pGameProgram);
 #endif
 
-//    pTextProgram = ResourceManager::GetShader("text");
-//    renderText(pTextProgram,
-//               "This is sample text",
-//               QVector3D(25.0f, 25.0f, 10.0f),
-//               1.0f,
-//               QVector3D(0.5f, 0.8f, 0.2f));
-//    renderText(pTextProgram,
-//               "(C) LearnOpenGL.com",
-//               QVector3D(540.0f, 570.0f, 10.0),
-//               0.5f,
-//               QVector3D(0.3f, 0.7f, 0.9f));
 
 #ifdef SHOW_DEPTH
 // render Depth map to quad for visual debugging
@@ -791,53 +750,19 @@ RaceWidget::paintGL() {
 }
 
 
-//void
-//RaceWidget::renderText(QOpenGLShaderProgram* pProgram, QString sText,
-//                       QVector3D position, float scale, QVector3D color)
-//{
-//    glEnable(GL_BLEND);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    pProgram->bind();
-//    pProgram->setUniformValue("projection", textProjectionMatrix);
-//    pProgram->setUniformValue("textColor", color);
-//    glActiveTexture(GL_TEXTURE0);
-
-//    float x = position.x();
-//    float y = position.y();
-
-//    for(int i=0; i< sText.count(); i++) {//  iterate through all characters
-//        Character ch = Characters[sText.at(i).toLatin1()];
-//        float xpos = x + ch.Bearing.x() * scale;
-//        float ypos = y - (ch.Size.y() - ch.Bearing.y()) * scale;
-//        float w = ch.Size.x() * scale;
-//        float h = ch.Size.y() * scale;
-//        // update VBO for each character
-//        float vertices[6][4] = {
-//            { xpos,     ypos + h, 0.0f, 0.0f },
-//            { xpos,     ypos,     0.0f, 1.0f },
-//            { xpos + w, ypos,     1.0f, 1.0f },
-
-//            { xpos,     ypos + h, 0.0f, 0.0f },
-//            { xpos + w, ypos,     1.0f, 1.0f },
-//            { xpos + w, ypos + h, 1.0f, 0.0f }
-//        };
-//        // render glyph texture over quad
-//        ch.pTexture->bind();
-//        charBuf.bind();
-//        charBuf.write(0, vertices, sizeof(vertices));
-//        pProgram->enableAttributeArray("vertex");
-//        pProgram->setAttributeBuffer("vertex", GL_FLOAT, 0, 4, 4*sizeof(float));
-//        // render quad
-//        glDrawArrays(GL_TRIANGLES, 0, 6);
-//        // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-//        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
-//        charBuf.release();
-//    }
-//}
+void
+RaceWidget::renderScene() {
+    glActiveTexture(GL_TEXTURE0);
+    for(int i=0; i<gameObjects.count(); i++) {
+        gameObjects.at(i)->draw();
+    }
+    if(bFiring)
+        pParticles->draw();
+}
 
 
 void
-RaceWidget::renderScene(QOpenGLShaderProgram* pProgram) {
+RaceWidget::renderScene(QOpenGLShaderProgram *pProgram) {
     glActiveTexture(GL_TEXTURE0);
     for(int i=0; i<gameObjects.count(); i++) {
         gameObjects.at(i)->draw(pProgram);

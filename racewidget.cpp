@@ -463,8 +463,8 @@ RaceWidget::initShaders() {
                                 ":/Shaders/fParticle.glsl",
                                 QString(),
                                 "particle");
-    ResourceManager::LoadShader(":/Shaders/vGlyphs.glsl",
-                                ":/Shaders/fGlyphs.glsl",
+    ResourceManager::LoadShader(":/Shaders/vText.glsl",
+                                ":/Shaders/fText.glsl",
                                 QString(),
                                 "text");
 #ifdef SHOW_DEPTH
@@ -609,8 +609,22 @@ RaceWidget::paintGL() {
     pGameProgram->setUniformValue("diffuseTexture",    0);
     pGameProgram->setUniformValue("shadowMap",         1);
 
+
+    pTextProgram = ResourceManager::GetShader("text");
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+
+    pTextProgram->bind();
+    pTextProgram->setUniformValue("view",              cameraProjectionMatrix);
+    pTextProgram->setUniformValue("camera",            cameraViewMatrix);
+    pTextProgram->setUniformValue("viewPos",           cameraPosition);
+    pTextProgram->setUniformValue("lightPos",          lightPosition);
+    pTextProgram->setUniformValue("lightColor",        light);
+    pTextProgram->setUniformValue("lightSpaceMatrix",  lightSpaceMatrix);
+    pTextProgram->setUniformValue("shadowMap",         1);
+
 #ifndef SHOW_DEPTH
-    renderScene(pGameProgram);
+    renderScene();
 #endif
 
 

@@ -40,5 +40,7 @@
         <file>Shaders/vParticle.glsl</file>
         <file>Shaders/fGlyphs.glsl</file>
         <file>Shaders/vGlyphs.glsl</file>
+        <file>Shaders/vText.glsl</file>
+        <file>Shaders/fText.glsl</file>
     </qresource>
 </RCC>

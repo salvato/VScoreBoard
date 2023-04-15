@@ -46,6 +46,10 @@ TextObject::draw() {
 void
 TextObject::draw(QOpenGLShaderProgram* pOtherProgram) {
     pOtherProgram->bind();
+    pOtherProgram->setUniformValue("fragmentColor",
+                                   static_cast<GLfloat>(color.red())   / 256.0f,
+                                   static_cast<GLfloat>(color.green()) / 256.0f,
+                                   static_cast<GLfloat>(color.blue())  / 256.0f);
     pOtherProgram->setUniformValue("model", modelMatrix());
 
     vertexTextBuf.bind();

@@ -103,7 +103,7 @@ ParticleGenerator::draw(QOpenGLShaderProgram *pOtherProgram) {
     pOtherProgram->bind();
     for(int i=0; i< particles.count(); i++) {
         if(particles.at(i)->life > 0.0f) {
-            particles.at(i)->draw();
+            particles.at(i)->draw(pOtherProgram);
         }
     }
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

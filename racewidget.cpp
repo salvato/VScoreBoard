@@ -24,14 +24,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "avatar.h"
 #include "particlegenerator.h"
 #include "resourcemanager.h"
-#include "model_creator.h"
 
 
 #include <QSurfaceFormat>
 #include <QScreen>
 #include <QIcon>
 #include <QTime>
-#include <QPainter>
 
 
 //#define SHOW_DEPTH
@@ -413,115 +411,6 @@ RaceWidget::createNet() {
 }
 
 
-float*
-RaceWidget::generateVertexBuffer(const Model3D& model) {
-    const unsigned int triangleCount = model.GetTriangleCount();
-    float* pointCoord = new float[3 * 3 * triangleCount];
-
-    if(pointCoord != nullptr) {
-        const unsigned int* indexes = model.GetIndexes();
-        const float* pointCoordSrc = model.GetPoints();
-        float* coord = pointCoord;
-        for(uint triangle=0; triangle<triangleCount; ++triangle) {
-            for(uint vertex=0; vertex<3; ++vertex, ++indexes) {
-                const float* coordSrc = (pointCoordSrc + (3 * (*indexes)));
-                (*(coord++)) = (*(coordSrc++));
-                (*(coord++)) = (*(coordSrc++));
-                (*(coord++)) = (*(coordSrc++));
-            }
-        }
-    }
-    return pointCoord;
-}
-
-
-void
-RaceWidget::generateNormalsBuffer(const Model3D& model, float* coords) {
-    const unsigned int triangleCount = model.GetTriangleCount();
-    const unsigned int* indexes = model.GetIndexes();
-    const float* points = model.GetPoints();
-    for(uint triangle=0; triangle<triangleCount; ++triangle, indexes += 3) {
-        const float* pointCoord1 = (points + (3 * indexes[0]));
-        const float* pointCoord2 = (points + (3 * indexes[1]));
-        const float* pointCoord3 = (points + (3 * indexes[2]));
-        QVector3D
-            normal(QVector3D::crossProduct(QVector3D((pointCoord2[0] - pointCoord1[0]),
-                                                     (pointCoord2[1] - pointCoord1[1]),
-                                                     (pointCoord2[2] - pointCoord1[2])),
-                                           QVector3D((pointCoord3[0] - pointCoord1[0]),
-                                                     (pointCoord3[1] - pointCoord1[1]),
-                                                     (pointCoord3[2] - pointCoord1[2]))
-                                           ).normalized());
-        (*(coords++)) = normal[0];
-        (*(coords++)) = normal[1];
-        (*(coords++)) = normal[2];
-        (*(coords++)) = normal[0];
-        (*(coords++)) = normal[1];
-        (*(coords++)) = normal[2];
-        (*(coords++)) = normal[0];
-        (*(coords++)) = normal[1];
-        (*(coords++)) = normal[2];
-    }
-}
-
-
-void
-RaceWidget::create2DImage(const QString& sText, const QFont& font, ushort height)
-{
-    qreal coeff = (static_cast<qreal>(QFontMetrics(font).height()) / static_cast<qreal>(height));
-    qreal newFontPointSize = (font.pointSizeF() / coeff);
-
-    QFont fontScaled(font);
-    fontScaled.setPointSizeF(newFontPointSize);
-
-    int width = (3 + QFontMetrics(fontScaled).boundingRect(sText).width());
-
-    if(pTextImage) delete pTextImage;
-    pTextImage = new QImage(width, height, QImage::Format_Mono);
-    pTextImage->fill((uint)1);
-    {
-        QPainter painter(pTextImage);
-        painter.setFont(fontScaled);
-        painter.setPen(QColor(Qt::black));
-
-        const QRect rectDraw(QPoint(0, 0), QSize(width, height));
-        painter.drawText(rectDraw, (Qt::AlignLeft | Qt::AlignTop), sText);
-    }
-}
-
-
-void
-RaceWidget::createTextModel() {
-    vertexTextBuf.destroy();
-    normalTextBuf.destroy();
-    vertexTextBuf.create();
-    normalTextBuf.create();
-
-    textModel.Recalc();
-
-    float* coords = generateVertexBuffer(textModel);
-    if(coords != nullptr) {
-        if(vertexTextBuf.isCreated() && normalTextBuf.isCreated()) {
-            vertexTextBuf.bind();
-            vertexTextBuf.allocate(coords, 3*3*textModel.GetTriangleCount()*sizeof(float));
-            vertexTextBuf.release();
-
-            generateNormalsBuffer(textModel, coords);
-            normalTextBuf.bind();
-            normalTextBuf.allocate(coords, 3*3*textModel.GetTriangleCount()*sizeof(float));
-            normalTextBuf.release();
-        }
-        else {
-            vertexTextBuf.destroy();
-            normalTextBuf.destroy();
-            vertexTextBuf.create();
-            normalTextBuf.create();
-        }
-        delete[] coords;
-    }
-}
-
-
 void
 RaceWidget::initGameObjects() {
     QQuaternion q = QQuaternion();
@@ -637,17 +526,6 @@ RaceWidget::initializeGL() {
     initTextures();
     initShadowBuffer();
     initGameObjects();
-
-    ushort dimension = 48;
-    float depth = 0.2f;
-    QString sText = "SSD UniMe";
-    create2DImage(sText, font(), dimension);
-    QPixmap pixmap;
-    pixmap.convertFromImage(*pTextImage, Qt::MonoOnly);
-    pixmap.setMask(pixmap.createMaskFromColor(QColor(Qt::white), Qt::MaskInColor));
-    ModelCreator creator(*pTextImage, depth);
-    textModel.Swap(creator.Create3DModel());
-    createTextModel();
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_CULL_FACE);

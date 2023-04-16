@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLTexture>
@@ -40,6 +41,7 @@ QT_FORWARD_DECLARE_CLASS(WhiteLine)
 QT_FORWARD_DECLARE_CLASS(Avatar)
 QT_FORWARD_DECLARE_CLASS(Pole)
 QT_FORWARD_DECLARE_CLASS(Floor)
+QT_FORWARD_DECLARE_CLASS(TextObject)
 QT_FORWARD_DECLARE_CLASS(ParticleGenerator)
 
 
@@ -125,6 +127,8 @@ private:
     QVector<Object*> gameObjects;
     Avatar* pTeam0;
     Avatar* pTeam1;
+    TextObject* pTeam0Text;
+    TextObject* pTeam1Text;
 
     const float z0Start = -2.0;
     const float z1Start =  2.0;

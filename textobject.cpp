@@ -8,21 +8,35 @@
 #include <QOpenglTexture>
 
 
-TextObject::TextObject()
-    : sText(QString())
-    , height(48)
-    , depth(0.2f)
+TextObject::TextObject(QSizeF                _size,
+                       QOpenGLShaderProgram* _pProgram,
+                       QOpenGLTexture*       _pTexture,
+                       QVector3D             _position,
+                       QQuaternion           _rotation,
+                       QVector3D             _scale,
+                       QVector3D             _speed)
+    : Object(_pProgram,
+             _pTexture,
+             _position,
+             _rotation,
+             _scale,
+             _speed)
+    , sText(QString())
+    , height(96)
+    , depth(0.1f)
+    , size(_size)
 {
+    initializeOpenGLFunctions();
     QString sFontName = QString("Arial");
-    font = QFont(sFontName, height, QFont::Black);
+    font = QFont(sFontName, height, QFont::Light);
 }
 
 
 void
 TextObject::setText(QString _sText,
-                    QColor _color,
-                    ushort _height,
-                    float _depth) {
+                    QColor  _color,
+                    ushort  _height,
+                    float   _depth) {
     sText  = _sText;
     color  = _color;
     height = _height;
@@ -45,22 +59,26 @@ TextObject::draw() {
 
 void
 TextObject::draw(QOpenGLShaderProgram* pOtherProgram) {
-    pOtherProgram->bind();
-    pOtherProgram->setUniformValue("fragmentColor",
-                                   static_cast<GLfloat>(color.red())   / 256.0f,
-                                   static_cast<GLfloat>(color.green()) / 256.0f,
-                                   static_cast<GLfloat>(color.blue())  / 256.0f);
-    pOtherProgram->setUniformValue("model", modelMatrix());
+    if(textModel.GetTriangleCount()) {
+        glDisable(GL_CULL_FACE);
+        pOtherProgram->bind();
+        pOtherProgram->setUniformValue("fragmentColor",
+                                       static_cast<GLfloat>(color.red())   / 256.0f,
+                                       static_cast<GLfloat>(color.green()) / 256.0f,
+                                       static_cast<GLfloat>(color.blue())  / 256.0f);
+        pOtherProgram->setUniformValue("model", modelMatrix());
 
-    vertexTextBuf.bind();
-    pOtherProgram->enableAttributeArray("vPosition");
-    pOtherProgram->setAttributeBuffer("vPosition", GL_FLOAT, 0, 3, 3*sizeof(float));
+        vertexTextBuf.bind();
+        pOtherProgram->enableAttributeArray("vPosition");
+        pOtherProgram->setAttributeBuffer("vPosition", GL_FLOAT, 0, 3, 3*sizeof(float));
 
-    normalTextBuf.bind();
-    pOtherProgram->enableAttributeArray("vNormal");
-    pOtherProgram->setAttributeBuffer("vNormal", GL_FLOAT, 0, 3, 3*sizeof(float));
+        normalTextBuf.bind();
+        pOtherProgram->enableAttributeArray("vNormal");
+        pOtherProgram->setAttributeBuffer("vNormal", GL_FLOAT, 0, 3, 3*sizeof(float));
 
-    glDrawArrays(GL_TRIANGLES, 0, 3*textModel.GetTriangleCount());
+        glDrawArrays(GL_TRIANGLES, 0, 3*textModel.GetTriangleCount());
+        glEnable(GL_CULL_FACE);
+    }
 }
 
 
@@ -170,3 +188,8 @@ TextObject::createTextModel() {
     }
 }
 
+
+void
+TextObject::updateStatus(float deltaTime) {
+    position += speed*deltaTime;
+}

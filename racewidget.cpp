@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whiteline.h"
 #include "pole.h"
 #include "avatar.h"
+#include "textobject.h"
 #include "particlegenerator.h"
 #include "resourcemanager.h"
 
@@ -441,11 +442,29 @@ RaceWidget::initGameObjects() {
                         QVector3D(-xField, ballRadius, z1Start));
     gameObjects.append(pTeam1);
 
+    q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), -90.0f);
+    pTeam0Text = new TextObject(QSizeF(1.0f, 1.0f),
+                                ResourceManager::GetShader("text"),
+                                nullptr,
+                                QVector3D(-xField+2.0f*ballRadius, ballRadius, z0Start+0.5f),
+                                q);
+    QString sText = sTeamName[0] + QString(" 0");
+    pTeam0Text->setText(sText, QColor(32, 32, 255), 96, 0.05f);
+    gameObjects.append(pTeam0Text);
+
+    pTeam1Text = new TextObject(QSizeF(1.0f, 1.0f),
+                                ResourceManager::GetShader("text"),
+                                nullptr,
+                                QVector3D(-xField+2.0f*ballRadius, ballRadius, z1Start+0.5f),
+                                q);
+    sText = sTeamName[1] + QString(" 0");
+    pTeam1Text->setText(sText, QColor(255, 32, 32), 96, 0.05f);
+    gameObjects.append(pTeam1Text);
+
     // ...and then the Particles
     pParticles = new ParticleGenerator(ResourceManager::GetShader("race"),
                                        ResourceManager::GetTexture("particle"),
                                        500);
-
 }
 
 
@@ -556,12 +575,16 @@ RaceWidget::startRace(int iSet) {
     indexScore = 0;
     if(score[iCurrentSet].at(indexScore+1).x() > score[iCurrentSet].at(indexScore).x()) {
         pTeam0->setSpeed(QVector3D(speed, 0.0f, 0.0f));
+        pTeam0Text->setSpeed(QVector3D(speed, 0.0f, 0.0f));
         pTeam1->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
+        pTeam1Text->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
         teamMoving = 0;
     }
     else {
         pTeam0->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
+        pTeam0Text->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
         pTeam1->setSpeed(QVector3D(speed, 0.0f, 0.0f));
+        pTeam1Text->setSpeed(QVector3D(speed, 0.0f, 0.0f));
         teamMoving = 1;
     }
     xTarget = (2.0*xField)/float(maxScore[iCurrentSet]) - xField;
@@ -746,7 +769,9 @@ RaceWidget::timerEvent(QTimerEvent*) {
             if(indexScore > score[iCurrentSet].count()-2) {
                 origin = teamMoving ? pTeam1->getPos() : pTeam0->getPos();
                 pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
+                pTeam0Text->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
                 pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
+                pTeam1Text->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
                 pParticles->init(origin);
                 bRacing = false;
                 bFiring = true;
@@ -760,15 +785,23 @@ RaceWidget::timerEvent(QTimerEvent*) {
                score[iCurrentSet].at(indexScore).x()) {
                 teamMoving = 0;
                 pTeam0->setSpeed(QVector3D(speed, 0.0f, 0.0f));
+                pTeam0Text->setSpeed(QVector3D(speed, 0.0f, 0.0f));
                 pTeam1->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
+                pTeam1Text->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
                 xTarget = score[iCurrentSet].at(indexScore+1).x()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;
             }
             else {
                 teamMoving = 1;
                 pTeam0->setSpeed(QVector3D(0.0f,  0.0f, 0.0f));
+                pTeam0Text->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
                 pTeam1->setSpeed(QVector3D(speed, 0.0f, 0.0f));
+                pTeam1Text->setSpeed(QVector3D(speed, 0.0f, 0.0f));
                 xTarget = score[iCurrentSet].at(indexScore+1).y()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;
             }
+            pTeam0Text->setText(sTeamName[0]+ QString(" %1").arg(score[iCurrentSet].at(indexScore+1).x()),
+                                QColor(32, 32, 255), 96, 0.05f);
+            pTeam1Text->setText(sTeamName[1]+ QString(" %1").arg(score[iCurrentSet].at(indexScore+1).y()),
+                                QColor(255, 32, 32), 96, 0.05f);
             emit newScore(score[iCurrentSet].at(indexScore+1).x(),
                           score[iCurrentSet].at(indexScore+1).y());
         }

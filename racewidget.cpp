@@ -442,23 +442,23 @@ RaceWidget::initGameObjects() {
                         QVector3D(-xField, ballRadius, z1Start));
     gameObjects.append(pTeam1);
 
-    q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), -90.0f);
+    q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), -75.0f);
     pTeam0Text = new TextObject(QSizeF(1.0f, 1.0f),
                                 ResourceManager::GetShader("text"),
                                 nullptr,
                                 QVector3D(-xField+2.0f*ballRadius, ballRadius, z0Start+0.5f),
                                 q);
     QString sText = sTeamName[0] + QString(" 0");
-    pTeam0Text->setText(sText, QColor(32, 32, 255), 96, 0.05f);
+    pTeam0Text->setText(sText, team0Color, fontSize, fontDepth);
     gameObjects.append(pTeam0Text);
 
-    pTeam1Text = new TextObject(QSizeF(1.0f, 1.0f),
+    pTeam1Text = new TextObject(QSizeF(0.5f, 0.5f),
                                 ResourceManager::GetShader("text"),
                                 nullptr,
                                 QVector3D(-xField+2.0f*ballRadius, ballRadius, z1Start+0.5f),
                                 q);
     sText = sTeamName[1] + QString(" 0");
-    pTeam1Text->setText(sText, QColor(255, 32, 32), 96, 0.05f);
+    pTeam1Text->setText(sText, team1Color, fontSize, fontDepth);
     gameObjects.append(pTeam1Text);
 
     // ...and then the Particles
@@ -799,11 +799,16 @@ RaceWidget::timerEvent(QTimerEvent*) {
                 xTarget = score[iCurrentSet].at(indexScore+1).y()*(2.0*xField)/float(maxScore[iCurrentSet])-xField;
             }
             pTeam0Text->setText(sTeamName[0]+ QString(" %1").arg(score[iCurrentSet].at(indexScore+1).x()),
-                                QColor(32, 32, 255), 96, 0.05f);
+                                team0Color, fontSize, fontDepth);
             pTeam1Text->setText(sTeamName[1]+ QString(" %1").arg(score[iCurrentSet].at(indexScore+1).y()),
-                                QColor(255, 32, 32), 96, 0.05f);
+                                team1Color, fontSize, fontDepth);
             emit newScore(score[iCurrentSet].at(indexScore+1).x(),
                           score[iCurrentSet].at(indexScore+1).y());
+//            float x, y, z;
+//            pTeam0Text->GetMin(x, y, z);
+//            qCritical() << x << y << z;
+//            pTeam0Text->GetMax(x, y, z);
+//            qCritical() << x << y << z;
         }
         cameraPosition += cameraSpeed*dt;
         cameraCenter.setX(cameraPosition.x());

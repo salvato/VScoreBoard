@@ -31,6 +31,10 @@ public:
     void draw() override;
     void draw(QOpenGLShaderProgram* pOtherProgram) override;
     void updateStatus(float deltaTime) override;
+    bool GetRadius(float& radius) const;
+    bool GetCenter(float& x, float& y, float& z) const;
+    bool GetMin(float& x, float& y, float& z) const;
+    bool GetMax(float& x, float& y, float& z) const;
 
 protected:
     void createTextModel();

@@ -51,6 +51,30 @@ TextObject::setText(QString _sText,
 }
 
 
+bool
+TextObject::GetRadius(float& radius) const {
+    return textModel.GetRadius(radius);
+}
+
+
+bool
+TextObject::GetCenter(float& x, float& y, float& z) const {
+    return textModel.GetCenter(x, y, z);
+}
+
+
+bool
+TextObject::GetMin(float& x, float& y, float& z) const {
+    return textModel.GetMin(x, y, z);
+}
+
+
+bool
+TextObject::GetMax(float& x, float& y, float& z) const {
+    return textModel.GetMax(x, y, z);
+}
+
+
 void
 TextObject::draw() {
     draw(pProgram);

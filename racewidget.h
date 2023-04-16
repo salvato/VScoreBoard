@@ -176,5 +176,9 @@ private:
     qreal zFar;
     qreal fov;
     qreal aspect;
+    int fontSize      = 48;
+    float fontDepth   = 0.05f;
+    QColor team0Color = QColor(96, 96, 255);
+    QColor team1Color = QColor(255, 96, 96);
 };
 

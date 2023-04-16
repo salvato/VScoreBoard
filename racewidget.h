@@ -129,6 +129,8 @@ private:
     Avatar* pTeam1;
     TextObject* pTeam0Text;
     TextObject* pTeam1Text;
+    TextObject* pScore0Text;
+    TextObject* pScore1Text;
 
     const float z0Start = -2.0;
     const float z1Start =  2.0;

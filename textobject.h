@@ -15,8 +15,7 @@
 class TextObject : public Object, protected QOpenGLFunctions_4_4_Core
 {
 public:
-    TextObject(QSizeF                _size,
-               QOpenGLShaderProgram* _pProgram = nullptr,
+    TextObject(QOpenGLShaderProgram* _pProgram = nullptr,
                QOpenGLTexture*       _pTexture = nullptr,
                QVector3D             _position = QVector3D(0.0f, 0.0f, 0.0f),
                QQuaternion           _rotation = QQuaternion(),
@@ -24,17 +23,17 @@ public:
                QVector3D             _speed    = QVector3D(0.0f, 0.0f, 0.0f));
 
 public:
-    void setText(QString _sText,
-                 QColor _color=QColor(1.0f, 1.0f, 1.0f, 1.0f),
-                 ushort _height=48,
-                 float _depth=0.2f);
-    void draw() override;
-    void draw(QOpenGLShaderProgram* pOtherProgram) override;
-    void updateStatus(float deltaTime) override;
+    void setText(QString _sText);
+    void setColor(QColor _color=QColor(1.0f, 1.0f, 1.0f, 1.0f));
+    void setHeight(ushort _height=48);
+    void setDepth(float _depth=0.2f);
     bool GetRadius(float& radius) const;
     bool GetCenter(float& x, float& y, float& z) const;
     bool GetMin(float& x, float& y, float& z) const;
     bool GetMax(float& x, float& y, float& z) const;
+    void updateStatus(float deltaTime) override;
+    void draw() override;
+    void draw(QOpenGLShaderProgram* pOtherProgram) override;
 
 protected:
     void createTextModel();
@@ -53,5 +52,4 @@ private:
     ushort height;
     float depth;
     QFont font;
-    QSizeF size;
 };

@@ -8,8 +8,7 @@
 #include <QOpenglTexture>
 
 
-TextObject::TextObject(QSizeF                _size,
-                       QOpenGLShaderProgram* _pProgram,
+TextObject::TextObject(QOpenGLShaderProgram* _pProgram,
                        QOpenGLTexture*       _pTexture,
                        QVector3D             _position,
                        QQuaternion           _rotation,
@@ -22,9 +21,10 @@ TextObject::TextObject(QSizeF                _size,
              _scale,
              _speed)
     , sText(QString())
+    , color(QColor(255, 255, 255, 255))
     , height(96)
-    , depth(0.1f)
-    , size(_size)
+    , depth(0.05f)
+
 {
     initializeOpenGLFunctions();
     QString sFontName = QString("Arial");
@@ -33,13 +33,40 @@ TextObject::TextObject(QSizeF                _size,
 
 
 void
-TextObject::setText(QString _sText,
-                    QColor  _color,
-                    ushort  _height,
-                    float   _depth) {
+TextObject::setText(QString _sText) {
     sText  = _sText;
+    create2DImage(sText, font, height);
+    QPixmap pixmap;
+    pixmap.convertFromImage(*pTextImage, Qt::MonoOnly);
+    pixmap.setMask(pixmap.createMaskFromColor(QColor(Qt::white), Qt::MaskInColor));
+    ModelCreator creator(*pTextImage, depth);
+    textModel.Swap(creator.Create3DModel());
+    createTextModel();
+
+}
+
+
+void
+TextObject::setColor(QColor _color) {
     color  = _color;
+}
+
+
+void
+TextObject::setHeight(ushort _height) {
     height = _height;
+    create2DImage(sText, font, height);
+    QPixmap pixmap;
+    pixmap.convertFromImage(*pTextImage, Qt::MonoOnly);
+    pixmap.setMask(pixmap.createMaskFromColor(QColor(Qt::white), Qt::MaskInColor));
+    ModelCreator creator(*pTextImage, depth);
+    textModel.Swap(creator.Create3DModel());
+    createTextModel();
+}
+
+
+void
+TextObject::setDepth(float _depth) {
     depth  = _depth;
     create2DImage(sText, font, height);
     QPixmap pixmap;

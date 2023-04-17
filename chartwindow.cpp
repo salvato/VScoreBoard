@@ -175,11 +175,11 @@ ChartWindow::resetAll() {
 }
 
 
-void
+bool
 ChartWindow::startChartAnimation(int iSet) {
     if(score[iSet].isEmpty()) {
         closeTimer.start(500);
-        return;
+        return false;
     }
     iCurrentSet = iSet;
     indexScore = 0;
@@ -225,6 +225,7 @@ ChartWindow::startChartAnimation(int iSet) {
     pScoreSequence->append(0,0);
     pScoreSequence->setName(sTeamName[1]);
     animateTimer.start(1000);
+    return true;
 }
 
 

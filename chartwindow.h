@@ -40,7 +40,7 @@ public:
     void updateLabel(int iTeam, QString sLabel);
     void resetScore(int iSet);
     void resetAll();
-    void startChartAnimation(int iSet);
+    bool startChartAnimation(int iSet);
     void hide();
 
 public slots:

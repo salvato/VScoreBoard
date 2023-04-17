@@ -942,44 +942,42 @@ VolleyController::onButtonNewGameClicked() {
 void
 VolleyController::onButtonStatisticsClicked() {
     QPixmap* pPixmap = new QPixmap();
+    pPixmap->load(":/buttonIcons/plot.png");
     QSize iconSize = QSize(48,48);
     if(pRaceWidget->isVisible()) {
         pRaceWidget->hide();
-        pPixmap->load(":/buttonIcons/plot.png");
     }
     else if(pCharts->isVisible()) {
         pCharts->hide();
-        pPixmap->load(":/buttonIcons/plot.png");
     }
     else {
         if(setSelectionDialog.exec() == QDialog::Accepted) {
 /* TODO: Parte da rimuovere... serve solo per debug. */
-//            int iScore0 = 0;
-//            int iScore1 = 0;
-//            bool bEnd   = false;
-//            while(!bEnd) {
-//                if(rand() & 1) iScore0++;
-//                else iScore1++;
-//                pCharts->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
-//                pRaceWidget->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
-//                bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
-//                       std::abs(iScore0-iScore1) > 1;
-//            }
-/* Fine parte da rimuovere */
-            if(setSelectionDialog.isPlotSelected())
-                pCharts->showFullScreen();
-            else
-                pRaceWidget->showFullScreen();
-            if(pRaceWidget->isVisible()) {
-                pPixmap->load(":/buttonIcons/sign_stop.png");
-                pRaceWidget->fadeIn(setSelectionDialog.iSelectedSet);
+/**/
+            int iScore0 = 0;
+            int iScore1 = 0;
+            bool bEnd   = false;
+            while(!bEnd) {
+                if(rand() & 1) iScore0++;
+                else iScore1++;
+                pCharts->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
+                pRaceWidget->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
+                bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
+                       std::abs(iScore0-iScore1) > 1;
             }
-            else if(pCharts->isVisible()) {
-                pPixmap->load(":/buttonIcons/sign_stop.png");
-                pCharts->startChartAnimation(setSelectionDialog.iSelectedSet);
+/**/
+/* Fine parte da rimuovere */
+            if(setSelectionDialog.isPlotSelected()) {
+                pCharts->showFullScreen();
+                if(pCharts->startChartAnimation(setSelectionDialog.iSelectedSet)) {
+                    pPixmap->load(":/buttonIcons/sign_stop.png");
+                }
             }
             else {
-                pPixmap->load(":/buttonIcons/plot.png");
+                pRaceWidget->showFullScreen();
+                if(pRaceWidget->fadeIn(setSelectionDialog.iSelectedSet)) {
+                    pPixmap->load(":/buttonIcons/sign_stop.png");
+                }
             }
         }
         else {

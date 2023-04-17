@@ -58,7 +58,7 @@ public:
     void updateLabel(int iTeam, QString sLabel);
     void resetScore(int iSet);
     void resetAll();
-    void fadeIn(int iSet);
+    bool fadeIn(int iSet);
 
 public slots:
     void closeEvent(QCloseEvent*) override;

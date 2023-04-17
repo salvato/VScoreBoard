@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "resourcemanager.h"
 
 
+#include <QApplication>
 #include <QSurfaceFormat>
 #include <QScreen>
 #include <QIcon>
@@ -54,6 +55,16 @@ RaceWidget::RaceWidget()
     , zFar(30.0f)
     , fov(50.0f)
 {
+    QList<QScreen*> screens = QApplication::screens();
+    QPoint point = QPoint(screens.at(0)->geometry().x(),
+                          screens.at(0)->geometry().y());
+    if(screens.count() > 1) {
+        point = QPoint(screens.at(1)->geometry().x(),
+                       screens.at(1)->geometry().y());
+    }
+    // Move the Panel on the Secondary Display (if connected)
+    move(point);
+
     setWindowIcon(QIcon(":/buttonIcons/plot.png"));
 
     sTeamName[0] = "Locali";
@@ -582,17 +593,21 @@ RaceWidget::initializeGL() {
 }
 
 
-void
-RaceWidget::fadeIn(int iSet) {
+bool RaceWidget::fadeIn(int iSet) {
     if(maxScore[iSet] == 0) {
         emit raceDone();
-        return;
+        return false;
     }
     light = QVector3D(0.0f, 0.0f, 0.0f);
     iCurrentSet = iSet;
     bFadeIn     = true;
+    bRacing     = false;
+    bFiring     = false;
+    bClosing    = false;
     pTeam0->setPos(QVector3D(-xField, ballRadius, z0Start));
     pTeam1->setPos(QVector3D(-xField, ballRadius, z1Start));
+    pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
+    pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
 
     float x, y, z;
     float x0, y0, z0;
@@ -605,6 +620,7 @@ RaceWidget::fadeIn(int iSet) {
     pScore0Text->GetMax(x0, y0, z0);
     pScore0Text->GetMin(x, y, z);
     pScore0Text->setPos(QVector3D(-xField-(x0-x)-ballRadius, ballRadius, z0Start+y0-y+2.0*ballRadius));
+    pScore0Text->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
 
     pTeam1Text->GetMax(x0, y0, z0);
     pTeam1Text->GetMin(x, y, z);
@@ -614,16 +630,26 @@ RaceWidget::fadeIn(int iSet) {
     pScore1Text->GetMax(x0, y0, z0);
     pScore1Text->GetMin(x, y, z);
     pScore1Text->setPos(QVector3D(-xField-(x0-x)-ballRadius, ballRadius, z1Start+y0-y+2.0*ballRadius));
+    pScore1Text->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
 
     pSetText->setText(QString("Set %1").arg(iCurrentSet+1));
     pSetText->GetMax(x0, y0, z0);
     pSetText->GetMin(x, y, z);
     pSetText->setPos(QVector3D(-0.5*(x0-x), 0.65f, -9.0f+z0));
 
+    cameraSpeed    = cameraSpeed0;
+    cameraPosition = cameraPosition0;
+    cameraCenter.setX(cameraPosition.x());
+    cameraViewMatrix.setToIdentity();
+    cameraViewMatrix.lookAt(cameraPosition0, // Eye
+                            cameraCenter0,   // Center
+                            cameraUp0);      // Up
+
     if(!timerUpdate.isActive()) {
         timerUpdate.start(refreshTime, this);
         t0 = QTime::currentTime().msecsSinceStartOfDay();
     }
+    return true;
 }
 
 

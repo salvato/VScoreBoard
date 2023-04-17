@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "volleypanel.h"
 #include "utility.h"
 #include "chartwindow.h"
-#include "racewindow.h"
+#include "racewidget.h"
 
 
 VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
@@ -41,7 +41,7 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     , bFontBuilt(false)
     , pCharts(nullptr)
     , pScoreFile(nullptr)
-    , pRaceWindow(nullptr)
+    , pRaceWidget(nullptr)
 {
     setWindowTitle("Score Controller - © Gabriele Salvato (2023)");
     setWindowIcon(QIcon(":/Logo.ico"));
@@ -81,9 +81,9 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     pCharts->updateLabel(0, gsArgs.sTeam[0]);
     pCharts->updateLabel(1, gsArgs.sTeam[1]);
 
-    pRaceWindow = new RaceWindow();
-    pRaceWindow->updateLabel(0, gsArgs.sTeam[0]);
-    pRaceWindow->updateLabel(1, gsArgs.sTeam[1]);
+    pRaceWidget = new RaceWidget();
+    pRaceWidget->updateLabel(0, gsArgs.sTeam[0]);
+    pRaceWidget->updateLabel(1, gsArgs.sTeam[1]);
 
     setEventHandlers();
 }
@@ -99,7 +99,7 @@ VolleyController::closeEvent(QCloseEvent *event) {
     SaveSettings();
     if(pVolleyPanel) delete pVolleyPanel;
     if(pCharts) delete pCharts;
-    if(pRaceWindow) delete pRaceWindow;
+    if(pRaceWidget) delete pRaceWidget;
     ScoreController::closeEvent(event);
     event->accept();
 }
@@ -176,8 +176,8 @@ void
 VolleyController::updateStatistics() {
     if(pCharts)
         pCharts->updateScore(iScore[0], iScore[1], iSet[0]+iSet[1]);
-    if(pRaceWindow)
-        pRaceWindow->updateScore(iScore[0], iScore[1], iSet[0]+iSet[1]);
+    if(pRaceWidget)
+        pRaceWidget->updateScore(iScore[0], iScore[1], iSet[0]+iSet[1]);
 }
 
 
@@ -583,7 +583,7 @@ VolleyController::setEventHandlers() {
     // Statistics Window Signal
     connect(pCharts, SIGNAL(done()),
             this, SLOT(onStatisticsDone()));
-    connect(pRaceWindow, SIGNAL(raceDone()),
+    connect(pRaceWidget, SIGNAL(raceDone()),
             this, SLOT(onRaceDone()));
 /*
  Keypress Sound
@@ -760,7 +760,7 @@ VolleyController::onTeamTextChanged(QString sText, int iTeam) {
     sText = QString("team%1/name").arg(iTeam+1, 1);
     pSettings->setValue(sText, gsArgs.sTeam[iTeam]);
     pCharts->updateLabel(iTeam, gsArgs.sTeam[iTeam]);
-    pRaceWindow->updateLabel(iTeam, gsArgs.sTeam[iTeam]);
+    pRaceWidget->updateLabel(iTeam, gsArgs.sTeam[iTeam]);
 }
 
 
@@ -934,7 +934,7 @@ VolleyController::onButtonNewGameClicked() {
     pService[iServizio ? 0 : 1]->setChecked(false);
     sendAll();
     pCharts->resetAll();
-    pRaceWindow->resetAll();
+    pRaceWidget->resetAll();
     SaveStatus();
 }
 
@@ -943,8 +943,8 @@ void
 VolleyController::onButtonStatisticsClicked() {
     QPixmap* pPixmap = new QPixmap();
     QSize iconSize = QSize(48,48);
-    if(pRaceWindow->isVisible()) {
-        pRaceWindow->hide();
+    if(pRaceWidget->isVisible()) {
+        pRaceWidget->hide();
         pPixmap->load(":/buttonIcons/plot.png");
     }
     else if(pCharts->isVisible()) {
@@ -961,7 +961,7 @@ VolleyController::onButtonStatisticsClicked() {
                 if(rand() & 1) iScore0++;
                 else iScore1++;
                 pCharts->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
-                pRaceWindow->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
+                pRaceWidget->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
                 bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
                        std::abs(iScore0-iScore1) > 1;
             }
@@ -969,10 +969,10 @@ VolleyController::onButtonStatisticsClicked() {
             if(setSelectionDialog.isPlotSelected())
                 pCharts->showFullScreen();
             else
-                pRaceWindow->showFullScreen();
-            if(pRaceWindow->isVisible()) {
+                pRaceWidget->showFullScreen();
+            if(pRaceWidget->isVisible()) {
                 pPixmap->load(":/buttonIcons/sign_stop.png");
-                pRaceWindow->startRace(setSelectionDialog.iSelectedSet);
+                pRaceWidget->startRace(setSelectionDialog.iSelectedSet);
             }
             else if(pCharts->isVisible()) {
                 pPixmap->load(":/buttonIcons/sign_stop.png");
@@ -1003,7 +1003,7 @@ VolleyController::onStatisticsDone() {
 
 void
 VolleyController::onRaceDone() {
-    pRaceWindow->hide();
+    pRaceWidget->hide();
     QPixmap* pPixmap= new QPixmap();
     QSize iconSize = QSize(48,48);
     pPixmap->load(":/buttonIcons/plot.png");

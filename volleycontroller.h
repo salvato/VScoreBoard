@@ -36,7 +36,7 @@ QT_FORWARD_DECLARE_CLASS(VolleyPanel)
 QT_FORWARD_DECLARE_CLASS(ClientListDialog)
 QT_FORWARD_DECLARE_CLASS(QFile)
 QT_FORWARD_DECLARE_CLASS(ChartWindow)
-QT_FORWARD_DECLARE_CLASS(RaceWindow)
+QT_FORWARD_DECLARE_CLASS(RaceWidget)
 
 
 class VolleyController : public ScoreController
@@ -119,6 +119,6 @@ private:
     QString         sScoreFileName;
     QFile*          pScoreFile;
     SetSelectionDialog setSelectionDialog;
-    RaceWindow*     pRaceWindow;
+    RaceWidget*     pRaceWidget;
 };
 

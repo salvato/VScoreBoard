@@ -40,7 +40,7 @@ RaceWidget::RaceWidget()
     : QOpenGLWidget()
     , scanTime(20)
     , closeTime(3000)
-    , lightColor(QVector3D(1.0f, 1.0f, 1.0f))
+    , lightColor(QVector3D(1.0f, 1.0f, 1.0f)*0.7f)
     , lightPosition(QVector3D(0.5f, 4.0f, -3.0f))
     , pTeam0(nullptr)
     , pTeam1(nullptr) // Tempo in secondi per l'intera "Corsa"
@@ -190,6 +190,10 @@ RaceWidget::resetAll() {
 }
 
 
+/// resizeGL() - Sets up the OpenGL viewport, projection, etc. Gets
+/// called whenever the widget has been resized (and also when it
+/// is shown for the first time because all newly created widgets get a
+/// resize event automatically).
 void
 RaceWidget::resizeGL(int w, int h) {
     // Calculate aspect ratio
@@ -443,6 +447,7 @@ RaceWidget::initGameObjects() {
                         QVector3D(-xField, ballRadius, z1Start));
     gameObjects.append(pTeam1);
 
+    // The Text...
     q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), -90.0f);
     pTeam0Text = new TextObject(ResourceManager::GetShader("text"),
                                 nullptr,
@@ -560,6 +565,8 @@ RaceWidget::initShadowBuffer() {
 }
 
 
+/// initializeGL() - Sets up the OpenGL resources and state.
+/// Gets called once before the first time resizeGL() or paintGL() is called.
 void
 RaceWidget::initializeGL() {
     initializeOpenGLFunctions();
@@ -590,11 +597,22 @@ RaceWidget::startRace(int iSet) {
         emit raceDone();
         return;
     }
+    light = lightColor;
     bFadeIn     = false;
     bRacing     = true;
     iCurrentSet = iSet;
     pTeam0->setPos(QVector3D(-xField, ballRadius, z0Start));
     pTeam1->setPos(QVector3D(-xField, ballRadius, z1Start));
+    float x, y, z;
+    pTeam0Text->GetMax(x, y, z);
+    pTeam0Text->setPos(QVector3D(-xField-x-2.0f*ballRadius, ballRadius, z0Start+0.5f));
+    pScore0Text->GetMin(x, y, z);
+    pScore0Text->setPos(QVector3D(-xField+x+2.0f*ballRadius, ballRadius, z0Start+0.5f));
+    pTeam1Text->GetMax(x, y, z);
+    pTeam1Text->setPos(QVector3D(-xField-x-2.0f*ballRadius, ballRadius, z1Start+0.5f));
+    pScore1Text->GetMin(x, y, z);
+    pScore1Text->setPos(QVector3D(-xField+x+2.0f*ballRadius, ballRadius, z1Start+0.5f));
+
     indexScore = 0;
     if(score[iCurrentSet].at(indexScore+1).x() > score[iCurrentSet].at(indexScore).x()) {
         pTeam0->setSpeed(QVector3D(speed, 0.0f, 0.0f));

@@ -954,17 +954,17 @@ VolleyController::onButtonStatisticsClicked() {
     else {
         if(setSelectionDialog.exec() == QDialog::Accepted) {
 /* TODO: Parte da rimuovere... serve solo per debug. */
-            int iScore0 = 0;
-            int iScore1 = 0;
-            bool bEnd   = false;
-            while(!bEnd) {
-                if(rand() & 1) iScore0++;
-                else iScore1++;
-                pCharts->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
-                pRaceWidget->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
-                bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
-                       std::abs(iScore0-iScore1) > 1;
-            }
+//            int iScore0 = 0;
+//            int iScore1 = 0;
+//            bool bEnd   = false;
+//            while(!bEnd) {
+//                if(rand() & 1) iScore0++;
+//                else iScore1++;
+//                pCharts->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
+//                pRaceWidget->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
+//                bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
+//                       std::abs(iScore0-iScore1) > 1;
+//            }
 /* Fine parte da rimuovere */
             if(setSelectionDialog.isPlotSelected())
                 pCharts->showFullScreen();

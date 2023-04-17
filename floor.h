@@ -21,7 +21,7 @@ public:
 
 public:
     void draw() override;
-    void draw(QOpenGLShaderProgram* pOtherProgram);
+    void draw(QOpenGLShaderProgram* pOtherProgram) override;
 
 private:
     QOpenGLBuffer floorBuf;

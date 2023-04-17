@@ -8,7 +8,7 @@ in VS_OUT {
     vec4 FragPosLightSpace;
 } fs_in;
 
-uniform vec3 fragmentColor;
+uniform vec4 fragmentColor;
 uniform sampler2D shadowMap;
 
 uniform vec3 lightPos;
@@ -54,10 +54,9 @@ ShadowCalculation(vec4 fragPosLightSpace) {
 
 void
 main() {
-    vec4 color = vec4(fragmentColor, 1.0);
     vec3 normal = normalize(fs_in.Normal);
     // ambient
-    vec4 ambient = vec4(0.45*lightColor, 1.0);
+    vec4 ambient = vec4(0.75*lightColor, 1.0);
     // diffuse
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     float diff = max(dot(lightDir, normal), 0.0);
@@ -70,7 +69,7 @@ main() {
     vec4 specular = vec4(spec * lightColor, 1.0);
     // calculate shadow
     float shadow = ShadowCalculation(fs_in.FragPosLightSpace);
-    vec4 lighting = (ambient + (1.0-shadow) * (diffuse+specular)) * color;
+    vec4 lighting = (ambient + (1.0-shadow) * (diffuse+specular)) * fragmentColor;
 
     FragColor = lighting;
 }

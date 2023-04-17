@@ -58,8 +58,7 @@ public:
     void updateLabel(int iTeam, QString sLabel);
     void resetScore(int iSet);
     void resetAll();
-    void resetInitialStatus();
-    void startRace(int iSet);
+    void fadeIn(int iSet);
 
 public slots:
     void closeEvent(QCloseEvent*) override;
@@ -76,6 +75,7 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
+    void startRace();
     void renderScene();
     void renderScene(QOpenGLShaderProgram *pProgram);
     void renderQuad(QOpenGLShaderProgram *pProgram);
@@ -131,6 +131,7 @@ private:
     TextObject* pTeam1Text;
     TextObject* pScore0Text;
     TextObject* pScore1Text;
+    TextObject* pSetText;
 
     const float z0Start = -2.0;
     const float z1Start =  2.0;
@@ -180,7 +181,10 @@ private:
     qreal aspect;
     int fontSize      = 48;
     float fontDepth   = 0.05f;
-    QColor team0Color = QColor(96, 96, 255);
-    QColor team1Color = QColor(255, 96, 96);
+    QVector4D team0Color  = QVector4D(0.33f, 0.33f, 1.00f, 1.00f);
+    QVector4D team1Color  = QVector4D(1.00f, 0.33f, 0.33f, 1.00f);
+    QVector4D score0Color = QVector4D(1.00f, 1.00f, 0.66f, 1.00f);
+    QVector4D score1Color = QVector4D(1.00f, 1.00f, 0.66f, 1.00f);
+    QVector4D setColor    = QVector4D(2.00f, 2.00f, 1.00f, 1.00f);
 };
 

@@ -43,7 +43,6 @@ SOURCES += \
     pixeldata.cpp \
     pole.cpp \
     racewidget.cpp \
-    racewindow.cpp \
     resourcemanager.cpp \
     scorecontroller.cpp \
     scorepanel.cpp \
@@ -78,7 +77,6 @@ HEADERS += \
     pixeldata.h \
     pole.h \
     racewidget.h \
-    racewindow.h \
     resourcemanager.h \
     scorecontroller.h \
     scorepanel.h \

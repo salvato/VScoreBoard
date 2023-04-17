@@ -24,7 +24,7 @@ public:
 
 public:
     void setText(QString _sText);
-    void setColor(QColor _color=QColor(1.0f, 1.0f, 1.0f, 1.0f));
+    void setColor(QVector4D _color=QVector4D(1.0f, 1.0f, 1.0f, 1.0f));
     void setHeight(ushort _height=48);
     void setDepth(float _depth=0.2f);
     bool GetRadius(float& radius) const;
@@ -48,7 +48,7 @@ protected:
 
 private:
     QString sText;
-    QColor color;
+    QVector4D color;
     ushort height;
     float depth;
     QFont font;

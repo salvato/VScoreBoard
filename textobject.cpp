@@ -21,7 +21,7 @@ TextObject::TextObject(QOpenGLShaderProgram* _pProgram,
              _scale,
              _speed)
     , sText(QString())
-    , color(QColor(255, 255, 255, 255))
+    , color(QVector4D(1.0f, 1.0f, 1.0f, 1.0f))
     , height(96)
     , depth(0.05f)
 
@@ -47,7 +47,7 @@ TextObject::setText(QString _sText) {
 
 
 void
-TextObject::setColor(QColor _color) {
+TextObject::setColor(QVector4D _color) {
     color  = _color;
 }
 
@@ -113,10 +113,7 @@ TextObject::draw(QOpenGLShaderProgram* pOtherProgram) {
     if(textModel.GetTriangleCount()) {
         glDisable(GL_CULL_FACE);
         pOtherProgram->bind();
-        pOtherProgram->setUniformValue("fragmentColor",
-                                       static_cast<GLfloat>(color.red())   / 256.0f,
-                                       static_cast<GLfloat>(color.green()) / 256.0f,
-                                       static_cast<GLfloat>(color.blue())  / 256.0f);
+        pOtherProgram->setUniformValue("fragmentColor", color);
         pOtherProgram->setUniformValue("model", modelMatrix());
 
         vertexTextBuf.bind();

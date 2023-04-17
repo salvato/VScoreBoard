@@ -81,6 +81,7 @@ Object::draw() {
 
 void
 Object::draw(QOpenGLShaderProgram *pOtherProgram) {
+    (void) pOtherProgram;
 }
 
 

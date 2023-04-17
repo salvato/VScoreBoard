@@ -972,7 +972,7 @@ VolleyController::onButtonStatisticsClicked() {
                 pRaceWidget->showFullScreen();
             if(pRaceWidget->isVisible()) {
                 pPixmap->load(":/buttonIcons/sign_stop.png");
-                pRaceWidget->startRace(setSelectionDialog.iSelectedSet);
+                pRaceWidget->fadeIn(setSelectionDialog.iSelectedSet);
             }
             else if(pCharts->isVisible()) {
                 pPixmap->load(":/buttonIcons/sign_stop.png");

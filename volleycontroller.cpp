@@ -84,6 +84,8 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     pRaceWidget = new RaceWidget();
     pRaceWidget->updateLabel(0, gsArgs.sTeam[0]);
     pRaceWidget->updateLabel(1, gsArgs.sTeam[1]);
+    pRaceWidget->showFullScreen();
+    pRaceWidget->hide();
 
     setEventHandlers();
 }

@@ -525,7 +525,7 @@ RaceWidget::initTextures() {
     ResourceManager::LoadTexture(":/Logo_SSD_UniMe.png", "logoSSD");
     ResourceManager::LoadTexture(":/brick-wall.jpg",     "brickwall");
     ResourceManager::LoadTexture(":/Logo_SSD.png",       "ssd");
-    ResourceManager::LoadTexture(":/gate0.png",          "gate");
+//    ResourceManager::LoadTexture(":/gate0.png",          "gate");
 }
 
 
@@ -598,20 +598,32 @@ bool RaceWidget::fadeIn(int iSet) {
         emit raceDone();
         return false;
     }
-    light = QVector3D(0.0f, 0.0f, 0.0f);
+
+    float x, y, z;
+    float x0, y0, z0;
+
     iCurrentSet = iSet;
+    light = QVector3D(0.0f, 0.0f, 0.0f);
+
     bFadeIn     = true;
     bRacing     = false;
     bFiring     = false;
     bClosing    = false;
+
+    cameraSpeed    = cameraSpeed0;
+    cameraPosition = cameraPosition0;
+    cameraCenter.setX(cameraPosition.x());
+    cameraViewMatrix.setToIdentity();
+    cameraViewMatrix.lookAt(cameraPosition0, // Eye
+                            cameraCenter0,   // Center
+                            cameraUp0);      // Up
+
     pTeam0->setPos(QVector3D(-xField, ballRadius, z0Start));
     pTeam1->setPos(QVector3D(-xField, ballRadius, z1Start));
     pTeam0->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
     pTeam1->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
 
-    float x, y, z;
-    float x0, y0, z0;
-
+    pTeam0Text->setText(sTeamName[0]);
     pTeam0Text->GetMax(x0, y0, z0);
     pTeam0Text->GetMin(x, y, z);
     pTeam0Text->setPos(QVector3D(-0.5*(x0-x), 0.02f, z0Start+0.5f));
@@ -622,6 +634,7 @@ bool RaceWidget::fadeIn(int iSet) {
     pScore0Text->setPos(QVector3D(-xField-(x0-x)-ballRadius, ballRadius, z0Start+y0-y+2.0*ballRadius));
     pScore0Text->setSpeed(QVector3D(0.0f, 0.0f, 0.0f));
 
+    pTeam1Text->setText(sTeamName[1]);
     pTeam1Text->GetMax(x0, y0, z0);
     pTeam1Text->GetMin(x, y, z);
     pTeam1Text->setPos(QVector3D(-0.5*(x0-x), 0.02f, z1Start+0.5f));
@@ -636,14 +649,6 @@ bool RaceWidget::fadeIn(int iSet) {
     pSetText->GetMax(x0, y0, z0);
     pSetText->GetMin(x, y, z);
     pSetText->setPos(QVector3D(-0.5*(x0-x), 0.65f, -9.0f+z0));
-
-    cameraSpeed    = cameraSpeed0;
-    cameraPosition = cameraPosition0;
-    cameraCenter.setX(cameraPosition.x());
-    cameraViewMatrix.setToIdentity();
-    cameraViewMatrix.lookAt(cameraPosition0, // Eye
-                            cameraCenter0,   // Center
-                            cameraUp0);      // Up
 
     if(!timerUpdate.isActive()) {
         timerUpdate.start(refreshTime, this);

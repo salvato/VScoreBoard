@@ -3,13 +3,7 @@
 #include <QVector>
 #include <QOpenglTexture>
 
-/// QSizeF _size,
-/// QOpenGLShaderProgram* _pProgram,
-/// QOpenGLTexture*       _pTexture,
-/// QVector3D             _position,
-/// QQuaternion           _rotation,
-/// QVector3D             _scale,
-/// QVector3D             _speed
+
 Floor::Floor(QSizeF                _size,
              QOpenGLShaderProgram* _pProgram,
              QOpenGLTexture*       _pTexture,

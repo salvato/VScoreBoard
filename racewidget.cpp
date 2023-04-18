@@ -195,6 +195,14 @@ RaceWidget::createWall() {
                                  ResourceManager::GetTexture("brickwall"),
                                  QVector3D(0.0f, 2.5f, -10.0f),
                                  q));
+
+//    gameObjects.append(new Floor(QSizeF(3.0f, 3.0f*229.0f/469.0f),    // size
+//                                 ResourceManager::GetShader("race"),  // shader
+//                                 ResourceManager::GetTexture("gate"), // texture
+//                                 QVector3D(-6.0f, 0.5f, -9.99f),      // position
+//                                 q,                                   // rotation
+//                                 QVector3D( 1.0f, 1.0f, 1.0f)));      // scale
+
     q  = QQuaternion::fromAxisAndAngle(QVector3D( 0.0f,-1.0f, 0.0f), 90.0f);
     q *= QQuaternion::fromAxisAndAngle(QVector3D( 1.0f, 0.0f, 0.0f), 90.0f);
     gameObjects.append(new Floor(QSizeF(25.0f, 2.5f),
@@ -222,13 +230,7 @@ RaceWidget::createWall() {
                                  q,
                                  QVector3D(1.0f, 1.0f, 1.0f)));
 
-    q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f);
-    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
-                                 ResourceManager::GetShader("race"),
-                                 ResourceManager::GetTexture("field-ex"),
-                                 QVector3D(0.0f, 1.2f, -9.95f),
-                                 q,
-                                 QVector3D(2.0f, 0.6f, 1.0f)));
+
 }
 
 
@@ -468,7 +470,14 @@ RaceWidget::initGameObjects() {
     pScore1Text->setColor(score1Color);
     gameObjects.append(pScore1Text);
 
-    q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), -45.0f);
+    q = QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 90.0f);
+    gameObjects.append(new Floor(QSizeF(1.0f, 1.0f),
+                                 ResourceManager::GetShader("race"),
+                                 ResourceManager::GetTexture("field-ex"),
+                                 QVector3D(0.0f, 1.0f, -9.99f),
+                                 q,
+                                 QVector3D(2.0f, 0.5f, 1.0f)));
+    q = QQuaternion();//::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), -90.0f);
     pSetText =  new TextObject(ResourceManager::GetShader("text"),
                                nullptr,
                                QVector3D(),
@@ -525,7 +534,7 @@ RaceWidget::initTextures() {
     ResourceManager::LoadTexture(":/Logo_SSD_UniMe.png", "logoSSD");
     ResourceManager::LoadTexture(":/brick-wall.jpg",     "brickwall");
     ResourceManager::LoadTexture(":/Logo_SSD.png",       "ssd");
-//    ResourceManager::LoadTexture(":/gate0.png",          "gate");
+    ResourceManager::LoadTexture(":/gate0.png",          "gate");
 }
 
 
@@ -648,7 +657,7 @@ bool RaceWidget::fadeIn(int iSet) {
     pSetText->setText(QString("Set %1").arg(iCurrentSet+1));
     pSetText->GetMax(x0, y0, z0);
     pSetText->GetMin(x, y, z);
-    pSetText->setPos(QVector3D(-0.5*(x0-x), 0.65f, -9.0f+z0));
+    pSetText->setPos(QVector3D(-0.5*(x0-x), 0.5f*(y0-y)+0.25f, -9.9f+z0));
 
     if(!timerUpdate.isActive()) {
         timerUpdate.start(refreshTime, this);

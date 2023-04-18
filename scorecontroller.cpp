@@ -51,6 +51,9 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
     pSpotButtonsLayout = CreateSpotButtons();
     connectButtonSignals();
 
+    pMySlideWindow->showFullScreen();
+    pMySlideWindow->hide();
+
     myStatus = showPanel;
 }
 

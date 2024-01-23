@@ -64,8 +64,8 @@ GeneralSetupDialog::GeneralSetupDialog(GeneralSetupArguments* pArguments)
     setSpotDir();
 
     for(int i=0; i<2; i++) {
-        teamLogoPathEdit[0].setReadOnly(true);
-        teamLogoPathEdit[0].setStyleSheet("background:red;color:white;");
+        teamLogoPathEdit[i].setReadOnly(true);
+        teamLogoPathEdit[i].setStyleSheet("background:red;color:white;");
     }
     setTeam0Path();
     setTeam1Path();

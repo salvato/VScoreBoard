@@ -23,10 +23,6 @@
         <file>buttonIcons/Camera.png</file>
         <file>buttonIcons/CampoVolley.png</file>
         <file>buttonIcons/Chiave2.png</file>
-        <file>buttonIcons/CusTriesteColor.jpg</file>
-        <file>buttonIcons/ExchangeBasketField.png</file>
-        <file>buttonIcons/ExchangeVolleyField</file>
-        <file>buttonIcons/ExchangeVolleyField.png</file>
         <file>buttonIcons/GeneralSetup.png</file>
         <file>buttonIcons/image-missing.png</file>
         <file>buttonIcons/Minus.png</file>
@@ -41,26 +37,14 @@
         <file>buttonIcons/sign_stop.png</file>
         <file>buttonIcons/video-display.png</file>
         <file>buttonIcons/plot.png</file>
-        <file>res/cubemap_negx.jpg</file>
-        <file>res/cubemap_negy.jpg</file>
-        <file>res/cubemap_negz.jpg</file>
-        <file>res/cubemap_posx.jpg</file>
-        <file>res/cubemap_posy.jpg</file>
-        <file>res/cubemap_posz.jpg</file>
         <file>VolleyBall_0.png</file>
         <file>VolleyBall_1.png</file>
-        <file>wood.png</file>
-        <file>blue-carpet.jpg</file>
-        <file>white-carpet.jpg</file>
-        <file>corda_nera.jpg</file>
         <file>ball0.png</file>
         <file>ball1.png</file>
-        <file>brick-wall.jpg</file>
         <file>Logo_SSD.png</file>
         <file>Rete.png</file>
         <file>gate0.png</file>
         <file>Logo_UniMe2.png</file>
-        <file>dark-blue-carpet.jpg</file>
         <file>arial.ttf</file>
     </qresource>
 </RCC>

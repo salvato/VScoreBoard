@@ -35,8 +35,6 @@ QT_FORWARD_DECLARE_CLASS(QGridLayout)
 QT_FORWARD_DECLARE_CLASS(VolleyPanel)
 QT_FORWARD_DECLARE_CLASS(ClientListDialog)
 QT_FORWARD_DECLARE_CLASS(QFile)
-QT_FORWARD_DECLARE_CLASS(ChartWindow)
-QT_FORWARD_DECLARE_CLASS(RaceWidget)
 
 
 class VolleyController : public ScoreController
@@ -69,10 +67,7 @@ private slots:
     void onButtonChangeFieldClicked();
     void onButtonNewSetClicked();
     void onButtonNewGameClicked();
-    void onButtonStatisticsClicked();
     void onChangePanelOrientation(PanelOrientation orientation);
-    void onStatisticsDone();
-    void onRaceDone();
 
 private:
     void          buildControls();
@@ -80,7 +75,6 @@ private:
     void          sendAll();
     void          logScore();
     bool          prepareScoreFile();
-    void          updateStatistics();
 
 
 private:
@@ -109,16 +103,13 @@ private:
     QPushButton*  pNewSetButton{};
     QPushButton*  pNewGameButton{};
     QPushButton*  pChangeFieldButton{};
-    QPushButton*  pStatisticButton{};
 
     bool            bFontBuilt;
     QPalette        panelPalette;
     QLinearGradient panelGradient;
     QBrush          panelBrush;
-    ChartWindow*    pCharts;
     QString         sScoreFileName;
     QFile*          pScoreFile;
     SetSelectionDialog setSelectionDialog;
-    RaceWidget*     pRaceWidget;
 };
 

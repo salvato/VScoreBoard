@@ -32,17 +32,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "button.h"
 #include "volleypanel.h"
 #include "utility.h"
-#include "chartwindow.h"
-#include "racewidget.h"
 
 
 VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     : ScoreController(myLogFile, parent)
     , pVolleyPanel(new VolleyPanel(myLogFile))
     , bFontBuilt(false)
-    , pCharts(nullptr)
     , pScoreFile(nullptr)
-    , pRaceWidget(nullptr)
 {
     setWindowTitle("Score Controller - © Gabriele Salvato (2023)");
     setWindowIcon(QIcon(":/Logo.ico"));
@@ -78,16 +74,6 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
 
     pVolleyPanel->showFullScreen();
 
-    pCharts = new ChartWindow();
-    pCharts->updateLabel(0, gsArgs.sTeam[0]);
-    pCharts->updateLabel(1, gsArgs.sTeam[1]);
-
-    pRaceWidget = new RaceWidget();
-    pRaceWidget->updateLabel(0, gsArgs.sTeam[0]);
-    pRaceWidget->updateLabel(1, gsArgs.sTeam[1]);
-    pRaceWidget->showFullScreen();
-    pRaceWidget->hide();
-
     setEventHandlers();
 }
 
@@ -101,8 +87,6 @@ VolleyController::closeEvent(QCloseEvent *event) {
     }
     SaveSettings();
     if(pVolleyPanel) delete pVolleyPanel;
-    if(pCharts) delete pCharts;
-    if(pRaceWidget) delete pRaceWidget;
     ScoreController::closeEvent(event);
     event->accept();
 }
@@ -172,15 +156,6 @@ VolleyController::logScore() {
     }
     else
         qCritical() << sMessage;
-}
-
-
-void
-VolleyController::updateStatistics() {
-    if(pCharts)
-        pCharts->updateScore(iScore[0], iScore[1], iSet[0]+iSet[1]);
-    if(pRaceWidget)
-        pRaceWidget->updateScore(iScore[0], iScore[1], iSet[0]+iSet[1]);
 }
 
 
@@ -351,10 +326,6 @@ VolleyController::CreateGameButtons() {
     pNewSetButton->setToolTip("Nuovo Set");
 
     pPixmap->load(":/buttonIcons/plot.png");
-    pStatisticButton  = new QPushButton(QIcon(*pPixmap), "");
-    pStatisticButton->setIconSize(iconSize);
-    pStatisticButton->setFlat(true);
-    pStatisticButton->setToolTip("Statistiche");
 
     delete pPixmap;
 
@@ -363,8 +334,6 @@ VolleyController::CreateGameButtons() {
     gameButtonLayout->addWidget(pNewSetButton);
     gameButtonLayout->addStretch();
     gameButtonLayout->addWidget(pChangeFieldButton);
-    gameButtonLayout->addStretch();
-    gameButtonLayout->addWidget(pStatisticButton);
     gameButtonLayout->addStretch();
     return gameButtonLayout;
 }
@@ -580,14 +549,6 @@ VolleyController::setEventHandlers() {
     // Exchange Field Position
     connect(pChangeFieldButton, SIGNAL(clicked(bool)),
             this, SLOT(onButtonChangeFieldClicked()));
-    // Show Statistics
-    connect(pStatisticButton, SIGNAL(clicked(bool)),
-            this, SLOT(onButtonStatisticsClicked()));
-    // Statistics Window Signal
-    connect(pCharts, SIGNAL(done()),
-            this, SLOT(onStatisticsDone()));
-    connect(pRaceWidget, SIGNAL(raceDone()),
-            this, SLOT(onRaceDone()));
 /*
  Keypress Sound
     for(int iTeam=0; iTeam <2; iTeam++) {
@@ -721,7 +682,6 @@ VolleyController::onScoreIncrement(int iTeam) {
     sText = QString("team%1/score").arg(iTeam+1, 1);
     pSettings->setValue(sText, iScore[iTeam]);
     logScore();
-    updateStatistics();
 //    bool bEndSet;
 //    if(iSet[0]+iSet[1] > 4)
 //        bEndSet = ((iScore[0] > 14) || (iScore[1] > 14)) &&
@@ -752,7 +712,6 @@ VolleyController::onScoreDecrement(int iTeam) {
     sText = QString("team%1/score").arg(iTeam+1, 1);
     pSettings->setValue(sText, iScore[iTeam]);
     logScore();
-    updateStatistics();
 }
 
 
@@ -762,8 +721,6 @@ VolleyController::onTeamTextChanged(QString sText, int iTeam) {
     pVolleyPanel->setTeam(iTeam, gsArgs.sTeam[iTeam]);
     sText = QString("team%1/name").arg(iTeam+1, 1);
     pSettings->setValue(sText, gsArgs.sTeam[iTeam]);
-    pCharts->updateLabel(iTeam, gsArgs.sTeam[iTeam]);
-    pRaceWidget->updateLabel(iTeam, gsArgs.sTeam[iTeam]);
 }
 
 
@@ -936,80 +893,7 @@ VolleyController::onButtonNewGameClicked() {
     pService[iServizio ? 1 : 0]->setChecked(true);
     pService[iServizio ? 0 : 1]->setChecked(false);
     sendAll();
-    pCharts->resetAll();
-    pRaceWidget->resetAll();
     SaveStatus();
-}
-
-
-void
-VolleyController::onButtonStatisticsClicked() {
-    QPixmap* pPixmap = new QPixmap();
-    pPixmap->load(":/buttonIcons/plot.png");
-    QSize iconSize = QSize(48,48);
-    if(pRaceWidget->isVisible()) {
-        pRaceWidget->hide();
-    }
-    else if(pCharts->isVisible()) {
-        pCharts->hide();
-    }
-    else {
-        if(setSelectionDialog.exec() == QDialog::Accepted) {
-/* TODO: Parte da rimuovere... serve solo per debug. */
-/**/
-            int iScore0 = 0;
-            int iScore1 = 0;
-            bool bEnd   = false;
-            while(!bEnd) {
-                if(rand() & 1) iScore0++;
-                else iScore1++;
-                pCharts->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
-                pRaceWidget->updateScore(iScore0, iScore1, setSelectionDialog.iSelectedSet);
-                bEnd = ((iScore0 > 24) || (iScore1 > 24)) &&
-                       std::abs(iScore0-iScore1) > 1;
-            }
-/**/
-/* Fine parte da rimuovere */
-            if(setSelectionDialog.isPlotSelected()) {
-                pCharts->showFullScreen();
-                if(pCharts->startChartAnimation(setSelectionDialog.iSelectedSet)) {
-                    pPixmap->load(":/buttonIcons/sign_stop.png");
-                }
-            }
-            else {
-                pRaceWidget->showFullScreen();
-                if(pRaceWidget->fadeIn(setSelectionDialog.iSelectedSet)) {
-                    pPixmap->load(":/buttonIcons/sign_stop.png");
-                }
-            }
-        }
-        else {
-            pPixmap->load(":/buttonIcons/plot.png");
-        }
-    }
-    pStatisticButton->setIcon(QIcon(*pPixmap));
-    pStatisticButton->setIconSize(iconSize);
-}
-
-
-void
-VolleyController::onStatisticsDone() {
-    QPixmap* pPixmap= new QPixmap();
-    QSize iconSize = QSize(48,48);
-    pPixmap->load(":/buttonIcons/plot.png");
-    pStatisticButton->setIcon(QIcon(*pPixmap));
-    pStatisticButton->setIconSize(iconSize);
-}
-
-
-void
-VolleyController::onRaceDone() {
-    pRaceWidget->hide();
-    QPixmap* pPixmap= new QPixmap();
-    QSize iconSize = QSize(48,48);
-    pPixmap->load(":/buttonIcons/plot.png");
-    pStatisticButton->setIcon(QIcon(*pPixmap));
-    pStatisticButton->setIconSize(iconSize);
 }
 
 

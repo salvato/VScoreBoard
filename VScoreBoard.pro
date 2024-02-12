@@ -26,70 +26,38 @@ CONFIG += c++17
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    avatar.cpp \
     button.cpp \
-    chartwindow.cpp \
     edit.cpp \
-    floor.cpp \
     generalsetuparguments.cpp \
     generalsetupdialog.cpp \
     main.cpp \
-    model3d.cpp \
-    model3dex.cpp \
-    model_creator.cpp \
-    object.cpp \
-    particle.cpp \
-    particlegenerator.cpp \
-    pixeldata.cpp \
-    pole.cpp \
-    racewidget.cpp \
     resourcemanager.cpp \
     scorecontroller.cpp \
     scorepanel.cpp \
     setselectiondialog.cpp \
     slidewidget.cpp \
-    sphere.cpp \
-    textobject.cpp \
     timeoutwindow.cpp \
     utility.cpp \
     volleyapplication.cpp \
     volleycontroller.cpp \
-    volleypanel.cpp \
-    whiteline.cpp
+    volleypanel.cpp
 
 HEADERS += \
-    avatar.h \
     button.h \
-    chartwindow.h \
     edit.h \
-    floor.h \
-    ft2build.h \
-    ft2build.h \
     generalsetuparguments.h \
     generalsetupdialog.h \
-    model3d.h \
-    model3dex.h \
-    model_creator.h \
-    object.h \
     panelorientation.h \
-    particle.h \
-    particlegenerator.h \
-    pixeldata.h \
-    pole.h \
-    racewidget.h \
     resourcemanager.h \
     scorecontroller.h \
     scorepanel.h \
     setselectiondialog.h \
     slidewidget.h \
-    sphere.h \
-    textobject.h \
     timeoutwindow.h \
     utility.h \
     volleyapplication.h \
     volleycontroller.h \
-    volleypanel.h \
-    whiteline.h
+    volleypanel.h
 
 
 TRANSLATIONS += VScoreBoard_en_US.ts

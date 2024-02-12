@@ -19,7 +19,7 @@
         <file>buttonIcons/scadFiles/Spots.scad</file>
         <file>buttonIcons/scadFiles/VolleyField.scad</file>
         <file>buttonIcons/scadFiles/VolleyPlayer.scad</file>
-        <file>buttonIcons/ball.png</file>
+        <file>buttonIcons/ball2.png</file>
         <file>buttonIcons/Camera.png</file>
         <file>buttonIcons/CampoVolley.png</file>
         <file>buttonIcons/Chiave2.png</file>
@@ -45,6 +45,6 @@
         <file>Rete.png</file>
         <file>gate0.png</file>
         <file>Logo_UniMe2.png</file>
-        <file>arial.ttf</file>
+        <file>buttonIcons/ExchangeVolleyField.png</file>
     </qresource>
 </RCC>

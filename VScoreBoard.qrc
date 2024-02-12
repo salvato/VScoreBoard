@@ -46,6 +46,5 @@
         <file>gate0.png</file>
         <file>Logo_UniMe2.png</file>
         <file>arial.ttf</file>
-        <file>buttonIcons/ExchangeVolleyField.png</file>
     </qresource>
 </RCC>

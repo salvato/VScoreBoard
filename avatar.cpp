@@ -1,6 +1,7 @@
 #include "avatar.h"
 
 #include <QOpenglTexture>
+#include <QtMath>
 
 
 Avatar::Avatar(float                 _radius,

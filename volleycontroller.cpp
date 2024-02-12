@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <QDir>
 #include <QStandardPaths>
+#include <QScreen>
 
 #include "volleycontroller.h"
 #include "generalsetupdialog.h"

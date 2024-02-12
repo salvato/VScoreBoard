@@ -24,6 +24,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QCategoryAxis>
+#include <QIcon>
+#include <QChart>
+#include <QChartView>
+
 
 #include "chartwindow.h"
 #include "utility.h"

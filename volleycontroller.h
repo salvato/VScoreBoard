@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "scorecontroller.h"
 #include "panelorientation.h"
-#include "setselectiondialog.h"
 
 #include <QTimer>
 
@@ -110,6 +109,5 @@ private:
     QBrush          panelBrush;
     QString         sScoreFileName;
     QFile*          pScoreFile;
-    SetSelectionDialog setSelectionDialog;
 };
 

@@ -21,29 +21,23 @@
         <file>buttonIcons/scadFiles/VolleyPlayer.scad</file>
         <file>buttonIcons/ball2.png</file>
         <file>buttonIcons/Camera.png</file>
-        <file>buttonIcons/CampoVolley.png</file>
-        <file>buttonIcons/Chiave2.png</file>
         <file>buttonIcons/GeneralSetup.png</file>
         <file>buttonIcons/image-missing.png</file>
         <file>buttonIcons/Minus.png</file>
         <file>buttonIcons/New-Game-Volley.png</file>
         <file>buttonIcons/New-Set-Volley.png</file>
-        <file>buttonIcons/New-Set-Volley1.png</file>
-        <file>buttonIcons/NewGameHandball.png</file>
         <file>buttonIcons/PanelSetup.png</file>
         <file>buttonIcons/PlaySlides.png</file>
         <file>buttonIcons/PlaySpots.png</file>
         <file>buttonIcons/Plus.png</file>
         <file>buttonIcons/sign_stop.png</file>
         <file>buttonIcons/video-display.png</file>
-        <file>buttonIcons/plot.png</file>
         <file>VolleyBall_0.png</file>
         <file>VolleyBall_1.png</file>
         <file>ball0.png</file>
         <file>ball1.png</file>
         <file>Logo_SSD.png</file>
         <file>Rete.png</file>
-        <file>gate0.png</file>
         <file>Logo_UniMe2.png</file>
         <file>buttonIcons/ExchangeVolleyField.png</file>
     </qresource>

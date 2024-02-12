@@ -31,10 +31,8 @@ SOURCES += \
     generalsetuparguments.cpp \
     generalsetupdialog.cpp \
     main.cpp \
-    resourcemanager.cpp \
     scorecontroller.cpp \
     scorepanel.cpp \
-    setselectiondialog.cpp \
     slidewidget.cpp \
     timeoutwindow.cpp \
     utility.cpp \
@@ -48,10 +46,8 @@ HEADERS += \
     generalsetuparguments.h \
     generalsetupdialog.h \
     panelorientation.h \
-    resourcemanager.h \
     scorecontroller.h \
     scorepanel.h \
-    setselectiondialog.h \
     slidewidget.h \
     timeoutwindow.h \
     utility.h \

@@ -325,8 +325,6 @@ VolleyController::CreateGameButtons() {
     pNewSetButton->setFlat(true);
     pNewSetButton->setToolTip("Nuovo Set");
 
-    pPixmap->load(":/buttonIcons/plot.png");
-
     delete pPixmap;
 
     gameButtonLayout->addWidget(pNewGameButton);

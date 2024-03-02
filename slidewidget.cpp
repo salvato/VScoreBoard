@@ -16,6 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
+#define _USE_MATH_DEFINES 1
+
 #include "slidewidget.h"
 
 
@@ -25,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <QPainter>
 #include <QStandardPaths>
+#include <QTime>
+#include <QScreen>
 
 
 #define STEADY_SHOW_TIME       3000 // Change slide time

@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDir>
 #include <QStandardPaths>
 #include <QSettings>
+#include <QTime>
 
 #include "volleyapplication.h"
 #include "volleycontroller.h"

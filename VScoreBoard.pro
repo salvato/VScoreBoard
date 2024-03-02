@@ -17,7 +17,9 @@ QT += core
 QT += gui
 QT += widgets
 QT += opengl
-QT += openglwidgets
+linux {
+    QT += openglwidgets
+}
 QT += charts
 
 

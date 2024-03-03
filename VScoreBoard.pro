@@ -17,17 +17,16 @@ QT += core
 QT += gui
 QT += widgets
 QT += opengl
-linux {
-    QT += openglwidgets
-}
-QT += charts
-
+QT += openglwidgets
+#QT += charts
+QT += bluetooth
 
 CONFIG += c++17
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    btserver.cpp \
     button.cpp \
     edit.cpp \
     generalsetuparguments.cpp \
@@ -43,6 +42,7 @@ SOURCES += \
     volleypanel.cpp
 
 HEADERS += \
+    btserver.h \
     button.h \
     edit.h \
     generalsetuparguments.h \

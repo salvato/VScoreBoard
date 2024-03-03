@@ -24,10 +24,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QScreen>
 #include <QDir>
 #include <QKeyEvent>
+#include <QPermissions>
+
+#include <QtBluetooth/qbluetoothlocaldevice.h>
 
 #include "scorecontroller.h"
 #include "slidewidget.h"
 #include "utility.h"
+#include "btserver.h"
 
 
 ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
@@ -54,17 +58,25 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
     pMySlideWindow->showFullScreen();
     pMySlideWindow->hide();
 
+    initBluetooth();
+
     myStatus = showPanel;
 }
 
 
 ScoreController::~ScoreController() {
+    if(pMySlideWindow)
+        pMySlideWindow->deleteLater();
+    pMySlideWindow = nullptr;
     doProcessCleanup();
 }
 
 
 void
 ScoreController::closeEvent(QCloseEvent*) {
+    if(pMySlideWindow)
+        pMySlideWindow->deleteLater();
+    pMySlideWindow = nullptr;
     doProcessCleanup();
 }
 
@@ -83,6 +95,61 @@ ScoreController::eventFilter(QObject *obj, QEvent *event) {
         }
     }
     return QObject::eventFilter(obj, event);
+}
+
+
+void
+ScoreController::initBluetooth() {
+#if QT_CONFIG(permissions)
+    QBluetoothPermission permission{};
+    switch (qApp->checkPermission(permission)) {
+    case Qt::PermissionStatus::Undetermined:
+        qApp->requestPermission(permission, this, &ScoreController::initBluetooth);
+        return;
+    case Qt::PermissionStatus::Denied:
+#ifdef LOG_MESG
+        logMessage(pLogFile,
+                   Q_FUNC_INFO,
+                   tr("Permissions are needed to use Bluetooth. "
+                      "Please grant the permissions to this "
+                      "application in the system settings."));
+#endif
+        QMessageBox::warning(this, tr("Missing permissions"),
+                             tr("Permissions are needed to use Bluetooth. "
+                                "Please grant the permissions to this "
+                                "application in the system settings."));
+        qApp->quit();
+        return;
+    case Qt::PermissionStatus::Granted:
+        break; // proceed to initialization
+    }
+#endif // QT_CONFIG(permissions)
+
+    localAdapters = QBluetoothLocalDevice::allDevices();
+    // make discoverable
+    if (!localAdapters.isEmpty()) {
+        QBluetoothLocalDevice adapter(localAdapters.at(0).address());
+        adapter.setHostMode(QBluetoothLocalDevice::HostDiscoverable);
+    }
+    else {
+        qWarning("No Bluetooth adapter has been found!");
+    }
+
+    // Create The Bluetooth Panel Server
+    pBtServer = new BtServer(this);
+    connect(pBtServer, QOverload<const QString &>::of(&BtServer::clientConnected),
+            this, &ScoreController::clientConnected);
+    connect(pBtServer, QOverload<const QString &>::of(&BtServer::clientDisconnected),
+            this,  QOverload<const QString &>::of(&ScoreController::clientDisconnected));
+    connect(pBtServer, &BtServer::messageReceived,
+            this,  &ScoreController::processMessage);
+    connect(this, &ScoreController::sendMessage,
+            pBtServer, &BtServer::sendMessage);
+    pBtServer->startServer();
+
+    // Get the local device name
+    sLocalName = QBluetoothLocalDevice().name();
+    //qDebug() << "Local Name:" << sLocalName;
 }
 
 
@@ -459,3 +526,78 @@ ScoreController::onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus) 
     }
 }
 
+
+void
+ScoreController::clientConnected(const QString &name) {
+    qDebug() << QString::fromLatin1("%1 has joined chat.\n").arg(name);
+}
+
+
+void
+ScoreController::clientDisconnected(const QString &name) {
+    qDebug() << QString::fromLatin1("%1 has left.\n").arg(name);
+}
+
+
+void
+ScoreController::connected(const QString &name) {
+    qDebug() << QString::fromLatin1("Joined chat with %1.\n").arg(name);
+}
+
+
+QString
+ScoreController::XML_Parse(const QString& input_string, const QString& token) {
+    // simple XML parser
+    //   XML_Parse("<score1>10</score1>","beam")   will return "10"
+    // returns "" on error
+    QString start_token, end_token, result = QString("NoData");
+    start_token = "<" + token + ">";
+    end_token = "</" + token + ">";
+
+    int start_pos=-1, end_pos=-1, len=0;
+
+    start_pos = input_string.indexOf(start_token);
+    end_pos   = input_string.indexOf(end_token);
+
+    if(start_pos < 0 || end_pos < 0) {
+        result = QString("NoData");
+    } else {
+        start_pos += start_token.length();
+        len = end_pos - start_pos;
+        if(len>0)
+            result = input_string.mid(start_pos, len);
+        else
+            result = "";
+    }
+
+    return result;
+}
+
+
+void
+ScoreController::processMessage(const QString &sender, const QString &message) {
+    qDebug() << QString::fromLatin1("%1: %2\n").arg(sender, message);
+    processBtMessage(message);
+}
+
+
+void
+ScoreController::processBtMessage(QString sMessage) {
+}
+
+
+void
+ScoreController::reactOnSocketError(const QString &error) {
+    qDebug() << QString::fromLatin1("%1\n").arg(error);
+}
+
+
+void
+ScoreController::clientDisconnected() {
+    // ChatClient *client = qobject_cast<ChatClient *>(sender());
+    // if(client) {
+    //     clients.removeOne(client);
+    //     client->deleteLater();
+    // }
+    qDebug() << "Bt Client Disconnected!";
+}

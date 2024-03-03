@@ -26,9 +26,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 int
 main(int argc, char *argv[]) {
-//    qputenv("QT_LOGGING_RULES","*.debug=false;qt.qpa.*=true");
-//    qputenv("QT_LOGGING_RULES","*.debug=false;qt.qpa.*=false"); // supress anoying messages
-//    qputenv("QSG_INFO", "1");
+
+    // qputenv("QT_LOGGING_RULES","*.debug=false;qt.qpa.*=true");
+    // qputenv("QT_LOGGING_RULES","*.debug=false;qt.qpa.*=false"); // supress anoying messages
+    // qputenv("QSG_INFO", "1");
+    // qputenv("QT_FATAL_WARNINGS", "1");
+
     QSurfaceFormat format;
     format.setVersion(3, 3);
     format.setDepthBufferSize(32);

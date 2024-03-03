@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QSettings>
 #include <QProcess>
 #include <QFileInfoList>
+#include <QBluetoothHostInfo>
 
 #include "generalsetuparguments.h"
 
@@ -31,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QT_FORWARD_DECLARE_CLASS(QHBoxLayout)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
 QT_FORWARD_DECLARE_CLASS(SlideWidget)
+QT_FORWARD_DECLARE_CLASS(BtServer)
 
 
 class ScoreController : public QMainWindow
@@ -50,6 +52,19 @@ protected slots:
     void onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus);
     void closeEvent(QCloseEvent*) override;
 
+private slots:
+    void initBluetooth();
+    void clientConnected(const QString &name);
+    void clientDisconnected(const QString &name);
+    void clientDisconnected();
+    void connected(const QString &name);
+    void reactOnSocketError(const QString &error);
+    void processMessage(const QString &sender, const QString &message);
+
+signals:
+    // void messageReceived(const QString &sender, const QString &message);
+    void sendMessage(const QString &message);
+
 protected:
     bool            eventFilter(QObject *obj, QEvent *event) override;
     bool            prepareLogFile();
@@ -64,6 +79,8 @@ protected:
     virtual void    SaveStatus();
     virtual void    GeneralSetup();
     void            doProcessCleanup();
+    QString         XML_Parse(const QString& input_string, const QString& token);
+    virtual void    processBtMessage(QString sMessage);
 
 protected:
     GeneralSetupArguments gsArgs;
@@ -80,7 +97,7 @@ protected:
         showSlides,
         showCamera
     };
-    status                myStatus;
+    status          myStatus;
     QProcess*       pVideoPlayer;
     QString         sProcess;
     QString         sProcessArguments;
@@ -93,4 +110,7 @@ protected:
     QList<spot>        availabeSpotList;
     int                iCurrentSpot;
     QString            sVideoPlayer;
+    BtServer*          pBtServer;
+    QString            sLocalName;
+    QList<QBluetoothHostInfo> localAdapters;
 };

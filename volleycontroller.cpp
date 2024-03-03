@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDebug>
 
 #include "volleycontroller.h"
+#include "btserver.h"
 #include "generalsetupdialog.h"
 #include "edit.h"
 #include "button.h"
@@ -41,6 +42,7 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     , pVolleyPanel(new VolleyPanel(myLogFile))
     , bFontBuilt(false)
     , pScoreFile(nullptr)
+    , maxTeamNameLen(15)
 {
     setWindowTitle("Score Controller - © Gabriele Salvato (2023)");
     setWindowIcon(QIcon(":/Logo.ico"));
@@ -385,6 +387,13 @@ VolleyController::sendAll() {
     pVolleyPanel->setLogo(1, gsArgs.sTeamLogoFilePath[1]);
     pVolleyPanel->setServizio(iServizio);
     pVolleyPanel->setMirrored(gsArgs.isPanelMirrored);
+    pBtServer->sendMessage();
+}
+
+
+void
+VolleyController::btSendAll() {
+    qCritical() << "Implement btSendAll()";
 }
 
 
@@ -907,5 +916,114 @@ VolleyController::onChangePanelOrientation(PanelOrientation orientation) {
                .arg(static_cast<int>(orientation)));
 #endif
     pVolleyPanel->setMirrored(gsArgs.isPanelMirrored);
+}
+
+
+void
+VolleyController::processBtMessage(const QString &sender, const QString &message) {
+    qDebug() << QString::fromLatin1("%1: %2\n").arg(sender, message);
+}
+
+
+void
+VolleyController::processMessage(QString sMessage) {
+    QString sToken;
+    bool ok;
+    int iTeam;
+    QString sNoData = QString("NoData");
+
+    sToken = XML_Parse(sMessage, "team0");
+    if(sToken != sNoData) {
+        onTeamTextChanged(sToken.left(maxTeamNameLen), 0);
+    }// team 0 name
+
+    sToken = XML_Parse(sMessage, "team1");
+    if(sToken != sNoData){
+        onTeamTextChanged(sToken.left(maxTeamNameLen), 1);
+    }// team 1 name
+
+    sToken = XML_Parse(sMessage, "incset");
+    if(sToken != sNoData) {
+        iTeam = sToken.toInt(&ok);
+        if(!ok || (iTeam<0) || (iTeam>1))
+            return;
+        onSetIncrement(iTeam);
+    }// increment set
+
+    sToken = XML_Parse(sMessage, "decset");
+    if(sToken != sNoData){
+        iTeam = sToken.toInt(&ok);
+        if(!ok || (iTeam<0) || (iTeam>1))
+            return;
+        onSetDecrement(iTeam);
+    }// decrement set
+
+    sToken = XML_Parse(sMessage, "inctimeout");
+    if(sToken != sNoData){
+        iTeam = sToken.toInt(&ok);
+        if(!ok || (iTeam<0) || (iTeam>1))
+            return;
+        onTimeOutIncrement(iTeam);
+    }// increment timeout
+
+    sToken = XML_Parse(sMessage, "dectimeout");
+    if(sToken != sNoData){
+        iTeam = sToken.toInt(&ok);
+        if(!ok || (iTeam<0) || (iTeam>1))
+            return;
+        onTimeOutDecrement(iTeam);
+    }// decrement timeout
+
+    sToken = XML_Parse(sMessage, "incscore");
+    if(sToken != sNoData) {
+        iTeam = sToken.toInt(&ok);
+        if(!ok || (iTeam<0) || (iTeam>1))
+            return;
+        onScoreIncrement(iTeam);
+    }// increment score
+
+    sToken = XML_Parse(sMessage, "decscore");
+    if(sToken != sNoData) {
+        iTeam = sToken.toInt(&ok);
+        if(!ok || (iTeam<0) || (iTeam>1))
+            return;
+        onScoreDecrement(iTeam);
+    }// decrement score
+
+    sToken = XML_Parse(sMessage, "servizio");
+    if(sToken != sNoData) {
+        iTeam = sToken.toInt(&ok);
+        if(!ok || (iTeam<-1) || (iTeam>1))
+            iTeam = 0;
+        onServiceClicked(iTeam);
+    }// servizio
+
+    sToken = XML_Parse(sMessage, "setOrientation");
+    if(sToken != sNoData) {
+        PanelOrientation orientation = PanelOrientation(sToken.toInt(&ok));
+        if(!ok)
+            return;
+        onChangePanelOrientation(orientation);
+    }// mirrored
+
+    sToken = XML_Parse(sMessage, "startspotloop");
+    if(sToken != sNoData) {
+        onButtonSpotLoopClicked();
+    }// startSpotLoop
+
+    sToken = XML_Parse(sMessage, "endspotloop");
+    if(sToken != sNoData) {
+        onButtonSpotLoopClicked();
+    }// stop spotloop
+
+    sToken = XML_Parse(sMessage, "startslideshow");
+    if(sToken != sNoData) {
+        onButtonSlideShowClicked();
+    }// start slideshow
+
+    sToken = XML_Parse(sMessage, "endslideshow");
+    if(sToken != sNoData) {
+        onButtonSlideShowClicked();
+    }// stop slideshow
 }
 

@@ -67,14 +67,16 @@ private slots:
     void onButtonNewSetClicked();
     void onButtonNewGameClicked();
     void onChangePanelOrientation(PanelOrientation orientation);
+    void processBtMessage(const QString &sender, const QString &message);
 
 private:
     void          buildControls();
     void          setEventHandlers();
     void          sendAll();
+    void          btSendAll();
     void          logScore();
     bool          prepareScoreFile();
-
+    void          processMessage(QString sMessage);
 
 private:
     VolleyPanel*  pVolleyPanel;
@@ -109,5 +111,6 @@ private:
     QBrush          panelBrush;
     QString         sScoreFileName;
     QFile*          pScoreFile;
+    int             maxTeamNameLen;
 };
 

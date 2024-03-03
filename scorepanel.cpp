@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDebug>
 
 
+
 #include "scorepanel.h"
 #include "utility.h"
 
@@ -52,6 +53,7 @@ ScorePanel::ScorePanel(QFile *myLogFile, QWidget *parent)
     setCursor(Qt::BlankCursor);
     // We don't want windows decorations
     setWindowFlags(Qt::CustomizeWindowHint);
+
 }
 
 

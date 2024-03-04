@@ -638,6 +638,11 @@ VolleyController::onTimeOutIncrement(int iTeam) {
     if(gsArgs.iTimeoutDuration > 0) {
         pVolleyPanel->startTimeout(gsArgs.iTimeoutDuration);
     }
+    QString sMessage = QString("<timeout%1>%2</timeout%3>")
+                           .arg(iTeam,1)
+                           .arg(iTimeout[iTeam])
+                           .arg(iTeam,1);
+    pBtServer->sendMessage(sMessage);
     QString sText = QString("%1").arg(iTimeout[iTeam]);
     pTimeoutEdit[iTeam]->setText(sText);
     sText = QString("team%1/timeouts").arg(iTeam+1, 1);
@@ -656,6 +661,11 @@ VolleyController::onTimeOutDecrement(int iTeam) {
     pTimeoutIncrement[iTeam]->setEnabled(true);
     pVolleyPanel->setTimeout(iTeam, iTimeout[iTeam]);
     pVolleyPanel->stopTimeout();
+    QString sMessage = QString("<timeout%1>%2</timeout%3>")
+                           .arg(iTeam,1)
+                           .arg(iTimeout[iTeam])
+                           .arg(iTeam,1);
+    pBtServer->sendMessage(sMessage);
     QString sText;
     sText = QString("%1").arg(iTimeout[iTeam], 1);
     pTimeoutEdit[iTeam]->setText(sText);
@@ -672,6 +682,11 @@ VolleyController::onSetIncrement(int iTeam) {
         pSetsIncrement[iTeam]->setEnabled(false);
     }
     pVolleyPanel->setSets(iTeam, iSet[iTeam]);
+    QString sMessage = QString("<set%1>%2</set%3>")
+                   .arg(iTeam,1)
+                   .arg(iSet[iTeam])
+                   .arg(iTeam,1);
+    pBtServer->sendMessage(sMessage);
     QString sText;
     sText = QString("%1").arg(iSet[iTeam], 1);
     pSetsEdit[iTeam]->setText(sText);
@@ -688,6 +703,11 @@ VolleyController::onSetDecrement(int iTeam) {
         pSetsDecrement[iTeam]->setEnabled(false);
     }
     pVolleyPanel->setSets(iTeam, iSet[iTeam]);
+    QString sMessage = QString("<set%1>%2</set%3>")
+                           .arg(iTeam,1)
+                           .arg(iSet[iTeam])
+                           .arg(iTeam,1);
+    pBtServer->sendMessage(sMessage);
     QString sText;
     sText = QString("%1").arg(iSet[iTeam], 1);
     pSetsEdit[iTeam]->setText(sText);
@@ -703,6 +723,9 @@ VolleyController::onServiceClicked(int iTeam) {
     pService[iServizio ? 1 : 0]->setChecked(true);
     pService[iServizio ? 0 : 1]->setChecked(false);
     pVolleyPanel->setServizio(iServizio);
+    QString sMessage = QString("<servizio>%1</servizio>")
+                   .arg(iServizio, 1);
+    pBtServer->sendMessage(sMessage);
     pSettings->setValue("set/service", iServizio);
     pSettings->setValue("set/lastservice", lastService);
 }
@@ -721,6 +744,11 @@ VolleyController::onScoreIncrement(int iTeam) {
     pService[iServizio ? 1 : 0]->setChecked(true);
     pService[iServizio ? 0 : 1]->setChecked(false);
     pVolleyPanel->setServizio(iServizio);
+    QString sMessage = QString("<score%1>%2</score%3>")
+                   .arg(iTeam,1)
+                   .arg(iScore[iTeam], 2)
+                   .arg(iTeam,1);
+    pBtServer->sendMessage(sMessage);
     QString sText;
     sText = QString("%1").arg(iScore[iTeam], 2);
     pScoreEdit[iTeam]->setText(sText);
@@ -751,6 +779,11 @@ VolleyController::onScoreDecrement(int iTeam) {
     pService[iServizio ? 1 : 0]->setChecked(true);
     pService[iServizio ? 0 : 1]->setChecked(false);
     pVolleyPanel->setServizio(iServizio);
+    QString sMessage = QString("<score%1>%2</score%3>")
+                           .arg(iTeam,1)
+                           .arg(iScore[iTeam], 2)
+                           .arg(iTeam,1);
+    pBtServer->sendMessage(sMessage);
     QString sText;
     sText = QString("%1").arg(iScore[iTeam], 2);
     pScoreEdit[iTeam]->setText(sText);
@@ -764,6 +797,11 @@ void
 VolleyController::onTeamTextChanged(QString sText, int iTeam) {
     gsArgs.sTeam[iTeam] = sText;
     pVolleyPanel->setTeam(iTeam, gsArgs.sTeam[iTeam]);
+    QString sMessage = QString("<team%1>%2</team%3>")
+                   .arg(iTeam,1)
+                   .arg(gsArgs.sTeam[iTeam])
+                   .arg(iTeam,1);
+    pBtServer->sendMessage(sMessage);
     sText = QString("team%1/name").arg(iTeam+1, 1);
     pSettings->setValue(sText, gsArgs.sTeam[iTeam]);
 }

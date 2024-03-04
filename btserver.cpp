@@ -102,6 +102,8 @@ BtServer::stopServer() {
 // sendMessage
 void
 BtServer::sendMessage(const QString &message) {
+    if(!pClientSocket)
+        return;
     QByteArray text = message.toUtf8() + '\n';
     pClientSocket->write(text);
 }

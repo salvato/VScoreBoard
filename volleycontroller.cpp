@@ -76,6 +76,7 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
 
     prepareScoreFile();
 
+    sendAll();
     pVolleyPanel->showFullScreen();
 
     setEventHandlers();
@@ -371,29 +372,64 @@ VolleyController::GetSettings() {
             iSet[i] = gsArgs.maxSet;
     }
 
-    sendAll();
 }
 
 
 void
 VolleyController::sendAll() {
     for(int i=0; i<2; i++) {
-        pVolleyPanel->setTeam(i, gsArgs.sTeam[i]);
+        pVolleyPanel->setTeam(i, pTeamName[i]->text());
         pVolleyPanel->setTimeout(i, iTimeout[i]);
         pVolleyPanel->setSets(i, iSet[i]);
         pVolleyPanel->setScore(i, iScore[i]);
     }
+    pVolleyPanel->setServizio(iServizio);
     pVolleyPanel->setLogo(0, gsArgs.sTeamLogoFilePath[0]);
     pVolleyPanel->setLogo(1, gsArgs.sTeamLogoFilePath[1]);
-    pVolleyPanel->setServizio(iServizio);
     pVolleyPanel->setMirrored(gsArgs.isPanelMirrored);
-    pBtServer->sendMessage();
+    btSendAll();
 }
 
 
 void
 VolleyController::btSendAll() {
-    qCritical() << "Implement btSendAll()";
+    QString sMessage = QString();
+
+    sMessage = QString("<setOrientation>%1</setOrientation>")
+                   .arg(static_cast<int>(gsArgs.isPanelMirrored));
+    pBtServer->sendMessage(sMessage);
+
+    for(int i=0; i<2; i++) {
+        sMessage = QString("<team%1>%2</team%3>")
+                    .arg(i,1)
+                    .arg(pTeamName[i]->text().toLocal8Bit().data())
+                    .arg(i,1);
+        pBtServer->sendMessage(sMessage);
+        sMessage = QString("<timeout%1>%2</timeout%3>")
+                    .arg(i,1)
+                    .arg(iTimeout[i])
+                    .arg(i,1);
+        pBtServer->sendMessage(sMessage);
+        sMessage = QString("<set%1>%2</set%3>")
+                    .arg(i,1)
+                    .arg(iSet[i])
+                    .arg(i,1);
+        pBtServer->sendMessage(sMessage);
+        sMessage = QString("<score%1>%2</score%3>")
+                    .arg(i,1)
+                    .arg(iScore[i], 2)
+                    .arg(i,1);
+        pBtServer->sendMessage(sMessage);
+    }
+    sMessage = QString("<servizio>%1</servizio>")
+                .arg(iServizio, 1);
+    pBtServer->sendMessage(sMessage);
+
+    if(myStatus == showSlides)
+        sMessage = QString("<slideshow>1</slideshow>");
+    else if(myStatus == showSpots)
+        sMessage = QString("<spotloop>1</spotloop>");
+    pBtServer->sendMessage(sMessage);
 }
 
 
@@ -916,12 +952,6 @@ VolleyController::onChangePanelOrientation(PanelOrientation orientation) {
                .arg(static_cast<int>(orientation)));
 #endif
     pVolleyPanel->setMirrored(gsArgs.isPanelMirrored);
-}
-
-
-void
-VolleyController::processBtMessage(const QString &sender, const QString &message) {
-    qDebug() << QString::fromLatin1("%1: %2\n").arg(sender, message);
 }
 
 

@@ -67,7 +67,6 @@ private slots:
     void onButtonNewSetClicked();
     void onButtonNewGameClicked();
     void onChangePanelOrientation(PanelOrientation orientation);
-    void processBtMessage(const QString &sender, const QString &message);
 
 private:
     void          buildControls();

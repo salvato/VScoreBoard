@@ -5,9 +5,9 @@
 
 using namespace Qt::StringLiterals;
 
-//! [Service UUID]
+// Service UUID
 static constexpr auto serviceUuid = "e8e10f95-1a70-4b27-9ccf-02010264e9c8"_L1;
-//! [Service UUID]
+
 
 BtServer::BtServer(QObject *parent)
     : QObject{parent}
@@ -81,15 +81,17 @@ BtServer::startServer(const QBluetoothAddress& localAdapter) {
     serviceInfo.registerService(localAdapter);
 }
 
+
 // stopServer
 void
 BtServer::stopServer() {
     // Unregister service
     serviceInfo.unregisterService();
 
-    // Close sockets
-    qDeleteAll(clientSockets);
-    clientNames.clear();
+    // Close socket
+    if(pClientSocket) delete pClientSocket;
+    pClientSocket = nullptr;
+    sClientName = QString();
 
     // Close server
     delete rfcommServer;
@@ -101,25 +103,24 @@ BtServer::stopServer() {
 void
 BtServer::sendMessage(const QString &message) {
     QByteArray text = message.toUtf8() + '\n';
-    for(QBluetoothSocket *socket : std::as_const(clientSockets))
-        socket->write(text);
+    pClientSocket->write(text);
 }
 
 
 // clientConnected
 void
 BtServer::clientConnected() {
-    QBluetoothSocket *socket = rfcommServer->nextPendingConnection();
-    if(!socket)
+    pClientSocket = rfcommServer->nextPendingConnection();
+    if(!pClientSocket)
         return;
 
-    connect(socket, &QBluetoothSocket::readyRead,
+    connect(pClientSocket, &QBluetoothSocket::readyRead,
             this, &BtServer::readSocket);
-    connect(socket, &QBluetoothSocket::disconnected,
+    connect(pClientSocket, &QBluetoothSocket::disconnected,
             this, QOverload<>::of(&BtServer::clientDisconnected));
-    clientSockets.append(socket);
-    clientNames[socket] = socket->peerName();
-    emit clientConnected(socket->peerName());
+
+    sClientName = pClientSocket->peerName();
+    emit clientConnected(pClientSocket->peerName());
 }
 
 
@@ -130,10 +131,10 @@ BtServer::clientDisconnected() {
     if (!socket)
         return;
 
-    emit clientDisconnected(clientNames[socket]);
+    emit clientDisconnected(sClientName);
 
-    clientSockets.removeOne(socket);
-    clientNames.remove(socket);
+    pClientSocket = nullptr;
+    sClientName = QString();
 
     socket->deleteLater();
 }
@@ -143,12 +144,14 @@ BtServer::clientDisconnected() {
 void
 BtServer::readSocket() {
     QBluetoothSocket *socket = qobject_cast<QBluetoothSocket *>(sender());
-    if (!socket)
+    if(!socket)
+        return;
+    if(socket->peerName() != sClientName)
         return;
 
-    while (socket->canReadLine()) {
+    while(socket->canReadLine()) {
         QByteArray line = socket->readLine().trimmed();
-        emit messageReceived(clientNames[socket],
+        emit messageReceived(sClientName,
                              QString::fromUtf8(line.constData(), line.length()));
     }
 }

@@ -31,9 +31,9 @@ private slots:
     void readSocket();
 
 private:
-    QBluetoothServer *rfcommServer = nullptr;
+    QBluetoothServer* rfcommServer = nullptr;
     QBluetoothServiceInfo serviceInfo;
-    QList<QBluetoothSocket *> clientSockets;
-    QMap<QBluetoothSocket *, QString> clientNames;
+    QBluetoothSocket* pClientSocket = nullptr;
+    QString sClientName;
 };
 

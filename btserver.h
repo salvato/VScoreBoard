@@ -14,7 +14,7 @@ public:
     explicit BtServer(QObject *parent = nullptr);
     ~BtServer();
 
-    void startServer(const QBluetoothAddress &localAdapter = QBluetoothAddress());
+    bool startServer(const QBluetoothAddress &localAdapter = QBluetoothAddress());
     void stopServer();
 
 public slots:

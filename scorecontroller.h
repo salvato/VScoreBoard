@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QSettings>
 #include <QProcess>
 #include <QFileInfoList>
+#include <QBluetoothLocalDevice>
 #include <QBluetoothHostInfo>
 
 #include "generalsetuparguments.h"
@@ -57,7 +58,6 @@ private slots:
     void clientConnected(const QString &name);
     void clientDisconnected(const QString &name);
     void clientDisconnected();
-    void connected(const QString &name);
     void reactOnSocketError(const QString &error);
     void processMessage(const QString &sender, const QString &message);
 
@@ -81,6 +81,7 @@ protected:
     void            doProcessCleanup();
     QString         XML_Parse(const QString& input_string, const QString& token);
     virtual void    processBtMessage(QString sMessage);
+    virtual void    btSendAll();
 
 protected:
     GeneralSetupArguments gsArgs;
@@ -112,5 +113,5 @@ protected:
     QString            sVideoPlayer;
     BtServer*          pBtServer;
     QString            sLocalName;
-    QList<QBluetoothHostInfo> localAdapters;
+    QBluetoothLocalDevice btDevice;
 };

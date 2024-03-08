@@ -19,10 +19,10 @@ BtServer::~BtServer() {
 }
 
 
-void
+bool
 BtServer::startServer(const QBluetoothAddress& localAdapter) {
     if(rfcommServer)
-        return;
+        return true; // Already started !
 
     // Create the server
     rfcommServer = new QBluetoothServer(QBluetoothServiceInfo::RfcommProtocol, this);
@@ -30,8 +30,8 @@ BtServer::startServer(const QBluetoothAddress& localAdapter) {
             this, QOverload<>::of(&BtServer::clientConnected));
     bool result = rfcommServer->listen(localAdapter);
     if(!result) {
-        qWarning() << "Cannot bind chat server to" << localAdapter.toString();
-        return;
+        qCritical() << "Cannot bind chat server to" << localAdapter.toString();
+        return false;
     }
 
     //serviceInfo.setAttribute(QBluetoothServiceInfo::ServiceRecordHandle, (uint)0x00010010);
@@ -78,7 +78,12 @@ BtServer::startServer(const QBluetoothAddress& localAdapter) {
                              protocolDescriptorList);
 
     // Register service
-    serviceInfo.registerService(localAdapter);
+    bool bResult = serviceInfo.registerService(localAdapter);
+    if(!bResult) {
+        qCritical() << "Unable to register Bluetooth Service !";
+        return false;
+    }
+    return true;
 }
 
 
@@ -86,7 +91,9 @@ BtServer::startServer(const QBluetoothAddress& localAdapter) {
 void
 BtServer::stopServer() {
     // Unregister service
-    serviceInfo.unregisterService();
+    bool bResult = serviceInfo.unregisterService();
+    if(!bResult)
+        qCritical() << "Unable to unregister Bluetooth Service !";
 
     // Close socket
     if(pClientSocket) delete pClientSocket;
@@ -122,6 +129,7 @@ BtServer::clientConnected() {
             this, QOverload<>::of(&BtServer::clientDisconnected));
 
     sClientName = pClientSocket->peerName();
+    qDebug() << sClientName << "Connectd !";
     emit clientConnected(pClientSocket->peerName());
 }
 

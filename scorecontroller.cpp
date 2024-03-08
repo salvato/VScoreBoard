@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPermissions>
 
 #include <QtBluetooth/qbluetoothlocaldevice.h>
+#include <QtBluetooth/qbluetoothserver.h>
 
 #include "scorecontroller.h"
 #include "slidewidget.h"
@@ -48,7 +49,7 @@ ScoreController::ScoreController(QFile *myLogFile, QWidget *parent)
 {
     qApp->installEventFilter(this);
 
-    setWindowTitle("Score Controller - ©Gabriele Salvato (2023)");
+    setWindowTitle("Score Controller - ©Gabriele Salvato (2024)");
     setWindowIcon(QIcon(":/Logo.ico"));
 
     iCurrentSpot = 0;
@@ -102,7 +103,8 @@ void
 ScoreController::initBluetooth() {
 #if QT_CONFIG(permissions)
     QBluetoothPermission permission{};
-    switch (qApp->checkPermission(permission)) {
+    Qt::PermissionStatus btPermission = qApp->checkPermission(permission);
+    switch (btPermission) {
     case Qt::PermissionStatus::Undetermined:
         qApp->requestPermission(permission, this, &ScoreController::initBluetooth);
         return;
@@ -121,22 +123,26 @@ ScoreController::initBluetooth() {
         qApp->quit();
         return;
     case Qt::PermissionStatus::Granted:
+        // qDebug() << "Permissions Granted!:";
         break; // proceed to initialization
     }
 #endif // QT_CONFIG(permissions)
 
-    localAdapters = QBluetoothLocalDevice::allDevices();
-    // make discoverable
-    if (!localAdapters.isEmpty()) {
-        QBluetoothLocalDevice adapter(localAdapters.at(0).address());
-        adapter.setHostMode(QBluetoothLocalDevice::HostDiscoverable);
-    }
-    else {
+    if (!btDevice.isValid()) {
         qWarning("No Bluetooth adapter has been found!");
+        return;
     }
+    // Turn Bluetooth on
+    btDevice.powerOn();
+    // make bluetooth host discoverable
+    btDevice.setHostMode(QBluetoothLocalDevice::HostDiscoverable);
+    // Get the local device name
+    sLocalName = btDevice.name();
+    // qDebug() << sLocalName;
 
     // Create The Bluetooth Panel Server
     pBtServer = new BtServer(this);
+
     connect(pBtServer, QOverload<const QString &>::of(&BtServer::clientConnected),
             this, &ScoreController::clientConnected);
     connect(pBtServer, QOverload<const QString &>::of(&BtServer::clientDisconnected),
@@ -145,11 +151,10 @@ ScoreController::initBluetooth() {
             this,  &ScoreController::processMessage);
     connect(this, &ScoreController::sendMessage,
             pBtServer, &BtServer::sendMessage);
-    pBtServer->startServer();
 
-    // Get the local device name
-    sLocalName = QBluetoothLocalDevice().name();
-    //qDebug() << "Local Name:" << sLocalName;
+    if(!pBtServer->startServer()) {
+        qCritical() << "Bluetooth Server Could Not Start !";
+    }
 }
 
 
@@ -529,19 +534,19 @@ ScoreController::onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus) 
 
 void
 ScoreController::clientConnected(const QString &name) {
-    qDebug() << QString::fromLatin1("%1 has joined chat.\n").arg(name);
+    qDebug() << QString::fromLatin1("%1 Connected.\n").arg(name);
+    btSendAll();
+}
+
+
+void
+ScoreController::btSendAll(){
 }
 
 
 void
 ScoreController::clientDisconnected(const QString &name) {
     qDebug() << QString::fromLatin1("%1 has left.\n").arg(name);
-}
-
-
-void
-ScoreController::connected(const QString &name) {
-    qDebug() << QString::fromLatin1("Joined chat with %1.\n").arg(name);
 }
 
 

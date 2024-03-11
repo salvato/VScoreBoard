@@ -74,7 +74,7 @@ protected:
     void            connectButtonSignals();
     bool            startSlideShow();
     void            stopSlideShow();
-    void            startSpotLoop();
+    bool            startSpotLoop();
     void            stopSpotLoop();
     virtual void    SaveStatus();
     virtual void    GeneralSetup();

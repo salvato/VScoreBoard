@@ -261,7 +261,7 @@ ScoreController::SaveStatus() {
 }
 
 
-void
+bool
 ScoreController::startSpotLoop() {
     QDir spotDir(gsArgs.sSpotDir);
     spotList = QFileInfoList();
@@ -319,10 +319,13 @@ ScoreController::startSpotLoop() {
                 pVideoPlayer->disconnect();
                 delete pVideoPlayer;
                 pVideoPlayer = nullptr;
-                return;
+                return false;
             }
         } // if(!videoPlayer)
     } // if(!spotList.isEmpty())
+    else
+        return false;
+    return true;
 }
 
 
@@ -381,14 +384,17 @@ ScoreController::onButtonSpotLoopClicked() {
     QPixmap pixmap;
     QIcon ButtonIcon;
     if(myStatus == showPanel) {
-        pixmap.load(":/buttonIcons/sign_stop.png");
-        ButtonIcon.addPixmap(pixmap);
-        pSpotButton->setIcon(ButtonIcon);
-        pSpotButton->setIconSize(pixmap.rect().size());
-        pSlideShowButton->setDisabled(true);
-        pGeneralSetupButton->setDisabled(true);
-        startSpotLoop();
-        myStatus = showSpots;
+        if(startSpotLoop()) {
+            pixmap.load(":/buttonIcons/sign_stop.png");
+            ButtonIcon.addPixmap(pixmap);
+            pSpotButton->setIcon(ButtonIcon);
+            pSpotButton->setIconSize(pixmap.rect().size());
+            pSlideShowButton->setDisabled(true);
+            pGeneralSetupButton->setDisabled(true);
+            myStatus = showSpots;
+            QString sMessage = QString("<startSpotLoop>1</startSpotLoop>");
+            emit sendMessage(sMessage);
+        }
     }
     else {
         pixmap.load(":/buttonIcons/PlaySpots.png");
@@ -399,6 +405,8 @@ ScoreController::onButtonSpotLoopClicked() {
         pGeneralSetupButton->setEnabled(true);
         stopSpotLoop();
         myStatus = showPanel;
+        QString sMessage = QString("<endSpotLoop>1</endSpotLoop>");
+        emit sendMessage(sMessage);
     }
 }
 
@@ -417,6 +425,8 @@ ScoreController::onButtonSlideShowClicked() {
             pSlideShowButton->setIcon(ButtonIcon);
             pSlideShowButton->setIconSize(pixmap.rect().size());
             myStatus = showSlides;
+            QString sMessage = QString("<startSlideShow>1</startSlideShow>");
+            emit sendMessage(sMessage);
         }
     }
     else {
@@ -428,6 +438,8 @@ ScoreController::onButtonSlideShowClicked() {
         pSlideShowButton->setIconSize(pixmap.rect().size());
         stopSlideShow();
         myStatus = showPanel;
+        QString sMessage = QString("<endSlideShow>1</endSlideShow>");
+        emit sendMessage(sMessage);
     }
     unsetCursor();
 }

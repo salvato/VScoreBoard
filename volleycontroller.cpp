@@ -44,7 +44,7 @@ VolleyController::VolleyController(QFile *myLogFile, QWidget *parent)
     , pScoreFile(nullptr)
     , maxTeamNameLen(15)
 {
-    setWindowTitle("Score Controller - © Gabriele Salvato (2023)");
+    setWindowTitle("Score Controller - © Gabriele Salvato (2024)");
     setWindowIcon(QIcon(":/Logo.ico"));
 
     panelPalette = QWidget::palette();
@@ -994,7 +994,7 @@ VolleyController::onChangePanelOrientation(PanelOrientation orientation) {
 
 
 void
-VolleyController::processMessage(QString sMessage) {
+VolleyController::processBtMessage(QString sMessage) {
     QString sToken;
     bool ok;
     int iTeam;

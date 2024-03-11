@@ -129,7 +129,7 @@ BtServer::clientConnected() {
             this, QOverload<>::of(&BtServer::clientDisconnected));
 
     sClientName = pClientSocket->peerName();
-    qDebug() << sClientName << "Connectd !";
+    // qDebug() << sClientName << "Connectd !";
     emit clientConnected(pClientSocket->peerName());
 }
 

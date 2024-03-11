@@ -546,7 +546,8 @@ ScoreController::onStartNextSpot(int exitCode, QProcess::ExitStatus exitStatus) 
 
 void
 ScoreController::clientConnected(const QString &name) {
-    qDebug() << QString::fromLatin1("%1 Connected.\n").arg(name);
+    Q_UNUSED(name)
+    // qDebug() << QString::fromLatin1("%1 Connected.\n").arg(name);
     btSendAll();
 }
 
@@ -558,7 +559,8 @@ ScoreController::btSendAll(){
 
 void
 ScoreController::clientDisconnected(const QString &name) {
-    qDebug() << QString::fromLatin1("%1 has left.\n").arg(name);
+    Q_UNUSED(name)
+    // qDebug() << QString::fromLatin1("%1 has left.\n").arg(name);
 }
 
 
@@ -593,7 +595,8 @@ ScoreController::XML_Parse(const QString& input_string, const QString& token) {
 
 void
 ScoreController::processMessage(const QString &sender, const QString &message) {
-    qDebug() << QString::fromLatin1("%1: %2\n").arg(sender, message);
+    Q_UNUSED(sender)
+    // qDebug() << QString::fromLatin1("%1: %2\n").arg(sender, message);
     processBtMessage(message);
 }
 
@@ -605,16 +608,12 @@ ScoreController::processBtMessage(QString sMessage) {
 
 void
 ScoreController::reactOnSocketError(const QString &error) {
-    qDebug() << QString::fromLatin1("%1\n").arg(error);
+    Q_UNUSED(error)
+    // qDebug() << QString::fromLatin1("%1\n").arg(error);
 }
 
 
 void
 ScoreController::clientDisconnected() {
-    // ChatClient *client = qobject_cast<ChatClient *>(sender());
-    // if(client) {
-    //     clients.removeOne(client);
-    //     client->deleteLater();
-    // }
-    qDebug() << "Bt Client Disconnected!";
+    // qDebug() << "Bt Client Disconnected!";
 }

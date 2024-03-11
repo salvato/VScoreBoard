@@ -989,6 +989,7 @@ VolleyController::onChangePanelOrientation(PanelOrientation orientation) {
                QString("Direction %1")
                .arg(static_cast<int>(orientation)));
 #endif
+    gsArgs.isPanelMirrored = orientation==PanelOrientation::Reflected;
     pVolleyPanel->setMirrored(gsArgs.isPanelMirrored);
 }
 

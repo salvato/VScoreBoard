@@ -814,7 +814,12 @@ VolleyController::onButtonChangeFieldClicked() {
                                      QMessageBox::Yes | QMessageBox::No,
                                      QMessageBox::No);
     if(iRes != QMessageBox::Yes) return;
+    exchangeField();
+}
 
+
+void
+VolleyController::exchangeField() {
     QString sText = gsArgs.sTeam[0];
     gsArgs.sTeam[0] = gsArgs.sTeam[1];
     gsArgs.sTeam[1] = sText;
@@ -897,7 +902,12 @@ VolleyController::onButtonNewSetClicked() {
                                      QMessageBox::Yes | QMessageBox::No,
                                      QMessageBox::No);
     if(iRes != QMessageBox::Yes) return;
+    startNewSet();
+}
 
+
+void
+VolleyController::startNewSet(){
     // Exchange team's order in the field
     QString sText = gsArgs.sTeam[0];
     gsArgs.sTeam[0] = gsArgs.sTeam[1];
@@ -1094,5 +1104,16 @@ VolleyController::processBtMessage(QString sMessage) {
     if(sToken != sNoData) {
         onButtonSlideShowClicked();
     }// stop slideshow
+
+    sToken = XML_Parse(sMessage, "fieldExchange");
+    if(sToken != sNoData) {
+        exchangeField();
+    }// Change Field
+
+    sToken = XML_Parse(sMessage, "newSet");
+    if(sToken != sNoData) {
+        startNewSet();
+    }// Change Field
+
 }
 

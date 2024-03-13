@@ -76,6 +76,8 @@ private:
     void          logScore();
     bool          prepareScoreFile();
     void          processBtMessage(QString sMessage);
+    void          exchangeField();
+    void          startNewSet();
 
 private:
     VolleyPanel*  pVolleyPanel;

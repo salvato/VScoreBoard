@@ -6,7 +6,7 @@
 using namespace Qt::StringLiterals;
 
 // Service UUID
-static constexpr auto serviceUuid = "e8e10f95-1a70-4b27-9ccf-02010264e9c8"_L1;
+static constexpr auto serviceUuid = "aacf3e05-6531-43f3-9fdc-f0e3b3531f0c"_L1;
 
 
 BtServer::BtServer(QObject *parent)

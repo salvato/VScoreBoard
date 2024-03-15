@@ -177,7 +177,7 @@ VolleyPanel::createPanelElements() {
     }
 
     // Score
-    pScoreLabel = new QLabel(tr(""));
+    pScoreLabel = new QLabel(tr(" "));
     pScoreLabel->setFont(QFont(sFontName, iLabelsFontSize, fontWeight));
     pScoreLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     for(int i=0; i<2; i++){
@@ -210,6 +210,12 @@ VolleyPanel::createPanelElements() {
     }
     pTeam[0]->setText(tr("Locali"));
     pTeam[1]->setText(tr("Ospiti"));
+
+    // Copyright
+    pCopyRight = new QLabel("© Gabriele Salvato (2024)");
+    pCopyRight->setPalette(pal);
+    pCopyRight->setFont(QFont(sFontName, iTeamFontSize/3, fontWeight));
+    pCopyRight->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 
@@ -240,11 +246,13 @@ VolleyPanel::createPanel() {
     layout->addWidget(pSetLabel,         6, 4, 2, 4, Qt::AlignHCenter|Qt::AlignVCenter);
     layout->addWidget(pSet[iright],      6, 8, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
 
-    layout->addWidget(logoLabel[ileft],  6, 0, 4, 3, Qt::AlignHCenter   |Qt::AlignVCenter);
+    layout->addWidget(logoLabel[ileft],  6, 0, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
     layout->addWidget(pTimeout[ileft],   8, 3, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
     layout->addWidget(pTimeoutLabel,     8, 4, 2, 4, Qt::AlignHCenter|Qt::AlignVCenter);
     layout->addWidget(pTimeout[iright],  8, 8, 2, 1, Qt::AlignHCenter|Qt::AlignVCenter);
-    layout->addWidget(logoLabel[iright], 6, 9, 4, 3, Qt::AlignHCenter  |Qt::AlignVCenter);
+    layout->addWidget(logoLabel[iright], 6, 9, 4, 3, Qt::AlignHCenter|Qt::AlignVCenter);
+
+    layout->addWidget(pCopyRight,       10, 6, 1, 6, Qt::AlignRight  |Qt::AlignVCenter);
 
     return layout;
 }

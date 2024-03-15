@@ -69,6 +69,7 @@ private:
     QLabel*           pTimeout[2];
     QLabel*           pTimeoutLabel;
     QLabel*           logoLabel[2];
+    QLabel*           pCopyRight;
     QPixmap*          pPixmapLogo[2];
 
     QString           sFontName;

@@ -73,8 +73,6 @@ private:
     void          setEventHandlers();
     void          sendAll();
     void          btSendAll();
-    void          logScore();
-    bool          prepareScoreFile();
     void          processBtMessage(QString sMessage);
     void          exchangeField();
     void          startNewSet();
@@ -110,8 +108,6 @@ private:
     QPalette        panelPalette;
     QLinearGradient panelGradient;
     QBrush          panelBrush;
-    QString         sScoreFileName;
-    QFile*          pScoreFile;
     int             maxTeamNameLen;
 };
 

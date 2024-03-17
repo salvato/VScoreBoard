@@ -214,7 +214,7 @@ VolleyPanel::createPanelElements() {
     // Copyright
     pCopyRight = new QLabel("© Gabriele Salvato (2024)");
     pCopyRight->setPalette(pal);
-    pCopyRight->setFont(QFont(sFontName, iTeamFontSize/3, fontWeight));
+    pCopyRight->setFont(QFont(sFontName, iTeamFontSize/2, fontWeight));
     pCopyRight->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 

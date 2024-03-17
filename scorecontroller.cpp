@@ -105,31 +105,33 @@ ScoreController::initBluetooth() {
     QBluetoothPermission permission{};
     Qt::PermissionStatus btPermission = qApp->checkPermission(permission);
     switch (btPermission) {
-    case Qt::PermissionStatus::Undetermined:
-        qApp->requestPermission(permission, this, &ScoreController::initBluetooth);
-        return;
-    case Qt::PermissionStatus::Denied:
+        case Qt::PermissionStatus::Undetermined:
+            qApp->requestPermission(permission, this, &ScoreController::initBluetooth);
+            return;
+        case Qt::PermissionStatus::Denied:
 #ifdef LOG_MESG
-        logMessage(pLogFile,
-                   Q_FUNC_INFO,
-                   tr("Permissions are needed to use Bluetooth. "
-                      "Please grant the permissions to this "
-                      "application in the system settings."));
+            logMessage(pLogFile,
+                       Q_FUNC_INFO,
+                       tr("Permissions are needed to use Bluetooth. "
+                          "Please grant the permissions to this "
+                          "application in the system settings."));
 #endif
-        QMessageBox::warning(this, tr("Missing permissions"),
-                             tr("Permissions are needed to use Bluetooth. "
-                                "Please grant the permissions to this "
-                                "application in the system settings."));
-        qApp->quit();
-        return;
-    case Qt::PermissionStatus::Granted:
-        // qDebug() << "Permissions Granted!:";
-        break; // proceed to initialization
+            QMessageBox::warning(this, tr("Missing permissions"),
+                                 tr("Permissions are needed to use Bluetooth. "
+                                    "Please grant the permissions to this "
+                                    "application in the system settings."));
+            qApp->quit();
+            return;
+        case Qt::PermissionStatus::Granted:
+            // qDebug() << "Permissions Granted!:";
+            break; // proceed to initialization
     }
 #endif // QT_CONFIG(permissions)
 
     if (!btDevice.isValid()) {
-        qWarning("No Bluetooth adapter has been found!");
+        QMessageBox::critical(this, tr("No Bluetooth adapter has been found!"),
+                             tr("Program can continue but Bluetooth has been"
+                                "disabled and Remote control will not works"));
         return;
     }
     // Turn Bluetooth on
@@ -153,7 +155,12 @@ ScoreController::initBluetooth() {
             pBtServer, &BtServer::sendMessage);
 
     if(!pBtServer->startServer()) {
-        qCritical() << "Bluetooth Server Could Not Start !";
+        QMessageBox::critical(this, tr("Bluetooth Server Could Not Start !"),
+                             tr("Program can continue but Bluetooth has been"
+                                "disabled and Remote control will not works"));
+        pBtServer->disconnect();
+        pBtServer->deleteLater();
+        pBtServer = nullptr;
     }
 }
 
@@ -165,7 +172,6 @@ ScoreController::doProcessCleanup() {
                Q_FUNC_INFO,
                QString("Cleaning all processes"));
 #endif
-
     if(pMySlideWindow) {
         pMySlideWindow->close();
     }
@@ -316,6 +322,9 @@ ScoreController::startSpotLoop() {
                 logMessage(pLogFile,
                            Q_FUNC_INFO,
                            QString("Impossibile mandare lo spot."));
+                QMessageBox::critical(this, tr("Impossibile mandare lo spot !"),
+                                      tr("Il programma %1 é stato installato ?")
+                                          .arg(sVideoPlayer));
                 pVideoPlayer->disconnect();
                 delete pVideoPlayer;
                 pVideoPlayer = nullptr;

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions_3_3_Core>
+#include <QOpenGLFunctions>
 #include <QMatrix4x4>
 #include <QQuaternion>
 #include <QVector2D>
@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTimer>
 
 
-class SlideWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
+class SlideWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
@@ -80,12 +80,6 @@ private:
     QOpenGLTexture* pTexture0 = nullptr;
     QOpenGLTexture* pTexture1 = nullptr;
 
-    QMatrix4x4 projection;
-    QVector2D mousePressPosition;
-    QVector3D rotationAxis;
-    qreal angularSpeed = 0;
-    QQuaternion rotation;
-
     QString sSlideDir;
     int iCurrentSlide;
     QFileInfoList slideList;
@@ -97,10 +91,8 @@ private:
     int currentAnimation;
     GLint     iTex0Loc;
     GLint     iTex1Loc;
-    float viewingDistance;
-    QMatrix4x4 matrix;
+    QMatrix4x4 m;
     GLint     iProgressLoc;
     GLfloat   progress;
-    GLfloat   aspectRatio;
     QScreen*  pMyScreen;
 };
